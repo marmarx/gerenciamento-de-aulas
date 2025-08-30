@@ -1,0 +1,78 @@
+/* ICONS */
+:root{--back:var(--nav-back); --hover:var(--nav-hover); --color:var(--head-text)}
+
+.icon { color: var(--back); margin: auto; --border-size: 2px; }
+.fab:hover .icon{color: var(--hover)}
+.icon, .icon:after, .icon:before { position: absolute; content: '' }
+
+.icon-student {
+  margin-top: 11px;
+  width: 14px; height: 6px;
+  border: solid var(--border-size) var(--color); border-bottom: 0; border-radius: 6px 6px 0 0;
+}
+.icon-student:before {
+  left: 1px; top: -12px;
+  width: 8px; height: 8px;
+  border-radius: 50%; border: solid var(--border-size) var(--color);
+}
+
+.icon-lesson {
+  margin-top: 3px;
+  margin-left: -.5px;
+  width: 10px; height: 17px;
+  border-radius: 1px 1px 0 0; border: solid var(--border-size) var(--color); border-bottom: 0
+}
+.icon-lesson:before {
+  top: 10px; left: 1px;
+  width: 6px; height: 7px;
+  border-top: solid var(--border-size) var(--color); border-left: solid var(--border-size) var(--color);
+  -webkit-transform: rotate(45deg); transform: rotate(45deg);
+}
+
+.icon-event {
+  width: 23px; height: 23px;
+  border: 1px solid var(--color); border-radius: 5px;
+}
+
+.icon-event::before {
+  top: 0; left: 0;
+  width: 100%; height: 5px;
+  background-color: var(--color);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.icon-event::after {
+  content: var(--today-day);
+  top: 6px; left: 0; width: 100%;
+  font-size: .45em; text-align: center; color: var(--color);
+}
+
+.icon-payment {
+  width: 16px; height: 11px;
+  border-radius: 1px; border: solid var(--border-size) var(--color);
+}
+.icon-payment:before {
+  top: 2px; left: -1px;
+  width: 18px; height: 3px;
+  background-color: var(--color);
+}
+.icon-payment:after {
+  right: 1px; bottom: 2px;
+  width: 4px; height: 1px;
+  background-color: var(--color);
+}
+
+.icon-config {
+  width: 10px; height: 10px;
+  border-radius: 100%; border: solid 5px var(--color);
+  background:currentColor; transform:scale(.9)
+}
+
+.icon-config:before{
+  top: 50%; left: 50%;
+  width: 20px; height: 20px;
+  border-radius: 100%; border: dashed 3px var(--color);
+  background-repeat: no-repeat; background-position: center center;
+  transform-origin: center; transform: translate(-50%, -50%);
+}

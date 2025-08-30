@@ -1,0 +1,105 @@
+<script setup>
+import cardEvent from '@/components/cardEvent.vue'
+import { computed, watch } from 'vue'
+
+import { useDataStore } from "@/stores/datastore"
+const dataStore = useDataStore()
+const nextDaysTitle = computed(() => dataStore.data.config.numberOfDays === 1 ? 'Amanhã' : `Próximos ${dataStore.data.config.numberOfDays} dias`)
+const lastDate = computed(() => new Date(new Date().setDate(new Date().getDate() + dataStore.data.config.numberOfDays)))
+
+// Generate list of new events
+const generateEvents = () => {
+  const studentsWithSchedule = dataStore.data.students.filter(s => s.weekly_schedule.length > 0 && !s.paused)
+  const existingEvents = dataStore.data.events.filter(l => l.status !== 'done').map(l => ({ id_student: l.id_student, date: l.date, time: l.time, originalDate: l.originalDate, originalTime: l.originalTime }))
+
+  const datesToCheck = []
+  for (let d = 0; d <= dataStore.data.config.numberOfDays; d++) {
+    const date = new Date(new Date().setDate(new Date().getDate() + d))
+    datesToCheck.push({ date: date.toISOString().split('T')[0], weekDay: date.getDay() })
+  }
+
+  studentsWithSchedule.forEach(student => {
+    student.weekly_schedule.forEach(schedule => {
+      if (schedule.weekDay === '' || schedule.timeDay === '') return //skip empty schedule entries
+      datesToCheck.forEach(d => {
+        if (parseInt(schedule.weekDay) === d.weekDay) {
+          // check if event already exists
+          if (!existingEvents.find(e => student.id_student === e.id_student && d.date === (e.originalDate || e.date) && schedule.timeDay === (e.originalTime || e.time))) {
+            // create new event
+            const newEvent = dataStore.newEvent()
+            newEvent.id_student = student.id_student
+            newEvent.student_name = student.student_name
+            newEvent.date = d.date
+            newEvent.time = schedule.timeDay
+            newEvent.originalDate = d.date
+            newEvent.originalTime = schedule.timeDay
+            newEvent.subject = schedule.subject
+            newEvent.cost = student.cost
+            newEvent.added_manually = false
+            newEvent.status = 'scheduled'
+            dataStore.data.events.push(newEvent)
+          }
+        }
+      })
+    })
+  })
+  
+  dataStore.data.events.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time))
+}
+generateEvents()
+
+watch(() => dataStore.data.config.numberOfDays, (newVal, oldVal) => {
+  if (newVal > 0 && newVal > oldVal) generateEvents()
+}, { immediate: true } )
+
+// Auto add events
+const autoFinishEvents = () => {
+  if(!dataStore.data.config.autoFinishEvents) return
+  dataStore.data.students.forEach(s => {
+    if (s.paused) return
+    if (s.weekly_schedule.length === 0) return
+    dataStore.data.events.forEach(event => {
+      if (event.status === 'scheduled' && event.date < new Date().toISOString().split('T')[0]) event.status = 'done'
+    })
+  })
+}
+autoFinishEvents()
+
+// Strip undone past events
+const stripUndonePastEvents = () => {
+  if (!dataStore.data.config.autoRemovePastEvents) return
+  dataStore.data.events = dataStore.data.events.filter(l => l.status === 'done' || l.date >= new Date().toISOString().split('T')[0])
+}
+stripUndonePastEvents()
+
+import { today, dateISO } from '@/stores/utility';
+const undoneEvents = computed(() => dataStore.data.events.filter(l => l.status !== 'done'))
+const eventsToday = computed(() => undoneEvents.value.filter(l => l.date === dateISO(today())))
+const eventsNextDays = computed(() => undoneEvents.value.filter(l => l.date > dateISO(today()) && l.date <= dateISO(lastDate.value)))
+</script>
+
+<template>
+  <div class="section">
+    <div class="agenda">
+      <h2>Hoje</h2>
+      <div v-if="eventsToday.length" class="container grid">
+        <cardEvent v-for="event in eventsToday" :key="event.id_event" :id="event.id_event" :add="true" />
+      </div>
+      <p class="tac" v-else>Nenhuma aula para hoje :)</p>
+    </div>
+      
+    <div class="agenda" v-if="dataStore.data.config.numberOfDays>0 && eventsNextDays.length">
+      <h2>{{nextDaysTitle}}</h2>
+      <div class="container grid">
+        <cardEvent v-for="event in eventsNextDays" :key="event.id_event" :id="event.id_event" :add="false" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+.agenda{width:100%}
+.agenda:nth-last-child(1){margin-top:2em}
+.agenda h2{margin-bottom:1.5em}
+.grid{ display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 14px ; margin-top: 1em}
+</style>
