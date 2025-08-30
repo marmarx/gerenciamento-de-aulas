@@ -17,7 +17,7 @@ const router = createRouter({
     { path: '/extrato',           name: 'Extrato',         component: () => import('@/views/extrato.vue'),       alias: ['/statement'] },
     { path: '/relatorio',         name: 'Relatório',       component: () => import('@/views/relatorio.vue'),     alias: ['/report'] },
     { path: '/config',            name: 'Configurações',   component: () => import('@/views/config.vue'),        alias: ['/configuracoes', '/configuracao'] },
-    { path: '/test',              name: 'Teste Env',       component: () => import('@/views/test.vue'),       },
+    // { path: '/test',              name: 'Teste Env',       component: () => import('@/views/test.vue'),       },
   ],
 })
 
