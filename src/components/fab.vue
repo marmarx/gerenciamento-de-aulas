@@ -1,7 +1,7 @@
 <!-- Floating Action Buttons -->
 
 <script setup>
-import { useDataStore } from "@/stores/datastore"
+import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 const reset = () => {

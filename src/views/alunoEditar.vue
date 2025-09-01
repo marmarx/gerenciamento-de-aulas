@@ -1,5 +1,5 @@
 <script setup>
-import { useDataStore } from "@/stores/datastore"
+import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 import { ref, watch, onBeforeUnmount } from 'vue'
@@ -46,7 +46,6 @@ const removeStudent = () => {
 onBeforeUnmount(() => {
   if(student.student_name) return
   dataStore.removeStudent(student.id_student)
-  router.push('/alunos')
 })
 const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 </script>
@@ -58,6 +57,8 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
       <div class="half">
         <label>Nome do aluno
         <input type="text" placeholder="Nome do aluno" v-model="student.student_name" required></label>
+        <label>Telefone do Aluno
+        <input type="tel" placeholder="Telefone" v-model="student.student_phone"></label>
         <label>Nome do Responsável
         <input type="text" placeholder="Responsável" v-model="student.parent"></label>
         <label>Telefone do Responsável
@@ -72,7 +73,7 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
         <input type="text" placeholder="Link para Google Meeting, Zoom, etc" v-model="student.meeting"></label>
         <label>Escola
         <input type="text" placeholder="Escola" v-model="student.scholl"></label>
-        <label>Série e aluno
+        <label>Série e ano
         <input type="text" placeholder="Série" v-model="student.year"></label>
       </div>
       <div class="half">

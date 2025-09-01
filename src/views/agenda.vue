@@ -2,18 +2,20 @@
 import cardEvent from '@/components/cardEvent.vue'
 import { computed, watch } from 'vue'
 
-import { useDataStore } from "@/stores/datastore"
+import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
-const nextDaysTitle = computed(() => dataStore.data.config.numberOfDays === 1 ? 'Amanhã' : `Próximos ${dataStore.data.config.numberOfDays} dias`)
-const lastDate = computed(() => new Date(new Date().setDate(new Date().getDate() + dataStore.data.config.numberOfDays)))
+const numberOfDays = computed(() => dataStore.data.config.numberOfDays || 0)
+const nextDaysTitle = computed(() => numberOfDays.value === 1 ? 'Amanhã' : `Próximos ${numberOfDays.value} dias`)
+const lastDate = computed(() => new Date(new Date().setDate(new Date().getDate() + numberOfDays.value)))
 
 // Generate list of new events
 const generateEvents = () => {
   const studentsWithSchedule = dataStore.data.students.filter(s => s.weekly_schedule.length > 0 && !s.paused)
-  const existingEvents = dataStore.data.events.filter(l => l.status !== 'done').map(l => ({ id_student: l.id_student, date: l.date, time: l.time, originalDate: l.originalDate, originalTime: l.originalTime }))
+  const existingEvents = dataStore.data.events.map(l => ({ id_student: l.id_student, date: l.date, time: l.time, originalDate: l.originalDate, originalTime: l.originalTime }))
+  
 
   const datesToCheck = []
-  for (let d = 0; d <= dataStore.data.config.numberOfDays; d++) {
+  for (let d = 0; d <= numberOfDays.value; d++) {
     const date = new Date(new Date().setDate(new Date().getDate() + d))
     datesToCheck.push({ date: date.toISOString().split('T')[0], weekDay: date.getDay() })
   }
@@ -27,6 +29,7 @@ const generateEvents = () => {
           if (!existingEvents.find(e => student.id_student === e.id_student && d.date === (e.originalDate || e.date) && schedule.timeDay === (e.originalTime || e.time))) {
             // create new event
             const newEvent = dataStore.newEvent()
+            newEvent.added_on = new Date()
             newEvent.id_student = student.id_student
             newEvent.student_name = student.student_name
             newEvent.date = d.date
@@ -38,20 +41,20 @@ const generateEvents = () => {
             newEvent.added_manually = false
             newEvent.status = 'scheduled'
             dataStore.data.events.push(newEvent)
+            // console.log(`Creating event ${newEvent.id_event}`)
           }
         }
       })
     })
   })
-  
-  dataStore.data.events.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time))
 }
 generateEvents()
 
-watch(() => dataStore.data.config.numberOfDays, (newVal, oldVal) => {
+watch(() => numberOfDays, (newVal, oldVal) => {
   if (newVal > 0 && newVal > oldVal) generateEvents()
 }, { immediate: true } )
 
+import { today, dateISO, formatTime } from '@/stores/utility';
 // Auto add events
 const autoFinishEvents = () => {
   if(!dataStore.data.config.autoFinishEvents) return
@@ -59,20 +62,21 @@ const autoFinishEvents = () => {
     if (s.paused) return
     if (s.weekly_schedule.length === 0) return
     dataStore.data.events.forEach(event => {
-      if (event.status === 'scheduled' && event.date < new Date().toISOString().split('T')[0]) event.status = 'done'
+      // if (event.status === 'scheduled' && event.date < new Date().toISOString().split('T')[0]) event.status = 'done'
+      console.log(`${event.date}T${formatTime(event.time)}` < new Date().toISOString().split('.')[0].slice(0,-3))
+      if (event.status === 'scheduled' && `${event.date}T${formatTime(event.time)}` < new Date().toISOString().split('.')[0].slice(0,-3)) event.status = 'done'
     })
   })
 }
 autoFinishEvents()
 
-// Strip undone past events
+// Strip undone past events (canceled and scheduled)
 const stripUndonePastEvents = () => {
   if (!dataStore.data.config.autoRemovePastEvents) return
   dataStore.data.events = dataStore.data.events.filter(l => l.status === 'done' || l.date >= new Date().toISOString().split('T')[0])
 }
 stripUndonePastEvents()
 
-import { today, dateISO } from '@/stores/utility';
 const undoneEvents = computed(() => dataStore.data.events.filter(l => l.status !== 'done'))
 const eventsToday = computed(() => undoneEvents.value.filter(l => l.date === dateISO(today())))
 const eventsNextDays = computed(() => undoneEvents.value.filter(l => l.date > dateISO(today()) && l.date <= dateISO(lastDate.value)))
@@ -88,7 +92,7 @@ const eventsNextDays = computed(() => undoneEvents.value.filter(l => l.date > da
       <p class="tac" v-else>Nenhuma aula para hoje :)</p>
     </div>
       
-    <div class="agenda" v-if="dataStore.data.config.numberOfDays>0 && eventsNextDays.length">
+    <div class="agenda" v-if="numberOfDays>0 && eventsNextDays.length">
       <h2>{{nextDaysTitle}}</h2>
       <div class="container grid">
         <cardEvent v-for="event in eventsNextDays" :key="event.id_event" :id="event.id_event" :add="false" />
@@ -102,4 +106,9 @@ const eventsNextDays = computed(() => undoneEvents.value.filter(l => l.date > da
 .agenda:nth-last-child(1){margin-top:2em}
 .agenda h2{margin-bottom:1.5em}
 .grid{ display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 14px ; margin-top: 1em}
+
+@media screen and (max-width: 992px) {
+  .agenda:nth-last-child(1){margin-top:1em}
+  .agenda h2{margin-bottom:0}
+}
 </style>

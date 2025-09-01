@@ -4,7 +4,7 @@
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#2f4550",
+  "theme_color": "#39373b",
   "description": "Uma ferramenta simples para gerenciar aulas, alunos e pagamentos.",
   "icons": [
     {

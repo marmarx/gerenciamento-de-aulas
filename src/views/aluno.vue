@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 
-import { useDataStore } from "@/stores/datastore"
+import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 import { useRouter } from 'vue-router'
@@ -27,6 +27,7 @@ const balance = computed(() => completedPayments.value - completedEventsValue.va
         <p><b>Nome:</b> {{ student.student_name }}</p>
         <p><b>Status:</b> <span class="status" :class="{paused: student.paused}">{{student.paused ? 'Pausado' : 'Ativo'}}</span></p>
         <p v-if="student.weekly_schedule"><b>Horários:</b> {{studentSchedules}}</p>
+        <p v-if="student.student_phone"><b>Telefone:</b> <a target="_blank" :href="whatsappLink(student.student_phone)" rel="noopener noreferrer">{{student.student_phone}}</a></p>
 
         <hr>
         <p><b>Responsável:</b> {{student.parent}}</p>

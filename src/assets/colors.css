@@ -1,9 +1,7 @@
 :root {
-  --today-day:'1';
-  --body-back: #f6f6f6;
-  --head-text: #fff;
-  --header-left: #44289e; --header-right: #d02377; --tab-back: #ccc;
-  --nav-main: #9480ef; --nav-back: #4cafef; --nav-hover: #3a9acb; --nav-focus:#2195cf;
+  --today-day:'1'; --head-text: #fff;
+  --body-back: #f6f6f6; --tab-back: #ccc;
+  --nav-main: #947ff0; --nav-back: #4daeef; --nav-hover: #3a9acb; --nav-focus:#2095cf;
   --black-main:#777777; --black-washed:#555555; --black-back:#c3c3c3;
   --black: #1f2937; --white:#fff; --over-trans:#ffffff3b;
   --back-grad: linear-gradient(165deg, var(--header-left) 0%, var(--header-right) 100%);
@@ -14,8 +12,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root{
-    --head-text: #fff;
-    --body-back: #1f1f2e; --header-left: #6c4bd1; --header-right: #e04a9f; --tab-back: #2a2a3b;
+    --body-back: #1f1f2e; --tab-back: #2a2a3b;
     --nav-main: #9c8fff; --nav-back: #3a6fcf; --nav-hover: #558edb; --nav-focus: #3386db;
     --black-main: #cccccc; --black-washed: #aaaaaa; --black-back: #333333;
     --black: #e5e7eb; --white: #111111; --over-trans: #0000004d;

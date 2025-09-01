@@ -3,13 +3,11 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 import inputToggle from '@/components/inputToggle.vue'
-import { useDataStore } from "@/stores/datastore"
+import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 import { ref } from 'vue'
 const fileInput = ref(null)
-
-import "@/stores/color"
 
 const copyToClipboard = async () => {
   try {await navigator.clipboard.writeText('c8a13647-4a71-44b1-967a-259079645ace'); alert("Chave Pix copiada para a área de transferência!")}
@@ -27,52 +25,61 @@ const copyToClipboard = async () => {
           <p class="title">Dias na agenda</p>
           <p class="helpText">Número de dias futuros que serão exibidos na agenda</p>
         </span>
-        <input class="tac" type="Number" min="0" step="1" placeholder="Dias na agenda" v-model.number="dataStore.data.config.numberOfDays">
+        <input class="tac" type="Number" min="0" step="1" placeholder="Dias" v-model.number="dataStore.data.config.numberOfDays">
       </label>
 
       <label class="inline-label">
         <span>
           <p class="title">Duração das aulas</p>
-          <p class="helpText">A duração padrão das aulas em horas será utilizado automaticamente quando não for especificado</p>
+          <p class="helpText">A duração padrão das aulas em horas será utilizado quando não especificado em cada evento - não afeta aulas existentes (passadas e agendadas)</p>
         </span>
-        <input class="tac" type="Number" min="0" step=".25" placeholder="Duração das aulas (horas)" v-model.number="dataStore.data.config.defaultClassDuration">
+        <input class="tac" type="Number" min="0" step=".25" placeholder="Horas" v-model.number="dataStore.data.config.defaultClassDuration">
+      </label>
+
+      <label class="inline-label">
+        <span>
+          <p class="title">Valor das aulas</p>
+          <p class="helpText">O valor padrão da hora aula será utilizado quando não especificado na ficha de cada aluno - não afeta alunos ou aulas existentes (passadas e agendadas)</p>
+        </span>
+        <input class="tac" type="Number" min="0" step=".05" placeholder="R$" v-model.number="dataStore.data.config.defaultClassCost">
       </label>
 
       <inputToggle v-model="dataStore.data.config.autoFinishEvents">
         <template #title>Finalizar aulas automaticamente</template>
-        <template #helpText>Aulas agendadas serão marcadas como aulas dadas automaticamente quando sua respectiva data chegar</template>
+        <template #helpText>Aulas agendadas serão marcadas como aulas dadas quando sua respectiva data chegar</template>
       </inputToggle>
 
       <inputToggle v-model="dataStore.data.config.autoRemovePastEvents">
         <template #title>Remover aulas automaticamente</template>
-        <template #helpText>Aulas passadas não finalizadas serão removidas automaticamente</template>
+        <template #helpText>Aulas passadas não finalizadas serão removidas da lista de todas as aulas (pode reduzir o uso de memória)</template>
       </inputToggle>
 
       <label class="inline-label">
         <span>
-          <p class="title">Cor primária</p>
-          <p class="helpText">Cor utilizada na interface do aplicativo, sinta-se a vontade para customizar</p>
+          <p class="title">Cor preferida</p>
+          <p class="helpText">Escola a cor utilizada na interface do aplicativo, sinta-se a vontade para customizar</p>
         </span>
-        <input type="color" v-model="dataStore.data.config.color1">
+        <input type="color" v-model="dataStore.data.config.color">
       </label>
 
-      <label class="inline-label">
-        <span>
-          <p class="title">Cor secundária</p>
-          <p class="helpText">Cor utilizada na interface do aplicativo, sinta-se a vontade para customizar</p>
-        </span>
-        <input type="color" v-model="dataStore.data.config.color2">
-      </label>
     </div>
 
     <hr style="width:80%; max-width:450px" />
 
     <div class="flexContainer mw500">
       <h3>Sobre o aplicativo</h3>
-      <p class="justify">Este aplicativo é desenvolvido por <a href="https://github.com/marmarx/marmarx.github.io/" target="_blank" rel="noopener">Marco Martins</a> de forma independente e está disponível gratuitamente no GitHub.</p>
+      <p class="justify">Este aplicativo é desenvolvido por <a href="https://github.com/marmarx/" target="_blank" rel="noopener">Marco Martins</a> de forma independente e está disponível gratuitamente no GitHub.</p>
       <p class="justify">Você pode utilizar esse aplicativo offline, se desejar instale-o no seu celular, tablet ou computador. Veja o <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">suporte Google</a> para instruções detalhadas.</p>
       <p class="justify">Se desejar suportar o desenvolvimento, fique a vontade para fazer doações por Pix.</p>
       <button @click="copyToClipboard()">Copiar Chave Pix</button>
+    </div>
+
+    <hr style="width:80%; max-width:450px" />
+
+    <div class="flexContainer mw500">
+      <h3>Exportar tabelas</h3>
+      <p class="justify">Caso desejado, utilize a opção a seguir para exportar todos os dados para arquivos .tsv que podem ser importados no Google Sheets ou Microsoft Excel.</p>
+      <button @click="dataStore.exportTSV()">Exportar tabelas</button>
     </div>
 
     <hr style="width:80%; max-width:450px" />

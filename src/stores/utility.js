@@ -21,6 +21,7 @@ const invertDateISOnoYear = d => invertDateISO(d).slice(0,invertDateISO(d).lastI
 
 // Weekday formatting functions
 const weekDay = d => ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d).getDay()+1]
+const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 
 const dateLabel = dataISO => {  //dataISO = YYYY-MM-DD, return Hoje, Amanhã, 26 de ago
   const today = dateISO(new Date())
@@ -32,10 +33,15 @@ const dateLabel = dataISO => {  //dataISO = YYYY-MM-DD, return Hoje, Amanhã, 26
 // Time formatting functions
 const timeISO = time => time.toLocaleTimeString('pt-br').slice(0, -3) //return 09:00
 
-const horaBR = hhmm => { //return 09:30 or 09h
+const horaBR = hhmm => { //return 9:30 or 9h or 10:30
   if (!hhmm) return '';
   const [h,m] = hhmm.split(':');
   return `${h}h${m>0?m:''}`
+}
+
+function formatTime(time) {
+  const [h, m] = time.split(":").map(Number)
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
 }
 
 // Text formating function
@@ -44,6 +50,6 @@ const toSentenceCase = str => str.charAt(0).toUpperCase() + str.toLowerCase().sl
 
 // Link functions
 const whatsappLink = phone => phone ? `https://wa.me/${phone.replace(/[ +\-\(\)'"]/g, '')}` : ''
-const mapsLink = address => address ? `https://google.com/maps/dir/?api=1&destination=${address.replace(/ ,/g, "+")}` : ''
+const mapsLink = address => address.trim() ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address.trim())}` : ''
 
-export { uuidv4, today, addDays, dateISO, invertDateISO, invertDateISOnoYear, weekDay, dateLabel, timeISO, horaBR, currency, toSentenceCase, whatsappLink, mapsLink }
+export { uuidv4, today, addDays, dateISO, invertDateISO, invertDateISOnoYear, weekDay, weekDays, dateLabel, timeISO, horaBR, formatTime, currency, toSentenceCase, whatsappLink, mapsLink }

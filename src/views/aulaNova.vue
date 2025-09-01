@@ -1,6 +1,6 @@
 <script setup>
 import inputToggle from '@/components/inputToggle.vue'
-import { useDataStore } from "@/stores/datastore"
+import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 if(!dataStore.selectedEvent) {
@@ -20,7 +20,8 @@ const router = useRouter()
 const saveEvent = () => {
   event.originalDate = event.originalDate || event.date
   event.originalTime = event.originalTime || event.time
-  event.cost = students.find(s => s.id_student === event.id_student).cost || 50
+  event.duration = event.duration || dataStore.data.config.defaultClassDuration
+  event.cost = students.find(s => s.id_student === event.id_student).cost || dataStore.data.config.defaultClassCost
   event.status = 'scheduled'
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
   if(dataStore.data.config.autoFinishEvents) event.status = `${event.date}T${event.time}` < new Date().toISOString().split('.')[0].slice(0,-3) ? 'done' : 'scheduled'

@@ -13,7 +13,7 @@ import fab from '@/components/fab.vue'
 <style>
 .section{
   display: flex; flex-direction: column; align-items: center; gap:25px;
-  padding: 30px; border-radius: 6px; margin: 10px;
+  padding: 50px 30px 60px; border-radius: 6px; margin: 10px;
   background: var(--white); 
 }
 </style>

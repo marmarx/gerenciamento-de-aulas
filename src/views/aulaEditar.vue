@@ -1,6 +1,6 @@
 <script setup>
 import inputToggle from '@/components/inputToggle.vue'
-import { useDataStore } from "@/stores/datastore"
+import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 if(!dataStore.selectedEvent) {
@@ -25,14 +25,26 @@ const isDisabled = () => !event.id_student || !event.date || !event.time
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+import { formatTime } from '@/stores/utility';
 const saveEvent = () => {
-  if(dataStore.data.config.autoFinishEvents) event.status = `${event.date}T${event.time}` < new Date().toISOString().split('.')[0].slice(0,-3) ? 'done' : 'scheduled'
+  // if(dataStore.data.config.autoFinishEvents) event.status = `${event.date}T${event.time}` < new Date().toISOString().split('.')[0].slice(0,-3) ? 'done' : 'scheduled'
+  if(dataStore.data.config.autoFinishEvents) event.status = `${event.date}T${formatTime(event.time)}` < new Date().toISOString().split('.')[0].slice(0,-3) ? 'done' : 'scheduled'
+  event.duration = event.duration || dataStore.data.config.defaultClassDuration
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
   router.push('/agenda')
 }
 
 const cancelEvent = () => {
   event.status = event.status === 'canceled' ? 'scheduled' : 'canceled'
+  router.push('/agenda')
+}
+
+const doEventNow = () => {
+  event.status = 'done'
+  event.originalDate = event.date
+  event.originalTime = event.time
+  event.date = new Date().toISOString().split('T')[0]
+  event.time = new Date().toISOString().split('T')[1].slice(0,-8)
   router.push('/agenda')
 }
 </script>
@@ -67,6 +79,7 @@ const cancelEvent = () => {
     </div>
     <div class="flexContainer">
       <button @click="saveEvent()" :disabled="isDisabled()">Salvar</button>
+      <button @click="doEventNow()">Finalizar Agora</button>
       <button @click="cancelEvent()">{{event.status === 'canceled' ? 'Restaurar Aula' : 'Cancelar Aula'}}</button>
       <button @click="restoreEvent()">Cancelar Edição</button>
     </div>

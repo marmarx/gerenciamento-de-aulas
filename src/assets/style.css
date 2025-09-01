@@ -18,7 +18,6 @@ select:invalid, option:disabled{color:var(--black-main)}
 select{-webkit-appearance: none; appearance: none; -moz-appearance: none;}
 
 .dateFilter { width: 100%; text-align: center; }
-h1 { padding: 30px 10px; margin: 0px; color: currentColor; text-align: center}
 h2 { margin: 12px 0 18px; width: 100%; text-align: center; }
 
 .container, .halfContainer {max-width: 900px; margin: auto}
@@ -66,8 +65,7 @@ button:disabled:hover{ background-color: var(--black-main) }
 #thisWeekClasse { width: 100%; max-width: 800px; display: flex; flex-direction: row; gap: 10px }
 .weekclass { width: 33.3333%; box-sizing: border-box; padding: 10px; border-radius: 5px }
 
-
-.web{display: block}
+/* .web{display: block} */
 .mob{display: none}
 
 @media screen and (max-width: 992px) {
