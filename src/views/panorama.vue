@@ -2,14 +2,106 @@
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+import { useDataStore } from "@/stores/dataStore"
+const dataStore = useDataStore()
+
+import { ref, computed } from 'vue'
+import { dateISO } from '@/stores/utility'
+const today = new Date();
+const year  = today.getFullYear();
+const month = today.getMonth();
+const filterStart = ref(dateISO(new Date(year, month, 1)))
+const filterEnd   = ref(dateISO(new Date(year, month + 1, 0)))
+
+const panorama = computed(() => {
+  const startDate = new Date(filterStart.value) 
+  const endDate   = new Date(filterEnd.value)
+
+  const students = dataStore.sortedStudents || []
+  const events   = dataStore.sortedEvents   || []
+  const payments = dataStore.sortedPayments || []
+
+  return students.map(student => {
+    // Pagamentos até o fim do período → saldo inicial
+    let balance = payments
+      .filter(p => p.id_student === student.id_student)
+      .filter(p => new Date(p.date) <= endDate)
+      .reduce((sum, p) => sum + p.value, 0)
+
+    // Aulas antes do período → desconta custo
+    const previousEvents = events.filter(e => e.id_student === student.id_student && new Date(e.date) < startDate)
+    for (const event of previousEvents) { balance -= (event.duration || 1) * (event.cost || student.cost) }
+
+    // Events in range - from startDate to endDate
+    const eventsInRange = events
+      .filter(e => e.id_student === student.id_student && new Date(e.date) >= startDate && new Date(e.date) <= endDate && e.status === 'done')
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+
+    // Contagem com frações
+    let paid = 0
+    for (const event of eventsInRange) {
+      const eventCost = (event.duration || 1) * (event.cost || student.cost)
+      if (balance >= eventCost) { paid += 1; balance -= eventCost }
+      else if (balance > 0) { paid += balance / eventCost; balance = 0 }
+    }
+
+    return {
+      id: student.id_student,
+      name: student.student_name,
+      done: eventsInRange.length,
+      paid: parseFloat(paid.toFixed(2))
+    }
+  })
+})
+
+const viewReport = id => {
+  dataStore.selectedStudent = id
+  router.push('/relatorio')
+}
+
 </script>
 
 <template>
   <div class="section">
     <h2>Panorama</h2>
-    <p>Em breve...</p>
+
+    <div class="dateFlex">
+      <div class="half">
+        <label>Início:</label>
+        <input class="dateFilter" type="text" placeholder="Data inicial" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="filterStart" :max="filterEnd" />
+      </div>
+      <div class="half">
+        <label>Fim:</label>
+        <input class="dateFilter" type="text" placeholder="Data final"   onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="filterEnd" :min="filterStart" />
+      </div>
+    </div>
+
+    <div v-if="filterStart && filterEnd" class="container">
+      <table>
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>Aulas Dadas</th>
+            <th>Aulas Pagas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in panorama" :key="item.nome" @click="viewReport(item.id)">
+            <td>{{ item.name }}</td>
+            <td>{{ item.done }}</td>
+            <td>{{ item.paid }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p v-else>Selecione um período acima.</p>
+
     <div class="flexContainer">
       <button @click="router.push('/aulas')">Todas as Aulas</button>
     </div>
   </div>
 </template>
+
+<style scoped>
+tr{cursor:pointer}
+</style>

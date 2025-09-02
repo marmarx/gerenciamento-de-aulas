@@ -4,8 +4,8 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 dataStore.selectedStudent = ''
-const students = dataStore.data.students
-const events = computed(() => dataStore.data.events.filter(e => !dataStore.selectedStudent || e.id_student === dataStore.selectedStudent))
+const students = dataStore.sortedStudents
+const events = computed(() => dataStore.sortedEvents.filter(e => !dataStore.selectedStudent || e.id_student === dataStore.selectedStudent))
 
 import { useRouter } from 'vue-router'
 const router = useRouter()

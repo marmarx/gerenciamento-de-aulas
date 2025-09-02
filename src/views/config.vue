@@ -95,6 +95,7 @@ const copyToClipboard = async () => {
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
+    <p>v 0.9</p>
     
   </div>
 </template>

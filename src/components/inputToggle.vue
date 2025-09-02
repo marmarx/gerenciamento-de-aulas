@@ -46,7 +46,7 @@ defineEmits(["update:modelValue"])
 
 input:checked + .slider:before { left: calc(var(--toogle-width) - var(--toogle-height) + var(--toggle-padding))}
 input:checked + .slider { background-color: var(--nav-back);  }
-.slider:hover { box-shadow: 0 0 .3em .2em var(--nav-focus) }
+.slider:hover { box-shadow: 0 0 .3em .2em var(--nav-hover) }
 
 span p{ font-size: 1.1em; margin: .5em 0; font-weight: normal; user-select: none }
 span p.title { font-weight: bold }

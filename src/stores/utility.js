@@ -9,21 +9,21 @@ const addDays = (d,n) => {
   return date.setDate(date.getDate() + n)
 }
 
-const dateISO = d => new Date(d).toISOString().split("T")[0]
+const dateISO = d => new Date(d).toLocaleDateString('en-CA') //Date() -> 2025-10-25
 
-const invertDateISO = d => {
+const invertDateISO = d => { //2025-10-25 -> 25-10-2025
   if (!d) return '';
   const [year, month, day] = d.split('-');
   return `${day}/${month}/${year}`;
 }
 
-const invertDateISOnoYear = d => invertDateISO(d).slice(0,invertDateISO(d).lastIndexOf('/'))
+const invertDateISOnoYear = d => invertDateISO(d).slice(0,invertDateISO(d).lastIndexOf('/')) //2025-10-25 -> 25/10
 
 // Weekday formatting functions
 const weekDay = d => ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d).getDay()+1]
 const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 
-const dateLabel = dataISO => {  //dataISO = YYYY-MM-DD, return Hoje, Amanhã, 26 de ago
+const dateLabel = dataISO => {  //YYYY-MM-DD -> return Hoje, Amanhã, 26 de ago
   const today = dateISO(new Date())
   const tomorrow = dateISO(addDays(0,1))
   const format = new Intl.DateTimeFormat('pt-BR',{ day:'2-digit', month:'short' })
@@ -31,17 +31,17 @@ const dateLabel = dataISO => {  //dataISO = YYYY-MM-DD, return Hoje, Amanhã, 26
 }
 
 // Time formatting functions
-const timeISO = time => time.toLocaleTimeString('pt-br').slice(0, -3) //return 09:00
+const timeISO = time => time.toLocaleTimeString('pt-BR').slice(0, -3) //Date() -> 09:00 - .toLocaleTimeString('pt-BR', { hour12: false, hour: '2-digit', minute: '2-digit' })
 
-const horaBR = hhmm => { //return 9:30 or 9h or 10:30
+const formatTime = time => { //string -> 09:00
+  const [h, m] = time.split(":").map(Number)
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
+}
+
+const horaBR = hhmm => { //string -> 9h30 or 9h
   if (!hhmm) return '';
   const [h,m] = hhmm.split(':');
   return `${h}h${m>0?m:''}`
-}
-
-function formatTime(time) {
-  const [h, m] = time.split(":").map(Number)
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
 }
 
 // Text formating function

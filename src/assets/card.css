@@ -17,16 +17,31 @@
 
 .btns{ display:inline-flex; margin-top:5px; border-top:1px solid var(--card-br) }
 .btn{
-  width: 100%;
+  width: 100%; height: 20px;
   padding:10px 0; border:0; border-right:1px solid var(--btn-br);
   font-weight:600; color: var(--white); text-align:center; text-decoration: none;
-  appearance: none; cursor:pointer; background:var(--black-main);
+  appearance: none; cursor:pointer;
+  background-color: var(--black-main); background-repeat: no-repeat; background-position: center; background-size: contain; background-origin: content-box
 }
-.btn:hover{background:var(--black-washed)}
+.btn:hover{background-color:var(--black-washed)}
 .btn:first-child{border-radius: 0 0 0 14px}
 .btn:last-child{border-right:0;border-radius: 0 0 14px 0}
 .btn:active{transform:translateY(1px);}
 .noround{border-radius:0!important}
+
+.btn.edit{background-image:url('@/svg/edit.svg')}
+.btn.complete{background-image:url('@/svg/complete.svg')}
+.btn.cancel{background-image:url('@/svg/cancel.svg')}
+.btn.undo{background-image:url('@/svg/undo.svg')}
+
+.btn.navigation{background-image:url('@/svg/navigation.svg')}
+.btn.video{background-image:url('@/svg/video.svg')}
+.btn.whatsapp{background-image:url('@/svg/whatsapp.svg')}
+.btn.parent{background-image:url('@/svg/parent.svg')}
+
+.btn.info{background-image:url('@/svg/info.svg')}
+.btn.extrato{background-image:url('@/svg/extrato.svg')}
+.btn.report{background-image:url('@/svg/report.svg')}
 
 @media screen and (max-width: 992px) {
   .name,.info{padding:22px 18px 12px}

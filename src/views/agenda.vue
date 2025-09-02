@@ -10,14 +10,13 @@ const lastDate = computed(() => new Date(new Date().setDate(new Date().getDate()
 
 // Generate list of new events
 const generateEvents = () => {
-  const studentsWithSchedule = dataStore.data.students.filter(s => s.weekly_schedule.length > 0 && !s.paused)
-  const existingEvents = dataStore.data.events.map(l => ({ id_student: l.id_student, date: l.date, time: l.time, originalDate: l.originalDate, originalTime: l.originalTime }))
+  const studentsWithSchedule = dataStore.activeStudents.filter(s => s.weekly_schedule.length > 0)
+  const existingEvents = dataStore.sortedEvents.map(l => ({ id_student: l.id_student, date: l.date, time: l.time, originalDate: l.originalDate, originalTime: l.originalTime }))
   
-
   const datesToCheck = []
   for (let d = 0; d <= numberOfDays.value; d++) {
     const date = new Date(new Date().setDate(new Date().getDate() + d))
-    datesToCheck.push({ date: date.toISOString().split('T')[0], weekDay: date.getDay() })
+    datesToCheck.push({ date: dateISO(date), weekDay: date.getDay() })
   }
 
   studentsWithSchedule.forEach(student => {
@@ -57,27 +56,28 @@ watch(() => numberOfDays, (newVal, oldVal) => {
 import { today, dateISO, formatTime } from '@/stores/utility';
 // Auto add events
 const autoFinishEvents = () => {
-  if(!dataStore.data.config.autoFinishEvents) return
-  dataStore.data.students.forEach(s => {
-    if (s.paused) return
-    if (s.weekly_schedule.length === 0) return
-    dataStore.data.events.forEach(event => {
-      // if (event.status === 'scheduled' && event.date < new Date().toISOString().split('T')[0]) event.status = 'done'
-      console.log(`${event.date}T${formatTime(event.time)}` < new Date().toISOString().split('.')[0].slice(0,-3))
-      if (event.status === 'scheduled' && `${event.date}T${formatTime(event.time)}` < new Date().toISOString().split('.')[0].slice(0,-3)) event.status = 'done'
-    })
-  })
-}
+  if (!dataStore.data.config.autoFinishEvents) return;
+  const now = new Date();
+  dataStore.sortedStudents.forEach(s => {
+    if (s.paused || s.weekly_schedule.length === 0) return;
+    dataStore.sortedEvents.forEach(event => {
+      if (event.status !== 'scheduled') return;
+      const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
+      const finishThreshold = new Date(eventDateTime.getTime() + 60 * 60 * 1000)  //1-hour offset
+      if (finishThreshold <= now) event.status = 'done'
+    });
+  });
+};
 autoFinishEvents()
 
 // Strip undone past events (canceled and scheduled)
 const stripUndonePastEvents = () => {
   if (!dataStore.data.config.autoRemovePastEvents) return
-  dataStore.data.events = dataStore.data.events.filter(l => l.status === 'done' || l.date >= new Date().toISOString().split('T')[0])
+  dataStore.data.events = dataStore.data.events.filter(l => l.status === 'done' || l.date >= dateISO(new Date()))
 }
 stripUndonePastEvents()
 
-const undoneEvents = computed(() => dataStore.data.events.filter(l => l.status !== 'done'))
+const undoneEvents = computed(() => dataStore.undoneEvents)
 const eventsToday = computed(() => undoneEvents.value.filter(l => l.date === dateISO(today())))
 const eventsNextDays = computed(() => undoneEvents.value.filter(l => l.date > dateISO(today()) && l.date <= dateISO(lastDate.value)))
 </script>

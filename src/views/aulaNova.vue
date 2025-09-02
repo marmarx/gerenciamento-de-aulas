@@ -4,12 +4,13 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 if(!dataStore.selectedEvent) {
-  dataStore.data.events.push(dataStore.newEvent())
-  dataStore.selectedEvent = dataStore.data.events.at(-1).id_event
+  const newEvent = dataStore.newEvent()
+  dataStore.data.events.push(newEvent)
+  dataStore.selectedEvent = newEvent.id_event
 }
 
-const event = dataStore.data.events.find(l => l.id_event === dataStore.selectedEvent)
-const students = dataStore.data.students.filter(s => !s.paused)
+const event = dataStore.sortedEvents.find(l => l.id_event === dataStore.selectedEvent)
+const students = dataStore.activeStudents
 
 const isDisabled = () => !event.id_student || !event.date || !event.time
 
@@ -24,7 +25,14 @@ const saveEvent = () => {
   event.cost = students.find(s => s.id_student === event.id_student).cost || dataStore.data.config.defaultClassCost
   event.status = 'scheduled'
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
-  if(dataStore.data.config.autoFinishEvents) event.status = `${event.date}T${event.time}` < new Date().toISOString().split('.')[0].slice(0,-3) ? 'done' : 'scheduled'
+
+  if(dataStore.data.config.autoFinishEvents) {
+    const now = new Date();
+    const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
+    const finishThreshold = new Date(eventDateTime.getTime() + 60 * 60 * 1000)  //1-hour offset
+    if(finishThreshold <= now) event.status = 'done'
+  }
+
   router.push('/agenda')
 }
 

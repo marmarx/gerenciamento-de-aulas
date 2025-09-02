@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { uuidv4, today, dateISO, timeISO, weekDays } from './utility';
 import { paletteFromBase } from './colorStore';
-import dummyData from './dummyData'
+// import dummyData from './dummyData'
 
 const storageTitle = 'gestaoDeAulas'
 const newData = () => (
@@ -156,31 +156,39 @@ export const useDataStore = defineStore(storageTitle, () => {
   const removeEvent = id => data.value.events.splice(data.value.events.findIndex(e => e.id_event === id), 1)
   const removePayment = id => data.value.payments.splice(data.value.payments.findIndex(p => p.id_pay === id), 1)
 
-  watch(() => data.value.students, (students) => students.sort((a, b) => a.student_name.toLowerCase().localeCompare(b.student_name.toLowerCase())), { deep: true, immediate: true } )
-  watch(() => data.value.events,   (events)   => events.sort((a, b)   => (a.date + a.time).localeCompare(b.date + b.time)), { deep: true, immediate: true } )
-  watch(() => data.value.payments, (payments) => payments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)), { deep: true, immediate: true } )
+  const sortedStudents = computed(() => data.value.students.sort((a, b) => a.student_name.toLowerCase().localeCompare(b.student_name.toLowerCase())))
+  const sortedEvents   = computed(() => data.value.events  .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)))
+  const sortedPayments = computed(() => data.value.payments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)))
 
-  const selectedStudent = ref(null)
-  const selectedEvent = ref(null)
-  const selectedPayment = ref(null)
+  const activeStudents = computed(() => sortedStudents.value.filter(s => !s.paused))
+  const pausedStudents = computed(() => sortedStudents.value.filter(s =>  s.paused))
 
-   watch(selectedStudent, () => console.log('Selected student:', selectedStudent.value))
-   watch(selectedEvent,   () => console.log('Selected event:', selectedEvent.value))
-   watch(selectedPayment, () => console.log('Selected payment:', selectedPayment.value))
+  const doneEvents   = computed(() => sortedEvents.value.filter(e =>  e.status === 'done'))
+  const undoneEvents = computed(() => sortedEvents.value.filter(e =>  e.status !== 'done'))
+
+  // watch(() => data.value.students, (students) => students.sort((a, b) => a.student_name.toLowerCase().localeCompare(b.student_name.toLowerCase())), { deep: true, immediate: true } )
+  // watch(() => data.value.events,   (events)   => events.sort((a, b)   => (a.date + a.time).localeCompare(b.date + b.time)), { deep: true, immediate: true } )
+  // watch(() => data.value.payments, (payments) => payments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)), { deep: true, immediate: true } )
+
+  const selectedStudent = ref('')
+  const selectedEvent = ref('')
+  const selectedPayment = ref('')
+
+  const color_label = ['nav-back','nav-hover','nav-line','header-left','header-right','head-text']
+  const color_set = (label,color) => document.documentElement.style.setProperty(`--${label}`, color)
 
   watch(() => data.value.config.color, (color) => {
-    const [colors, text] = paletteFromBase(color)
-    document.documentElement.style.setProperty('--nav-main', colors[0])
-    document.documentElement.style.setProperty('--nav-back', colors[1])
-    document.documentElement.style.setProperty('--nav-hover', colors[2])
-    document.documentElement.style.setProperty('--nav-focus', colors[3])
-    document.documentElement.style.setProperty('--head-text', text)
-    document.querySelector('meta[name="theme-color"]').setAttribute('content', colors[0]);
+    const colors = paletteFromBase(color)
+    colors.forEach((color,i) => color_set(color_label[i],color))
   }, { deep: true, immediate: true })
 
   return { 
     saveStorage, clearStorage, exportStorage, importStorage, exportTSV,
     newStudent, newEvent, newPayment, removeStudent, removeEvent, removePayment,
-    data, selectedStudent, selectedEvent, selectedPayment
+    selectedStudent, selectedEvent, selectedPayment,
+    sortedStudents, sortedEvents, sortedPayments,
+    activeStudents, pausedStudents,
+    doneEvents, undoneEvents,
+    data
   }
 });

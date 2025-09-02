@@ -1,0 +1,16 @@
+cd folder
+npm create vue@3
+project-name
+vue router
+pinia
+cd project-name
+npm install
+
+open project on VSCode
+replace files in zip
+add 'server:{host: true}' to vite.config.js under defineConfig({})
+npm install vite-plugin-pwa --save-dev
+npm run dev
+
+npm run build
+npm run preview

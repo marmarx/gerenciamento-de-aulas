@@ -5,9 +5,9 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 const reset = () => {
-  dataStore.selectedStudent = null
-  dataStore.selectedEvent = null
-  dataStore.selectedPayment = null
+  dataStore.selectedStudent = ''
+  dataStore.selectedEvent = ''
+  dataStore.selectedPayment = ''
 }
 
 const toggleFab = () => {

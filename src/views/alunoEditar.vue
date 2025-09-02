@@ -6,12 +6,13 @@ import { ref, watch, onBeforeUnmount } from 'vue'
 const isNewStudent = ref(false)
 // if no student is selected, create a new one and select it
 if(!dataStore.selectedStudent) {
-  dataStore.data.students.push(dataStore.newStudent())
-  dataStore.selectedStudent = dataStore.data.students.at(-1).id_student
+  const newStudent = dataStore.newStudent()
+  dataStore.data.students.push(newStudent)
+  dataStore.selectedStudent = newStudent.id_student
   isNewStudent.value = true
 }
 
-const student = dataStore.data.students.find(s => s.id_student === dataStore.selectedStudent)
+const student = dataStore.sortedStudents.find(s => s.id_student === dataStore.selectedStudent)
 student.weekly_schedule.push({ weekDay: '', timeDay: '', subject: '' })
 
 const hasContent = (item) => item.weekDay || item.timeDay || item.subject //true if any subitem has content, false if all are empty

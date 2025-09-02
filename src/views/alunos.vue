@@ -5,10 +5,10 @@ const filterByName = ref('')
 
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
-dataStore.selectedStudent = null
+dataStore.selectedStudent = ''
 
-const activeStudents = computed(() => dataStore.data.students.filter(s => !s.paused).filter(s => s.student_name.toLowerCase().includes(filterByName.value.toLowerCase())))
-const pausedStudents = computed(() => dataStore.data.students.filter(s =>  s.paused).filter(s => s.student_name.toLowerCase().includes(filterByName.value.toLowerCase())))
+const activeStudents = computed(() => dataStore.activeStudents.filter(s => s.student_name.toLowerCase().includes(filterByName.value.toLowerCase())))
+const pausedStudents = computed(() => dataStore.pausedStudents.filter(s => s.student_name.toLowerCase().includes(filterByName.value.toLowerCase())))
 </script>
 
 <template>

@@ -4,8 +4,8 @@ const props = defineProps({ id: { type: String, required: true }, add: { type: B
 
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
-const event = computed(() => dataStore.data.events.find(l => l.id_event === props.id))
-const student = computed(() => dataStore.data.students.find(s => s.id_student === event.value.id_student))
+const event = computed(() => dataStore.sortedEvents.find(l => l.id_event === props.id))
+const student = computed(() => dataStore.sortedStudents.find(s => s.id_student === event.value.id_student))
 
 import { mapsLink, whatsappLink, weekDay, dateLabel, horaBR } from '@/stores/utility';
 const eventSchedule = computed(() => `${dateLabel(event.value.date)}  •  ${weekDay(event.value.date)}  •  ${horaBR(event.value.time)}`)
@@ -24,17 +24,20 @@ const restoreEvent = () => { event.value.status = 'scheduled' }
     <div class="name">{{student.student_name}}</div>
     <div class="info">{{eventSchedule}}</div>
     <div v-if="add" class="btns">
-      <div class="btn" v-if="event.status === 'canceled'" @click="restoreEvent()">Restaurar</div>
-      <div class="btn" v-else-if="dataStore.data.config.autoFinishEvents" @click="cancelEvent()">Cancelar</div>
-      <div class="btn" v-else @click="markAsDone()">Finalizar</div> <!-- Registrar, Concluir, Finalizar, Efetivar, Validar, Lançar -->
-      <a v-if="student.address && !student.meeting" class="btn" :href="mapsLink(student.address)" target="_blank" rel="noopener noreferrer">Maps</a>
-      <a v-if="student.meeting"      class="btn" :href="student.meeting"                    target="_blank" rel="noopener noreferrer">Vídeo</a>
-      <a v-if="student.parent_phone" class="btn" :href="whatsappLink(student.parent_phone)" target="_blank" rel="noopener noreferrer">Whatsapp</a>
+      <div v-if="event.status === 'canceled'"                 title="Restaurar" class="btn undo"      @click="restoreEvent()"></div>
+      <div v-else-if="dataStore.data.config.autoFinishEvents" title="Cancelar"  class="btn cancel"    @click="cancelEvent()"></div>
+      <div v-else                                             title="Finalizar" class="btn complete"  @click="markAsDone()"></div>
+      <!-- Registrar, Concluir, Finalizar, Efetivar, Validar, Lançar -->
+      <a v-if="student.address && !student.meeting"    class="btn navigation" :href="mapsLink(student.address)"           target="_blank" rel="noopener noreferrer" title="Navegar"></a>
+      <a v-if="student.meeting"       title="Vídeo"    class="btn video"      :href="student.meeting"                     target="_blank" rel="noopener noreferrer"></a>
+      <a v-if="student.student_phone" title="Whatsapp" class="btn whatsapp"   :href="whatsappLink(student.student_phone)" target="_blank" rel="noopener noreferrer"></a>
+      <a v-if="student.parent_phone"  title="Whatsapp" class="btn parent"     :href="whatsappLink(student.parent_phone)"  target="_blank" rel="noopener noreferrer"></a>
     </div>
     <div v-else class="btns">
-      <router-link class="btn" @click="dataStore.selectedEvent = event.id_event" to="/aula/editar">Editar</router-link>
-      <a v-if="student.address && !student.meeting" class="btn" :href="mapsLink(student.address)" target="_blank" rel="noopener noreferrer">Maps</a>
-      <a v-if="student.parent_phone" class="btn" :href="whatsappLink(student.parent_phone)" target="_blank" rel="noopener noreferrer">Whatsapp</a>
+      <router-link to="/aula/editar"  title="Editar"   class="btn edit"       @click="dataStore.selectedEvent = event.id_event"></router-link>
+      <a v-if="student.address && !student.meeting"    class="btn navigation" :href="mapsLink(student.address)"           target="_blank" rel="noopener noreferrer" title="Navegar"></a>
+      <a v-if="student.student_phone" title="Whatsapp" class="btn whatsapp"   :href="whatsappLink(student.student_phone)" target="_blank" rel="noopener noreferrer"></a>
+      <a v-if="student.parent_phone"  title="Whatsapp" class="btn parent"     :href="whatsappLink(student.parent_phone)"  target="_blank" rel="noopener noreferrer"></a>
     </div>
   </div>
 </template>

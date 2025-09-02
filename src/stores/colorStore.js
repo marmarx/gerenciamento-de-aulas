@@ -1,4 +1,5 @@
-const clamp01 = x => Math.min(1, Math.max(0, x));
+const hue = h => h > 360 ? h - 360 : (h < 0 ? 360 + h : h)
+const sl = sl => sl > 1 ? 1 : (sl < 0 ? 0 : sl)
 
 const hexToRgb = hex => {
   const h = hex.replace('#','');
@@ -46,17 +47,20 @@ const hslToRgb = (h,s,l) => {
 
 function paletteFromBase(baseHex) {
   const [h0,s0,l0] = rgbToHsl(...hexToRgb(baseHex));
+  const [h,s,l] = [hue(h0),sl(s0),sl(l0)]
 
-  const hover = [h0, s0, l0];
-  const main  = [h0 + 50.87, clamp01(s0 * 1.357), clamp01(l0 + 0.208)];
-  const back  = [h0 +  3.80, clamp01(s0 * 1.435), clamp01(l0 + 0.108)]; 
-  const focus = [h0 -  0.39, clamp01(s0 * 1.257), clamp01(l0 - 0.043)];
+  const colors = [
+    [h,         s,          l],          //--nav-back
+    [h,         s,          sl(l-.1)],   //--nav-hover
+    [hue(h+30), sl(s-.1),   sl(l+.2)],   //--nav-line
+    [hue(h-30), s,          l],          //--header-left
+    [hue(h+30), s,          l],          //--header-right
+  ].map(([h,s,l]) => rgbToHex(hslToRgb(h,s,l)))
 
-  const colors = [main, back, hover, focus].map(([h,s,l]) => rgbToHex(hslToRgb(h,s,l)))
-  colors[1] = `${colors[1]}d9`
-  const text  = (s0 < .33 && l0 > .6) ? 'var(--black)' : 'var(--white)'
+  colors[0] = `${colors[0]}bf`  //add 85% transparency
+  const text  = (s < .33 && l > .6) ? 'var(--black)' : 'var(--white)'
 
-  return [colors, text]
+  return [...colors, text]
 }
 
 export { paletteFromBase }

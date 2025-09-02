@@ -3,12 +3,13 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 if(!dataStore.selectedPayment) {
-  dataStore.data.payments.push(dataStore.newPayment())
-  dataStore.selectedPayment = dataStore.data.payments.at(-1).id_pay
+  const newPayment = dataStore.newPayment()
+  dataStore.data.payments.push(newPayment)
+  dataStore.selectedPayment = newPayment.id_pay
 }
 
-const payment = dataStore.data.payments.find(l => l.id_pay === dataStore.selectedPayment)
-const students = dataStore.data.students.filter(s => !s.paused)
+const payment = dataStore.sortedPayments.find(l => l.id_pay === dataStore.selectedPayment)
+const students = dataStore.activeStudents
 
 const isDisabled = () => !payment.id_student || !payment.date || !payment.value
 

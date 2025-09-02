@@ -4,11 +4,12 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 if(!dataStore.selectedEvent) {
-  dataStore.data.events.push(dataStore.newEvent())
-  dataStore.selectedEvent = dataStore.data.events.at(-1).id_event
+  const newEvent = dataStore.newEvent()
+  dataStore.data.events.push(newEvent)
+  dataStore.selectedEvent = newEvent.id_event//sortedEvents
 }
 
-const event = dataStore.data.events.find(l => l.id_event === dataStore.selectedEvent)
+const event = dataStore.sortedEvents.find(l => l.id_event === dataStore.selectedEvent)
 const currentEventDate = event.date
 const currentEventTime = event.time
 
@@ -19,16 +20,20 @@ const restoreEvent = () => {
   saveEvent()
 }
 
-const students = dataStore.data.students.filter(s => !s.paused)
+const students = dataStore.activeStudents
 const isDisabled = () => !event.id_student || !event.date || !event.time
 
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-import { formatTime } from '@/stores/utility';
+import { dateISO, timeISO, formatTime } from '@/stores/utility';
 const saveEvent = () => {
-  // if(dataStore.data.config.autoFinishEvents) event.status = `${event.date}T${event.time}` < new Date().toISOString().split('.')[0].slice(0,-3) ? 'done' : 'scheduled'
-  if(dataStore.data.config.autoFinishEvents) event.status = `${event.date}T${formatTime(event.time)}` < new Date().toISOString().split('.')[0].slice(0,-3) ? 'done' : 'scheduled'
+  if(dataStore.data.config.autoFinishEvents) {
+    const now = new Date();
+    const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
+    const finishThreshold = new Date(eventDateTime.getTime() + 60 * 60 * 1000)  //1-hour offset
+    event.status = finishThreshold <= now ? 'done' : 'scheduled'
+  }
   event.duration = event.duration || dataStore.data.config.defaultClassDuration
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
   router.push('/agenda')
@@ -43,8 +48,9 @@ const doEventNow = () => {
   event.status = 'done'
   event.originalDate = event.date
   event.originalTime = event.time
-  event.date = new Date().toISOString().split('T')[0]
-  event.time = new Date().toISOString().split('T')[1].slice(0,-8)
+  const now = new Date();
+  event.date = dateISO(now); // YYYY-MM-DD format
+  event.time = timeISO(now); // HH:mm
   router.push('/agenda')
 }
 </script>
