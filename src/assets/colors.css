@@ -1,5 +1,6 @@
 :root {
-  --today-day:'1'; --head-text: #fff;
+  --today-day:'1'; 
+  --head-text: #fff; --head-black: #1f2937; --head-white: #fff;
   --nav-back: #9d289f; --nav-hover: #751e76; --nav-line: #cb6298;
   --header-left: #61289f; --header-right: #9f2866;
 

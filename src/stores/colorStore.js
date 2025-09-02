@@ -58,7 +58,7 @@ function paletteFromBase(baseHex) {
   ].map(([h,s,l]) => rgbToHex(hslToRgb(h,s,l)))
 
   colors[0] = `${colors[0]}bf`  //add 85% transparency
-  const text  = (s < .33 && l > .6) ? 'var(--black)' : 'var(--white)'
+  const text  = (s < .33 && l > .6) ? 'var(--head-black)' : 'var(--head-white)'
 
   return [...colors, text]
 }
