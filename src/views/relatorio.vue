@@ -5,6 +5,7 @@ const router = useRouter()
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const students = dataStore.sortedStudents || []
+const student = dataStore.student
 
 import { ref, computed } from 'vue'
 import { dateISO, invertDateISO, currency } from '@/stores/utility'
@@ -21,14 +22,13 @@ const listCompletedLessons = () => {
     type: 'aula',
     date: e.date,
     duration: e.duration || 1,
-    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || students.find(s => s.id_student === dataStore.selectedStudent).cost)),
+    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || student.cost)),
     experimental: e.experimental || false
   }));
 };
 
 const listPayments = () => {
-  const studentPayments = dataStore.sortedPayments
-    .filter(p => p.id_student === dataStore.selectedStudent)
+  const studentPayments = dataStore.studentPayments
     .map(payment => ({
       type: "payment",
       date: payment.date,
@@ -48,11 +48,11 @@ const report = computed(() => {
 
   const filteredEvents = events
     .filter(e => new Date(e.date) >= startDate && new Date(e.date) <= endDate)
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    // .sort((a, b) => new Date(a.date) - new Date(b.date))
 
   const filteredPayments = payments
     .filter(p => new Date(p.date) >= startDate && new Date(p.date) <= endDate)
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    // .sort((a, b) => new Date(a.date) - new Date(b.date))
 
   let balance = 0
   let report = ''
@@ -82,7 +82,7 @@ const report = computed(() => {
 })
 
 const copyToClipboard = () => {
-  const details = `<b>Aluno</b>: ${students.find(s => s.id_student === dataStore.selectedStudent).student_name}<br><br><b>Período</b>:<br>de ${invertDateISO(filterStart.value)} à ${invertDateISO(filterEnd.value)}<br><br>`
+  const details = `<b>Aluno</b>: ${student.student_name}<br><br><b>Período</b>:<br>de ${invertDateISO(filterStart.value)} à ${invertDateISO(filterEnd.value)}<br><br>`
 
   const reportContent = (details + report.value)
     .replace(/<\/?b>/gi, "*") // Replace <b> tags with asterisks

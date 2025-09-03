@@ -7,7 +7,7 @@ const dataStore = useDataStore()
 import { useRouter } from 'vue-router'
 if (!dataStore.selectedStudent) useRouter().push('/alunos')
 
-const student = dataStore.sortedStudents.find(s => s.id_student === dataStore.selectedStudent)
+const student = dataStore.student
 const weekDays = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
 
 import { invertDateISO, horaBR, currency, whatsappLink } from '@/stores/utility';

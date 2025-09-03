@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const students = dataStore.sortedStudents
+const student = dataStore.student
 
 const listCompletedLessons = () => {
   const events = dataStore.doneEvents.filter(e => e.id_student === dataStore.selectedStudent);
@@ -11,14 +12,13 @@ const listCompletedLessons = () => {
     type: 'aula',
     date: e.date,
     duration: e.duration || 1,
-    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || students.find(s => s.id_student === dataStore.selectedStudent).cost)),
+    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || student.cost)),
     experimental: e.experimental || false
   }));
 };
 
 const listPayments = () => {
-  const studentPayments = dataStore.sortedPayments
-    .filter(p => p.id_student === dataStore.selectedStudent)
+  const studentPayments = dataStore.studentPayments
     .map(payment => ({
       type: "payment",
       date: payment.date,

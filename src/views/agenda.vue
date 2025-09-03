@@ -77,9 +77,8 @@ const stripUndonePastEvents = () => {
 }
 stripUndonePastEvents()
 
-const undoneEvents = computed(() => dataStore.undoneEvents)
-const eventsToday = computed(() => undoneEvents.value.filter(l => l.date === dateISO(today())))
-const eventsNextDays = computed(() => undoneEvents.value.filter(l => l.date > dateISO(today()) && l.date <= dateISO(lastDate.value)))
+const eventsToday = computed(() => dataStore.undoneEvents.filter(l => l.date === dateISO(today())))
+const eventsNextDays = computed(() => dataStore.undoneEvents.filter(l => l.date > dateISO(today()) && l.date <= dateISO(lastDate.value)))
 </script>
 
 <template>

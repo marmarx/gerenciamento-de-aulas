@@ -12,7 +12,7 @@ if(!dataStore.selectedStudent) {
   isNewStudent.value = true
 }
 
-const student = dataStore.sortedStudents.find(s => s.id_student === dataStore.selectedStudent)
+const student = dataStore.student
 student.weekly_schedule.push({ weekDay: '', timeDay: '', subject: '' })
 
 const hasContent = (item) => item.weekDay || item.timeDay || item.subject //true if any subitem has content, false if all are empty

@@ -22,22 +22,24 @@ const panorama = computed(() => {
   const payments = dataStore.sortedPayments || []
 
   return students.map(student => {
-    // Pagamentos até o fim do período → saldo inicial
+    // Payments until endDate -> initial balance
     let balance = payments
       .filter(p => p.id_student === student.id_student)
       .filter(p => new Date(p.date) <= endDate)
       .reduce((sum, p) => sum + p.value, 0)
 
-    // Aulas antes do período → desconta custo
+    // Lessons before startDate -> reduces balance
     const previousEvents = events.filter(e => e.id_student === student.id_student && new Date(e.date) < startDate)
     for (const event of previousEvents) { balance -= (event.duration || 1) * (event.cost || student.cost) }
 
-    // Events in range - from startDate to endDate
+    // Events in range - from startDate to endDate - by student
     const eventsInRange = events
-      .filter(e => e.id_student === student.id_student && new Date(e.date) >= startDate && new Date(e.date) <= endDate && e.status === 'done')
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .filter(e => e.id_student === student.id_student && new Date(e.date) >= startDate && new Date(e.date) <= endDate)
+      // .sort((a, b) => new Date(a.date) - new Date(b.date))
 
-    // Contagem com frações
+    const doneEventsInRange = eventsInRange.filter(e => e.status === 'done')
+
+    // Counting lessons with fractions
     let paid = 0
     for (const event of eventsInRange) {
       const eventCost = (event.duration || 1) * (event.cost || student.cost)
@@ -48,7 +50,7 @@ const panorama = computed(() => {
     return {
       id: student.id_student,
       name: student.student_name,
-      done: eventsInRange.length,
+      done: doneEventsInRange.length,
       paid: parseFloat(paid.toFixed(2))
     }
   })
@@ -58,7 +60,6 @@ const viewReport = id => {
   dataStore.selectedStudent = id
   router.push('/relatorio')
 }
-
 </script>
 
 <template>

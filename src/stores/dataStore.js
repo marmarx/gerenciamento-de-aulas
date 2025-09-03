@@ -166,13 +166,13 @@ export const useDataStore = defineStore(storageTitle, () => {
   const doneEvents   = computed(() => sortedEvents.value.filter(e =>  e.status === 'done'))
   const undoneEvents = computed(() => sortedEvents.value.filter(e =>  e.status !== 'done'))
 
-  // watch(() => data.value.students, (students) => students.sort((a, b) => a.student_name.toLowerCase().localeCompare(b.student_name.toLowerCase())), { deep: true, immediate: true } )
-  // watch(() => data.value.events,   (events)   => events.sort((a, b)   => (a.date + a.time).localeCompare(b.date + b.time)), { deep: true, immediate: true } )
-  // watch(() => data.value.payments, (payments) => payments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)), { deep: true, immediate: true } )
-
   const selectedStudent = ref('')
-  const selectedEvent = ref('')
+  const selectedEvent   = ref('')
   const selectedPayment = ref('')
+
+  const student         = computed(() => sortedStudents.value.find  (s => s.id_student === selectedStudent.value))
+  const studentEvents   = computed(() => sortedEvents.value.filter  (e => e.id_student === selectedStudent.value))
+  const studentPayments = computed(() => sortedPayments.value.filter(p => p.id_student === selectedStudent.value))
 
   const color_label = ['nav-back','nav-hover','nav-line','header-left','header-right','head-text']
   const color_set = (label,color) => document.documentElement.style.setProperty(`--${label}`, color)
@@ -189,6 +189,7 @@ export const useDataStore = defineStore(storageTitle, () => {
     sortedStudents, sortedEvents, sortedPayments,
     activeStudents, pausedStudents,
     doneEvents, undoneEvents,
+    student, studentEvents, studentPayments,
     data
   }
 });
