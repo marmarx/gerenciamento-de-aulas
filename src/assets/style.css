@@ -24,6 +24,7 @@ h2 { margin: 12px 0 18px; width: 100%; text-align: center; }
 .container{ width:80% }
 .halfContainer { width:100%; display: flex; flex-wrap: wrap; justify-content: space-between;}
 .half, .alwaysHalf { width: calc(49.9999% - 5px); box-sizing: border-box; }
+.third{ width: calc(33.3333% - 10px); box-sizing: border-box }
 .halfContainer > .half{padding: 0 15px}
 .tac{text-align: center; margin-top: 0}
 #student-form{width:100%}
@@ -71,7 +72,8 @@ button:disabled:hover{ background-color: var(--black-main) }
 @media screen and (max-width: 992px) {
   .dateFlex{gap: 0}
   .container, .halfContainer, .formContainer, .flexContainer{width: 100%}
-  .half{width: 100%}
+  .flexContainer > label { width: 100% }
+  .half, .third{width: 100%}
   .web{display: none}
   .mob{display: block}
   button, a:has(button){width: 100%; margin:.5em 0}

@@ -13,6 +13,7 @@ const router = createRouter({
     { path: '/aula/editar',       name: 'Aula editar',     component: () => import('@/views/aulaEditar.vue'),    alias: ['/aula/edit'] },
     { path: '/aulas',             name: 'Aulas',           component: () => import('@/views/aulas.vue'),         alias: ['/aulas-dadas'] },
     { path: '/pagamento',         name: 'Pagamento',       component: () => import('@/views/pagamento.vue'),     alias: [] },
+    { path: '/pagamentos',        name: 'Pagamentos',      component: () => import('@/views/pagamentos.vue'),    alias: [] },
     { path: '/extrato',           name: 'Extrato',         component: () => import('@/views/extrato.vue'),       alias: ['/statement'] },
     { path: '/relatorio',         name: 'Relatório',       component: () => import('@/views/relatorio.vue'),     alias: ['/report'] },
     { path: '/config',            name: 'Configurações',   component: () => import('@/views/config.vue'),        alias: ['/configuracoes', '/configuracao'] },

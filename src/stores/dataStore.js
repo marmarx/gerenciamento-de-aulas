@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
 import { uuidv4, today, dateISO, timeISO, weekDays } from './utility';
 import { paletteFromBase } from './colorStore';
-// import dummyData from './dummyData'
+import dummyData from '@/unpublished/dummyData'
 
 const storageTitle = 'gestaoDeAulas'
 const newData = () => (
@@ -95,7 +95,7 @@ export const useDataStore = defineStore(storageTitle, () => {
   const data = ref()
 
   data.value = loadStorage()
-  // data.value = dummyData;
+  data.value = dummyData;
   watch(data,saveStorage,{deep:true})
 
   const newStudent = () => {

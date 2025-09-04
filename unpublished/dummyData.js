@@ -1,0 +1,535 @@
+const dummyData =
+  {
+  "students": [
+    {
+      "id_student": "student_1f9a8df3-3d52-4034-81b5-316e41964253",
+      "added_on": 1756564307665,
+      "paused": false,
+      "student_name": "Amâncio ",
+      "parent": "Elaine de Carvalho",
+      "parent_phone": "27998602093",
+      "parent_2": "",
+      "parent_2_phone": "",
+      "address": "",
+      "meeting": "",
+      "scholl": "EMEF ASFA ",
+      "year": "9º",
+      "weekly_schedule": [
+        {
+          "weekDay": 1,
+          "timeDay": "14:00",
+          "subject": ""
+        },
+        {
+          "weekDay": "",
+          "timeDay": "",
+          "subject": ""
+        }
+      ],
+      "cost": 37.5,
+      "start_date": "2025-07-07",
+      "end_date": "",
+      "obs": ""
+    },
+    {
+      "id_student": "student_95a8d9e0-b6ff-4a3c-a513-ed799be9b398",
+      "added_on": 1756675892437,
+      "paused": false,
+      "student_name": "Heloísa ",
+      "parent": "Tathyana",
+      "parent_phone": "27998839005",
+      "parent_2": "",
+      "parent_2_phone": "",
+      "address": "Rua Durval Loureiro Nogueira, 111, Ilha das Conchas, apto 406",
+      "meeting": "",
+      "scholl": "EMEF Maria Madalena",
+      "year": "6º",
+      "weekly_schedule": [
+        {
+          "weekDay": 3,
+          "timeDay": "14:00",
+          "subject": ""
+        },
+        {
+          "weekDay": "",
+          "timeDay": "",
+          "subject": ""
+        }
+      ],
+      "cost": 37.5,
+      "start_date": "2025-07-02",
+      "end_date": "",
+      "obs": ""
+    },
+    {
+      "id_student": "student_660510ba-13b2-46cd-9813-116f729a74f8",
+      "added_on": 1756676976202,
+      "paused": false,
+      "student_name": "Iago",
+      "parent": "Juliana",
+      "parent_phone": "27999568687",
+      "parent_2": "",
+      "parent_2_phone": "",
+      "address": "",
+      "meeting": "",
+      "scholl": "EMEF ASFA ",
+      "year": "9º",
+      "weekly_schedule": [
+        {
+          "weekDay": 4,
+          "timeDay": "19:00",
+          "subject": ""
+        },
+        {
+          "weekDay": "",
+          "timeDay": "",
+          "subject": ""
+        }
+      ],
+      "cost": 37.5,
+      "start_date": "2025-06-12",
+      "end_date": "",
+      "obs": ""
+    },
+    {
+      "id_student": "student_9807cfbf-3fcd-498a-b2f5-c65e01156d21",
+      "added_on": 1756676530011,
+      "paused": false,
+      "student_name": "Isabelle",
+      "parent": "Marilia Guedes",
+      "parent_phone": "27999646339",
+      "parent_2": "",
+      "parent_2_phone": "",
+      "address": "Rua Alípio da Costa e asilva, 950, Edifício Green Residence, apto 1306",
+      "meeting": "",
+      "scholl": "EMEF Maria Madalena ",
+      "year": "6º",
+      "weekly_schedule": [
+        {
+          "weekDay": 4,
+          "timeDay": "14:30",
+          "subject": ""
+        },
+        {
+          "weekDay": "",
+          "timeDay": "",
+          "subject": ""
+        }
+      ],
+      "cost": 37.5,
+      "start_date": "2025-08-07",
+      "end_date": "",
+      "obs": ""
+    },
+    {
+      "id_student": "student_1c743162-2529-41d9-935e-97d40a5fddff",
+      "added_on": 1756676051549,
+      "paused": false,
+      "student_name": "Laura",
+      "parent": "Geisa Salles",
+      "parent_phone": "27981229601",
+      "parent_2": "",
+      "parent_2_phone": "",
+      "address": "Avenida Engenheiro Charles Bitran, 435, Recanto de Camburi, apto 401 C",
+      "meeting": "",
+      "scholl": "UP Jd. Camburi",
+      "year": "8º",
+      "weekly_schedule": [
+        {
+          "weekDay": 3,
+          "timeDay": "15:30",
+          "subject": ""
+        },
+        {
+          "weekDay": "",
+          "timeDay": "",
+          "subject": ""
+        }
+      ],
+      "cost": 37.5,
+      "start_date": "2024-10-25",
+      "end_date": "",
+      "obs": ""
+    },
+    {
+      "id_student": "student_d1cd8731-c093-4ed1-b0c9-0278fa5d5d8e",
+      "added_on": 1756564219222,
+      "paused": false,
+      "student_name": "Nathália Meireles",
+      "parent": "Karina",
+      "parent_phone": "27992890719",
+      "parent_2": "",
+      "parent_2_phone": "",
+      "address": "",
+      "meeting": "",
+      "scholl": "EMEF ASFA",
+      "year": "8º",
+      "weekly_schedule": [
+        {
+          "weekDay": 2,
+          "timeDay": "15:00",
+          "subject": ""
+        },
+        {
+          "weekDay": "",
+          "timeDay": "",
+          "subject": ""
+        }
+      ],
+      "cost": 37.5,
+      "start_date": "2025-09-02",
+      "end_date": "",
+      "obs": ""
+    },
+    {
+      "id_student": "student_7c4de5f7-de23-4ac2-b7b4-e1ad62f455d5",
+      "added_on": 1756563820510,
+      "paused": false,
+      "student_name": "Noah Dal'Col",
+      "parent": "Gabriel",
+      "parent_phone": "27999411376",
+      "parent_2": "Daniela",
+      "parent_2_phone": "27981227597",
+      "address": "",
+      "meeting": "",
+      "scholl": "Salesiano Jd. Camburi",
+      "year": "5º",
+      "weekly_schedule": [
+        {
+          "weekDay": 3,
+          "timeDay": "18:30",
+          "subject": ""
+        },
+        {
+          "weekDay": "",
+          "timeDay": "",
+          "subject": ""
+        }
+      ],
+      "cost": 37.5,
+      "start_date": "2025-03-03",
+      "end_date": "",
+      "obs": "Aluno com TDAH. Possui facilidade de aprendizagem, porém perde o foco com facilidade"
+    }
+  ],
+  "events": [
+    {
+      "id_event": "event_2045886c-06ec-430c-9a1b-a1eb2e7ff0a3",
+      "id_student": "student_1f9a8df3-3d52-4034-81b5-316e41964253",
+      "student_name": "Amâncio ",
+      "added_on": 1756564377268,
+      "date": "2025-09-01",
+      "time": "14:00",
+      "originalDate": "2025-09-01",
+      "originalTime": "14:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "done",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_6027e069-2978-45cf-aade-f17e157a6a77",
+      "id_student": "student_d1cd8731-c093-4ed1-b0c9-0278fa5d5d8e",
+      "student_name": "Nathália Meireles",
+      "added_on": "2025-09-02T12:40:11.625Z",
+      "date": "2025-09-02",
+      "time": "15:00",
+      "originalDate": "2025-09-02",
+      "originalTime": "15:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_48da33e8-c792-4ead-84c5-f34909906ad4",
+      "id_student": "student_95a8d9e0-b6ff-4a3c-a513-ed799be9b398",
+      "student_name": "Heloísa ",
+      "added_on": "2025-09-02T12:40:11.623Z",
+      "date": "2025-09-03",
+      "time": "14:00",
+      "originalDate": "2025-09-03",
+      "originalTime": "14:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_3f44d6f2-862c-4613-ad12-00f9cf560e90",
+      "id_student": "student_1c743162-2529-41d9-935e-97d40a5fddff",
+      "student_name": "Laura",
+      "added_on": "2025-09-02T12:40:11.624Z",
+      "date": "2025-09-03",
+      "time": "15:30",
+      "originalDate": "2025-09-03",
+      "originalTime": "15:30",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_50ee1577-f636-4765-818c-0adab82ed9f4",
+      "id_student": "student_7c4de5f7-de23-4ac2-b7b4-e1ad62f455d5",
+      "student_name": "Noah Dal'Col",
+      "added_on": "2025-09-02T12:40:11.626Z",
+      "date": "2025-09-03",
+      "time": "18:30",
+      "originalDate": "2025-09-03",
+      "originalTime": "18:30",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_d7bfa22e-2ff8-43aa-bed1-d66edf3089d5",
+      "id_student": "student_9807cfbf-3fcd-498a-b2f5-c65e01156d21",
+      "student_name": "Isabelle",
+      "added_on": "2025-09-02T12:40:11.624Z",
+      "date": "2025-09-04",
+      "time": "14:30",
+      "originalDate": "2025-09-04",
+      "originalTime": "14:30",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_d7018bba-54fc-4e4f-9132-a3aee2e0d9d7",
+      "id_student": "student_660510ba-13b2-46cd-9813-116f729a74f8",
+      "student_name": "Iago",
+      "added_on": "2025-09-02T12:40:11.624Z",
+      "date": "2025-09-04",
+      "time": "19:00",
+      "originalDate": "2025-09-04",
+      "originalTime": "19:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_b5e96479-33d0-45f6-a500-18088a48eb40",
+      "id_student": "student_1f9a8df3-3d52-4034-81b5-316e41964253",
+      "student_name": "Amâncio ",
+      "added_on": "2025-09-02T12:40:11.623Z",
+      "date": "2025-09-08",
+      "time": "14:00",
+      "originalDate": "2025-09-08",
+      "originalTime": "14:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_707ca32e-656d-48d5-a2d7-7fb79236f27c",
+      "id_student": "student_d1cd8731-c093-4ed1-b0c9-0278fa5d5d8e",
+      "student_name": "Nathália Meireles",
+      "added_on": "2025-09-02T12:40:11.625Z",
+      "date": "2025-09-09",
+      "time": "15:00",
+      "originalDate": "2025-09-09",
+      "originalTime": "15:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_ef309ab2-1bc3-4bf7-b6df-d8ba895882a3",
+      "id_student": "student_95a8d9e0-b6ff-4a3c-a513-ed799be9b398",
+      "student_name": "Heloísa ",
+      "added_on": "2025-09-02T12:40:11.623Z",
+      "date": "2025-09-10",
+      "time": "14:00",
+      "originalDate": "2025-09-10",
+      "originalTime": "14:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_9e2add3b-0574-417f-9258-0e4d6df69a99",
+      "id_student": "student_1c743162-2529-41d9-935e-97d40a5fddff",
+      "student_name": "Laura",
+      "added_on": "2025-09-02T12:40:11.625Z",
+      "date": "2025-09-10",
+      "time": "15:30",
+      "originalDate": "2025-09-10",
+      "originalTime": "15:30",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_1449e1ee-3455-4d77-8e70-6a136e13efe8",
+      "id_student": "student_7c4de5f7-de23-4ac2-b7b4-e1ad62f455d5",
+      "student_name": "Noah Dal'Col",
+      "added_on": "2025-09-02T12:40:11.626Z",
+      "date": "2025-09-10",
+      "time": "18:30",
+      "originalDate": "2025-09-10",
+      "originalTime": "18:30",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_9eb7c2b2-44e9-4953-92a6-7f575f2a9d88",
+      "id_student": "student_9807cfbf-3fcd-498a-b2f5-c65e01156d21",
+      "student_name": "Isabelle",
+      "added_on": "2025-09-02T12:40:11.624Z",
+      "date": "2025-09-11",
+      "time": "14:30",
+      "originalDate": "2025-09-11",
+      "originalTime": "14:30",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_d79e021b-ce65-45d2-89ee-ef9fddd51d55",
+      "id_student": "student_660510ba-13b2-46cd-9813-116f729a74f8",
+      "student_name": "Iago",
+      "added_on": "2025-09-02T12:40:11.624Z",
+      "date": "2025-09-11",
+      "time": "19:00",
+      "originalDate": "2025-09-11",
+      "originalTime": "19:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_27c09101-fcc3-46a3-9faa-b72d508fdeab",
+      "id_student": "student_1f9a8df3-3d52-4034-81b5-316e41964253",
+      "student_name": "Amâncio ",
+      "added_on": "2025-09-02T12:40:11.623Z",
+      "date": "2025-09-15",
+      "time": "14:00",
+      "originalDate": "2025-09-15",
+      "originalTime": "14:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    },
+    {
+      "id_event": "event_42ae47a1-61c9-411f-acdb-ebeb1e782063",
+      "id_student": "student_d1cd8731-c093-4ed1-b0c9-0278fa5d5d8e",
+      "student_name": "Nathália Meireles",
+      "added_on": "2025-09-02T12:40:11.625Z",
+      "date": "2025-09-16",
+      "time": "15:00",
+      "originalDate": "2025-09-16",
+      "originalTime": "15:00",
+      "duration": 1,
+      "cost": 37.5,
+      "experimental": false,
+      "added_manually": false,
+      "rescheduled": false,
+      "status": "scheduled",
+      "obs": "",
+      "subject": ""
+    }
+  ],
+  "payments": [
+    {
+      "id_pay": "payment_4e5cd575-c570-4113-aeb6-9ed8d9102da4",
+      "id_student": "student_1c743162-2529-41d9-935e-97d40a5fddff",
+      "student_name": "Laura",
+      "added_on": 1756721393735,
+      "date": "2025-09-01",
+      "value": 150,
+      "obs": "Referente Agosto"
+    },
+    {
+      "id_pay": "payment_903262c5-11e9-4b7d-8e21-abf6585b20c7",
+      "id_student": "student_1f9a8df3-3d52-4034-81b5-316e41964253",
+      "student_name": "Amâncio ",
+      "added_on": 1756745801339,
+      "date": "2025-09-01",
+      "value": 150,
+      "obs": ""
+    }
+  ],
+  "config": {
+    "numberOfDays": 14,
+    "defaultClassDuration": 1,
+    "color": "#9d289f",
+    "autoFinishEvents": true,
+    "autoRemovePastEvents": false,
+    "defaultClassCost": 50
+  }
+}
+
+export default dummyData;

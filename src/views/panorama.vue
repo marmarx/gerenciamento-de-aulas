@@ -96,9 +96,10 @@ const viewReport = id => {
       </table>
     </div>
     <p v-else>Selecione um período acima.</p>
-
+    <p class="tac">Clique em um aluno para ver o relatório.</p>
     <div class="flexContainer">
       <button @click="router.push('/aulas')">Todas as Aulas</button>
+      <button @click="router.push('/pagamentos')">Todos os Pagamentos</button>
     </div>
   </div>
 </template>

@@ -28,6 +28,7 @@ import { invertDateISOnoYear, weekDay, horaBR, currency } from '@/stores/utility
         <option v-for="student in students" :key="student.id_student" :value="student.id_student">{{student.student_name}}</option>
       </select>
     </div>
+    
     <div class="container">
       <table>
         <thead><tr>
@@ -39,17 +40,18 @@ import { invertDateISOnoYear, weekDay, horaBR, currency } from '@/stores/utility
           <th class="web">R$/h</th>
           <th>Status</th>
         </tr></thead>
-      <tbody><tr v-for="event in events" :key="event.id_event" @click="editEvent(event.id_event)">
-        <td>{{ event.student_name }}</td>
-        <td>{{ invertDateISOnoYear(event.date) }}</td>
-        <td class="web">{{ weekDay(event.date) }}</td>
-        <td class="web">{{ event.time }}</td>
-        <td class="web">{{ `${event.duration} hora${event.duration>1?'s':''}` }}</td>
-        <td class="web">{{ event.experimental ? currency(0) : currency(event.cost) }}</td>
-        <td>{{ status[event.status] }}</td>
-      </tr></tbody>
-    </table>
+        <tbody><tr v-for="event in events" :key="event.id_event" @click="editEvent(event.id_event)">
+          <td>{{ event.student_name }}</td>
+          <td>{{ invertDateISOnoYear(event.date) }}</td>
+          <td class="web">{{ weekDay(event.date) }}</td>
+          <td class="web">{{ event.time }}</td>
+          <td class="web">{{ `${event.duration} hora${event.duration>1?'s':''}` }}</td>
+          <td class="web">{{ event.experimental ? currency(0) : currency(event.cost) }}</td>
+          <td>{{ status[event.status] }}</td>
+        </tr></tbody>
+      </table>
     </div>
+    <p class="tac">Clique em uma aula para editar.</p>
   </div>
 </template>
 

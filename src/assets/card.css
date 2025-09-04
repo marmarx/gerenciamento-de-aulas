@@ -5,15 +5,15 @@
 }
 .partiallyVisible{opacity:.5}
 
-.name,.info{padding:22px 18px 18px}
+.name,.details{padding:22px 18px 18px}
 
 .name{display:inline-flex; justify-content:space-between; font-weight:600; font-size:1.05rem; word-break:break-word}
 .ampel{width: 8px; height: 8px; border-radius: 100%; background: currentColor}
 .status{color: var(--money-green); font-weight:bold}
 .paused{color: var(--money-red)}
 
-.info{font-size:.98rem; color:var(--accent); display:flex; align-items:center; gap:8px; padding-top:0; white-space:pre}
-.info:nth-child(3){padding-bottom:22px}
+.details{font-size:.98rem; color:var(--accent); display:flex; align-items:center; gap:8px; padding-top:0; white-space:pre}
+.details:nth-child(3){padding-bottom:22px}
 
 .btns{ display:inline-flex; margin-top:5px; border-top:1px solid var(--card-br) }
 .btn{
@@ -43,6 +43,6 @@
 /* .btn.message    {background-image:url('@/svg/message.svg')} */
 
 @media screen and (max-width: 992px) {
-  .name,.info{padding:22px 18px 12px}
-  .info{padding-top:0}
+  .name,.details{padding:22px 18px 12px}
+  .details{padding-top:0}
 }

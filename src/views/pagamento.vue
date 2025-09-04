@@ -2,18 +2,20 @@
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
+const isNewPayment = ref(false)
 if(!dataStore.selectedPayment) {
   const newPayment = dataStore.newPayment()
   dataStore.data.payments.push(newPayment)
   dataStore.selectedPayment = newPayment.id_pay
+  isNewPayment.value = true
 }
 
-const payment = dataStore.sortedPayments.find(l => l.id_pay === dataStore.selectedPayment)
+const payment = dataStore.sortedPayments.find(p => p.id_pay === dataStore.selectedPayment)
 const students = dataStore.activeStudents
 
 const isDisabled = () => !payment.id_student || !payment.date || !payment.value
 
-import { onBeforeUnmount } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
@@ -31,7 +33,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="section">
-    <h2>Novo Pagamento</h2>
+    <h2>{{ payment.student_name ? `Editar` : 'Novo' }} Pagamento</h2>
     <div class="container">
       <label>Nome do aluno
       <select name="aluno" v-model="payment.id_student" required>
@@ -45,7 +47,8 @@ onBeforeUnmount(() => {
     </div>
     <div class="flexContainer">
       <button @click="router.push('/alunos')" :disabled="isDisabled()">Salvar</button>
-      <button @click="cancelPayment()">Cancelar</button>
+      <button  v-if="isNewPayment" @click="router.push('/alunos')">Cancelar</button>
+      <button  v-else @click="cancelPayment()">Remover</button>
     </div>
   </div>
 </template>

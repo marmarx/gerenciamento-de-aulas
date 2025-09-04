@@ -21,8 +21,8 @@ const balance = computed(() => completedPayments.value - completedEventsValue.va
       {{student.student_name}}
       <div class="ampel status" :class="{paused: student.paused}"></div>
     </div>
-    <div class="info">{{studentSchedules}}</div>
-    <div class="info">Saldo:<span class="status" :class="{paused: balance < 0}">{{ currency(balance) }}</span></div>
+    <div class="details">{{studentSchedules}}</div>
+    <div class="details">Saldo:<span class="status" :class="{paused: balance < 0}">{{ currency(balance) }}</span></div>
     <div class="btns">
       <router-link title="Info"       class="btn info"     @click="dataStore.selectedStudent = student.id_student" to="/aluno"></router-link>
       <router-link title="Extrato"    class="btn extrato"  @click="dataStore.selectedStudent = student.id_student" to="/extrato"></router-link>

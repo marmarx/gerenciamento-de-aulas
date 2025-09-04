@@ -103,18 +103,18 @@ const copyToClipboard = () => {
     <h2>Relatório</h2>
 
     <div class="flexContainer">
-      <label>
+      <label class="third">
         Aluno:
         <select name="aluno" v-model="dataStore.selectedStudent" required>
           <option value="" selected>Selecione um aluno</option>
           <option v-for="student in students" :key="student.id_student" :value="student.id_student">{{student.student_name}}</option>
         </select>
       </label>
-      <label>
+      <label class="third">
         Início:
         <input class="dateFilter" type="text" placeholder="Data inicial" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="filterStart" :max="filterEnd" />
       </label>
-      <label>
+      <label class="third">
         Fim:
         <input class="dateFilter" type="text" placeholder="Data final"   onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="filterEnd" :min="filterStart" />
       </label>

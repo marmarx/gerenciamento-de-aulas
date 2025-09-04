@@ -22,7 +22,7 @@ const restoreEvent = () => { event.value.status = 'scheduled' }
 <template>
   <div v-if="!student.paused" class="card" :class="{partiallyVisible: event.status === 'canceled'}">
     <div class="name">{{student.student_name}}</div>
-    <div class="info">{{eventSchedule}}</div>
+    <div class="details">{{eventSchedule}}</div>
     <div v-if="add" class="btns">
       <div v-if="event.status === 'canceled'"                 title="Restaurar" class="btn undo"      @click="restoreEvent()"></div>
       <div v-else-if="dataStore.data.config.autoFinishEvents" title="Cancelar"  class="btn cancel"    @click="cancelEvent()"></div>
