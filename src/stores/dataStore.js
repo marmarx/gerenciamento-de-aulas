@@ -10,7 +10,7 @@ const newData = () => (
     students:[], events:[], payments:[], config:
     {
       numberOfDays: 14, defaultClassDuration: 1, defaultClassCost: 50,
-      autoFinishEvents: false, autoRemovePastEvents: false, color: '#44289e',
+      autoFinishEvents: false, autoFinishOffset: 60, autoRemovePastEvents: false, color: '#44289e',
     }
   }
 )
@@ -192,4 +192,5 @@ export const useDataStore = defineStore(storageTitle, () => {
     student, studentEvents, studentPayments,
     data
   }
+
 });
