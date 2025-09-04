@@ -63,7 +63,7 @@ const autoFinishEvents = () => {
     dataStore.sortedEvents.forEach(event => {
       if (event.status !== 'scheduled') return;
       const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
-      const finishThreshold = new Date(eventDateTime.getTime() + 60 * 60 * 1000)  //1-hour offset
+      const finishThreshold = new Date(eventDateTime.getTime() + Number(dataStore.data.config.autoFinishOffset) * 60 * 1000)  //hour offset
       if (finishThreshold <= now) event.status = 'done'
     });
   });
