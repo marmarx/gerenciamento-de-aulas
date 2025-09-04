@@ -7,6 +7,8 @@ const dataStore = useDataStore()
 const numberOfDays = computed(() => dataStore.data.config.numberOfDays || 0)
 const nextDaysTitle = computed(() => numberOfDays.value === 1 ? 'Amanhã' : `Próximos ${numberOfDays.value} dias`)
 const lastDate = computed(() => new Date(new Date().setDate(new Date().getDate() + numberOfDays.value)))
+const autoFinishOffset = Number(dataStore.data.config.autoFinishOffset);
+const offset = computed(() => isNaN(autoFinishOffset) ? 60 : autoFinishOffset)
 
 // Generate list of new events
 const generateEvents = () => {
@@ -63,7 +65,7 @@ const autoFinishEvents = () => {
     dataStore.sortedEvents.forEach(event => {
       if (event.status !== 'scheduled') return;
       const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
-      const finishThreshold = new Date(eventDateTime.getTime() + Number(dataStore.data.config.autoFinishOffset) * 60 * 1000)  //hour offset
+      const finishThreshold = new Date(eventDateTime.getTime() + Number(offset) * 60 * 1000)  //hour offset
       if (finishThreshold <= now) event.status = 'done'
     });
   });
