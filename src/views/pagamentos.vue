@@ -15,7 +15,7 @@ const editEvent = (id) => {
   router.push('/pagamento')
 }
 
-import { invertDateISOnoYear } from '@/stores/utility';
+import { invertDateISOnoYear, currency } from '@/stores/utility';
 </script>
 
 <template>
@@ -37,7 +37,7 @@ import { invertDateISOnoYear } from '@/stores/utility';
         <tbody><tr v-for="payment in payments.reverse()" :key="payment.id_pay" @click="editEvent(payment.id_pay)">
           <td>{{ payment.student_name }}</td>
           <td>{{ invertDateISOnoYear(payment.date) }}</td>
-          <td>{{ payment.value }}</td>
+          <td>{{ currency(payment.value) }}</td>
         </tr></tbody>
       </table>
     </div>
@@ -49,3 +49,4 @@ import { invertDateISOnoYear } from '@/stores/utility';
 tr{cursor:pointer}
 
 </style>
+
