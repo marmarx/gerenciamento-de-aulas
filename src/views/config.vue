@@ -103,7 +103,7 @@ const copyToClipboard = async () => {
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-    <p>v 0.9.5</p>
+    <p>v 0.9.6</p>
     
   </div>
 </template>
@@ -124,5 +124,6 @@ p.justify{text-align: justify; line-height: 1.6em; margin: .5em}
 p.justify.mb{margin-bottom: 2em}
 
 </style>
+
 
 
