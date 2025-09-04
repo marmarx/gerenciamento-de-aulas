@@ -52,7 +52,7 @@ const copyToClipboard = async () => {
       <label class="inline-label">
         <span>
           <p class="title">Tempo finalização automática</p>
-          <p class="helpText">A finalização automática ocorre com quantos minutos após o horário agendado de cada aula</p>
+          <p class="helpText">A finalização automática ocorre {{ dataStore.data.config.autoFinishOffset }} minutos após o horário agendado de cada aula</p>
         </span>
         <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.autoFinishOffset">
       </label>
@@ -124,4 +124,5 @@ p.justify{text-align: justify; line-height: 1.6em; margin: .5em}
 p.justify.mb{margin-bottom: 2em}
 
 </style>
+
 
