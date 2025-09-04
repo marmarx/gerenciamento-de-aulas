@@ -34,7 +34,7 @@ import { invertDateISOnoYear } from '@/stores/utility';
           <th>Data</th>
           <th>Valor</th>
         </tr></thead>
-        <tbody><tr v-for="payment in payments" :key="payment.id_pay" @click="editEvent(payment.id_pay)">
+        <tbody><tr v-for="payment in payments.reverse()" :key="payment.id_pay" @click="editEvent(payment.id_pay)">
           <td>{{ payment.student_name }}</td>
           <td>{{ invertDateISOnoYear(payment.date) }}</td>
           <td>{{ payment.value }}</td>
@@ -47,4 +47,5 @@ import { invertDateISOnoYear } from '@/stores/utility';
 
 <style scoped>
 tr{cursor:pointer}
+
 </style>
