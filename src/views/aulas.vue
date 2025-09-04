@@ -40,7 +40,7 @@ import { invertDateISOnoYear, weekDay, horaBR, currency } from '@/stores/utility
           <th class="web">R$/h</th>
           <th>Status</th>
         </tr></thead>
-        <tbody><tr v-for="event in events" :key="event.id_event" @click="editEvent(event.id_event)">
+        <tbody><tr v-for="event in events.reverse()" :key="event.id_event" @click="editEvent(event.id_event)">
           <td>{{ event.student_name }}</td>
           <td>{{ invertDateISOnoYear(event.date) }}</td>
           <td class="web">{{ weekDay(event.date) }}</td>
@@ -57,4 +57,5 @@ import { invertDateISOnoYear, weekDay, horaBR, currency } from '@/stores/utility
 
 <style scoped>
 tr{cursor:pointer}
+
 </style>
