@@ -48,6 +48,14 @@ const copyToClipboard = async () => {
         <template #title>Finalizar aulas automaticamente</template>
         <template #helpText>Aulas agendadas serão marcadas como aulas dadas quando sua respectiva data chegar</template>
       </inputToggle>
+      
+      <label class="inline-label">
+        <span>
+          <p class="title">Tempo finalização automática</p>
+          <p class="helpText">A finalização automática ocorre com quantos minutos após o horário agendado de cada aula</p>
+        </span>
+        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.autoFinishOffset">
+      </label>
 
       <inputToggle v-model="dataStore.data.config.autoRemovePastEvents">
         <template #title>Remover aulas automaticamente</template>
@@ -114,4 +122,5 @@ span p.helpText { font-size: 1em; opacity: .9; }
 input[type="color"]{ border:0; padding: 0; width: 2.5em; height: 2.5em; cursor: pointer; }
 p.justify{text-align: justify; line-height: 1.6em; margin: .5em}
 p.justify.mb{margin-bottom: 2em}
+
 </style>
