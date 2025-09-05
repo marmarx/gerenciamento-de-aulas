@@ -81,10 +81,9 @@ const viewReport = id => {
       <table>
         <thead>
           <tr>
-            <th>Aluno</th>
+            <th>Alunos</th>
             <th>Aulas Dadas</th>
             <th>Aulas Pagas</th>
-            <th>Balance</th>
           </tr>
         </thead>
         <tbody>
@@ -92,7 +91,6 @@ const viewReport = id => {
             <td>{{ item.name }}</td>
             <td>{{ item.done }}</td>
             <td>{{ item.paid }}</td>
-            <td>{{ item.bal }}</td>
           </tr>
         </tbody>
       </table>
@@ -110,6 +108,7 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
 
 
 
