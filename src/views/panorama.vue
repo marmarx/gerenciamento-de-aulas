@@ -42,6 +42,7 @@ const panorama = computed(() => {
     let balance = studentPayments
     let paidEvents = 0
 
+    if(balance){
     uncanceledEvents.forEach(e => {
       const eventValue = (e.duration || dataStore.data.config.defaultClassDuration) * (e.cost || student.cost)
       balance -= eventValue
@@ -49,12 +50,14 @@ const panorama = computed(() => {
       else paidEvents += (balance + eventValue) / eventValue
       if (balance <= 0) break
     })
+    }
 
     return {
       id: student.id_student,
       name: student.student_name,
       done: completedEvents.length,
-      paid: paidEvents//.toFixed(2).replace(".",",")
+      paid: paidEvents,//.toFixed(2).replace(".",",")
+      balance: studentPayments
     }
   })
 })
@@ -87,6 +90,7 @@ const viewReport = id => {
             <th>Aluno</th>
             <th>Aulas Dadas</th>
             <th>Aulas Pagas</th>
+            <th>Balance</th>
           </tr>
         </thead>
         <tbody>
@@ -94,6 +98,7 @@ const viewReport = id => {
             <td>{{ item.name }}</td>
             <td>{{ item.done }}</td>
             <td>{{ item.paid }}</td>
+            <td>{{ item.balance }}</td>
           </tr>
         </tbody>
       </table>
@@ -111,5 +116,6 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
 
 
