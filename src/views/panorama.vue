@@ -45,8 +45,9 @@ const panorama = computed(() => {
     uncanceledEvents.forEach(e => {
       const eventValue = (e.duration || dataStore.data.config.defaultClassDuration) * (e.cost || student.cost)
       balance -= eventValue
-      if(balance >= 0) paidEvents++
+      if (balance >= 0) paidEvents++
       else paidEvents += (balance + eventValue) / eventValue
+      if (balance <= 0) break
     })
 
     return {
@@ -110,4 +111,5 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
 
