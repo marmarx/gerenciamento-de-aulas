@@ -22,36 +22,38 @@ const panorama = computed(() => {
   const payments = dataStore.sortedPayments || []
 
   return students.map(student => {
-    // Payments until endDate -> initial balance
-    let balance = payments
+
+    //total student payments in range
+    const studentPayments = payments
       .filter(p => p.id_student === student.id_student)
-      .filter(p => new Date(p.date) <= endDate)
+      .filter(p => new Date(p.date) >= startDate && new Date(p.date) <= endDate)
       .reduce((sum, p) => sum + p.value, 0)
 
-    // Lessons before startDate -> reduces balance
-    const previousEvents = events.filter(e => e.id_student === student.id_student && new Date(e.date) < startDate)
-    for (const event of previousEvents) { balance -= (event.duration || 1) * (event.cost || student.cost) }
+    //student events in range
+    const studentEvents = events
+      .filter(e => e.id_student === student.id_student)
+      .filter(e => new Date(e.date) >= startDate && new Date(e.date) <= endDate)
 
-    // Events in range - from startDate to endDate - by student
-    const eventsInRange = events
-      .filter(e => e.id_student === student.id_student && new Date(e.date) >= startDate && new Date(e.date) <= endDate)
-      // .sort((a, b) => new Date(a.date) - new Date(b.date))
+    //student done events in range
+    const completedEvents = studentEvents.filter(e => e.status === 'done')
+    //student scheduled and done events in range 
+    const uncanceledEvents = studentEvents.filter(e => e.status !== 'canceled')
+  
+    let balance = studentPayments
+    let paidEvents = 0
 
-    const doneEventsInRange = eventsInRange.filter(e => e.status === 'done')
-
-    // Counting lessons with fractions
-    let paid = 0
-    for (const event of eventsInRange) {
-      const eventCost = (event.duration || 1) * (event.cost || student.cost)
-      if (balance >= eventCost) { paid += 1; balance -= eventCost }
-      else if (balance > 0) { paid += balance / eventCost; balance = 0 }
-    }
+    uncanceledEvents.forEach(e => {
+      const eventValue = (e.duration || dataStore.data.config.defaultClassDuration) * (e.cost || student.cost)
+      balance -= eventValue
+      if(balance >= 0) paidEvents++
+      else paidEvents += (balance + eventValue) / eventValue
+    })
 
     return {
       id: student.id_student,
-      name: student.student_name,
-      done: doneEventsInRange.length,
-      paid: parseFloat(paid.toFixed(2))
+      name: student.name,
+      done: completedEvents.length,
+      paid: paidEvents.toFixed(2).replace(".",",")
     }
   })
 })
@@ -106,4 +108,5 @@ const viewReport = id => {
 
 <style scoped>
 tr{cursor:pointer}
+
 </style>
