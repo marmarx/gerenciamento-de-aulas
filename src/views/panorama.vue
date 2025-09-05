@@ -51,9 +51,9 @@ const panorama = computed(() => {
 
     return {
       id: student.id_student,
-      name: student.name,
+      name: student.student_name,
       done: completedEvents.length,
-      paid: paidEvents.toFixed(2).replace(".",",")
+      paid: paidEvents//.toFixed(2).replace(".",",")
     }
   })
 })
@@ -110,3 +110,4 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
