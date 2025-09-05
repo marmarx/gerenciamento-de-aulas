@@ -14,50 +14,44 @@ const filterStart = ref(dateISO(new Date(year, month, 1)))
 const filterEnd   = ref(dateISO(new Date(year, month + 1, 0)))
 
 const panorama = computed(() => {
-  const startDate = new Date(filterStart.value) 
-  const endDate   = new Date(filterEnd.value)
+  const startDate = filterStart.value ? new Date(filterStart.value) : new Date(-8640000000000000)
+  const endDate   = filterEnd.value ? new Date(filterEnd.value) : new Date(8640000000000000)
 
   const students = dataStore.sortedStudents || []
   const events   = dataStore.sortedEvents   || []
   const payments = dataStore.sortedPayments || []
 
   return students.map(student => {
-
-    //total student payments in range
-    const studentPayments = payments
+    // Payments until endDate -> initial balance
+    let balance = payments
       .filter(p => p.id_student === student.id_student)
-      .filter(p => new Date(p.date) >= startDate && new Date(p.date) <= endDate)
+      .filter(p => new Date(p.date) <= endDate)
       .reduce((sum, p) => sum + p.value, 0)
 
-    //student events in range
-    const studentEvents = events
-      .filter(e => e.id_student === student.id_student)
-      .filter(e => new Date(e.date) >= startDate && new Date(e.date) <= endDate)
+    // Lessons before startDate -> reduces balance
+    const previousEvents = events.filter(e => e.id_student === student.id_student && new Date(e.date) < startDate)
+    for (const event of previousEvents) { balance -= (event.duration || 1) * (event.cost || student.cost) }
 
-    //student done events in range
-    const completedEvents = studentEvents.filter(e => e.status === 'done')
-    //student scheduled and done events in range 
-    const uncanceledEvents = studentEvents.filter(e => e.status !== 'canceled')
-  
-    let balance = studentPayments
-    let paidEvents = 0
+    // Events in range - from startDate to endDate - by student
+    const eventsInRange = events
+      .filter(e => e.id_student === student.id_student && new Date(e.date) >= startDate && new Date(e.date) <= endDate)
+      // .sort((a, b) => new Date(a.date) - new Date(b.date))
 
-    if(balance){
-    uncanceledEvents.forEach(e => {
-      const eventValue = (e.duration || dataStore.data.config.defaultClassDuration) * (e.cost || student.cost)
-      balance -= eventValue
-      if (balance >= 0) paidEvents++
-      else paidEvents += (balance + eventValue) / eventValue
-      if (balance <= 0) break
-    })
+    const doneEventsInRange = eventsInRange.filter(e => e.status === 'done')
+
+    // Counting lessons with fractions
+    let paid = 0
+    for (const event of eventsInRange) {
+      const eventCost = (event.duration || 1) * (event.cost || student.cost)
+      if (balance >= eventCost) { paid += 1; balance -= eventCost }
+      else if (balance > 0) { paid += balance / eventCost; balance = 0 }
     }
 
     return {
       id: student.id_student,
       name: student.student_name,
-      done: completedEvents.length,
-      paid: paidEvents,//.toFixed(2).replace(".",",")
-      bal: studentPayments
+      done: doneEventsInRange.length,
+      paid: parseFloat(paid.toFixed(2))
     }
   })
 })
@@ -116,6 +110,7 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
 
 
 
