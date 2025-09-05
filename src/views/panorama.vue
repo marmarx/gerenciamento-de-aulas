@@ -57,7 +57,7 @@ const panorama = computed(() => {
       name: student.student_name,
       done: completedEvents.length,
       paid: paidEvents,//.toFixed(2).replace(".",",")
-      balance: studentPayments
+      bal: studentPayments
     }
   })
 })
@@ -98,7 +98,7 @@ const viewReport = id => {
             <td>{{ item.name }}</td>
             <td>{{ item.done }}</td>
             <td>{{ item.paid }}</td>
-            <td>{{ item.balance }}</td>
+            <td>{{ item.bal }}</td>
           </tr>
         </tbody>
       </table>
@@ -116,6 +116,7 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
 
 
 
