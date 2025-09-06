@@ -43,7 +43,7 @@ const panorama = computed(() => {
     // Counting lessons with fractions
     let paid = 0
     for (const event of uncanceledEvents) {
-      const eventValue = (e.duration ?? dataStore.data.config.defaultClassDuration) * (e.cost ?? student.cost)
+      const eventValue = (event.duration ?? dataStore.data.config.defaultClassDuration) * (event.cost ?? student.cost)
       if (balance >= eventCost) { paid += 1; balance -= eventCost }
       else if (balance > 0) { paid += balance / eventCost; balance = 0 }
     }
@@ -109,6 +109,7 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
 
 
 
