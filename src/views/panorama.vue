@@ -14,8 +14,8 @@ const filterStart = ref(dateISO(new Date(year, month, 1)))
 const filterEnd   = ref(dateISO(new Date(year, month + 1, 0)))
 
 const panorama = computed(() => {
-  const startDate = filterStart.value ? new Date(filterStart.value) : new Date(-8640000000000000)
-  const endDate   = filterEnd.value ? new Date(filterEnd.value) : new Date(8640000000000000)
+  const startDate = filterStart.value ? new Date(filterStart.value) : new Date("2000-01-01")
+  const endDate   = filterEnd.value ? new Date(filterEnd.value) : new Date("3000-01-01")
 
   const students = dataStore.sortedStudents || []
   const events   = dataStore.sortedEvents   || []
@@ -37,12 +37,13 @@ const panorama = computed(() => {
       .filter(e => e.id_student === student.id_student && new Date(e.date) >= startDate && new Date(e.date) <= endDate)
       // .sort((a, b) => new Date(a.date) - new Date(b.date))
 
-    const doneEventsInRange = eventsInRange.filter(e => e.status === 'done')
+    const doneEvents = eventsInRange.filter(e => e.status === 'done')
+    const uncanceledEvents = eventsInRange.filter(e => e.status !== 'canceled')
 
     // Counting lessons with fractions
     let paid = 0
-    for (const event of eventsInRange) {
-      const eventCost = (event.duration || 1) * (event.cost || student.cost)
+    for (const event of uncanceledEvents) {
+      const eventValue = (e.duration ?? dataStore.data.config.defaultClassDuration) * (e.cost ?? student.cost)
       if (balance >= eventCost) { paid += 1; balance -= eventCost }
       else if (balance > 0) { paid += balance / eventCost; balance = 0 }
     }
@@ -50,7 +51,7 @@ const panorama = computed(() => {
     return {
       id: student.id_student,
       name: student.student_name,
-      done: doneEventsInRange.length,
+      done: doneEvents.length,
       paid: parseFloat(paid.toFixed(2))
     }
   })
@@ -108,6 +109,7 @@ const viewReport = id => {
 tr{cursor:pointer}
 
 </style>
+
 
 
 
