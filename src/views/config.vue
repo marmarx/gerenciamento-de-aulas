@@ -113,7 +113,7 @@ const importAction = (ev) => {
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-    <p>v 0.9.6</p>
+    <p>v 1.0.0</p>
     
   </div>
 </template>
@@ -132,4 +132,5 @@ span p.helpText { font-size: 1em; opacity: .9; }
 input[type="color"]{ border:0; padding: 0; width: 2.5em; height: 2.5em; cursor: pointer; }
 p.justify{text-align: justify; line-height: 1.6em; margin: .5em}
 p.justify.mb{margin-bottom: 2em}
+
 </style>
