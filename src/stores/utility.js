@@ -45,7 +45,7 @@ const horaBR = hhmm => { //string -> 9h30 or 9h
 }
 
 // Text formating function
-const currency = val => val.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
+const currency = val => val.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })//.replace('-R$','- R$')
 const toSentenceCase = str => str.charAt(0).toUpperCase() + str.toLowerCase().slice(1)
 
 // Link functions
