@@ -52,4 +52,7 @@ const toSentenceCase = str => str.charAt(0).toUpperCase() + str.toLowerCase().sl
 const whatsappLink = phone => phone ? `https://wa.me/${phone.replace(/[ +\-\(\)'"]/g, '')}` : ''
 const mapsLink = address => address.trim() ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address.trim())}` : ''
 
+const sortByStr = (arr, prop) => arr.sort((a, b) => a[prop].toLowerCase().localeCompare(b[prop].toLowerCase()))
+const sortByDate = (arr, prop) => arr.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+
 export { uuidv4, today, addDays, dateISO, invertDateISO, invertDateISOnoYear, weekDay, weekDays, dateLabel, timeISO, horaBR, formatTime, currency, toSentenceCase, whatsappLink, mapsLink }

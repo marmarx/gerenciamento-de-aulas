@@ -22,6 +22,7 @@ const normalizeSchedule = () => {
   }
   const last = student.weekly_schedule.at(-1)
   if (!last || hasContent(last)) student.weekly_schedule.push({ weekDay: '', timeDay: '', subject: '' })
+  // trigger agende refactor --HERE--
 }
 
 // add or remove items to schedule whenever it is changed
@@ -33,6 +34,9 @@ watch(
 
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
+const isDisabled = () => !student.student_name
+const saveStudent = () => router.push('/alunos')
 
 // remove existing student on user request
 const removeStudent = () => {
@@ -48,6 +52,7 @@ onBeforeUnmount(() => {
   if(student.student_name) return
   dataStore.removeStudent(student.id_student)
 })
+
 const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 </script>
 
@@ -58,11 +63,11 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
       <div class="half">
         <label>Nome do aluno
         <input type="text" placeholder="Nome do aluno" v-model="student.student_name" required></label>
-        <label>Telefone do Aluno
+        <label>Telefone do aluno
         <input type="tel" placeholder="Telefone" v-model="student.student_phone"></label>
-        <label>Nome do Responsável
+        <label>Nome do responsável
         <input type="text" placeholder="Responsável" v-model="student.parent"></label>
-        <label>Telefone do Responsável
+        <label>Telefone do responsável
         <input type="tel" placeholder="Telefone" v-model="student.parent_phone"></label>
         <label>Nome do responsável
         <input type="text" placeholder="Responsável 2" v-model="student.parent_2"></label>
@@ -88,7 +93,7 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
             <!-- <input type="text" placeholder="Matéria" v-model="schedule.subject"> -->
           </div>
         </label>
-        <label>Valor da hora aulas
+        <label>Valor da hora aula
         <input type="number" min="0" step="0.01" placeholder="Valor da hora aula" v-model.number="student.cost"></label>
         <label>Início e fim de contrato
           <div class="inputFlex">
@@ -102,7 +107,7 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
       </div>
     </div>
     <div class="flexContainer">
-      <router-link to="/aluno" :id_student="student.id_student"><button>Salvar</button></router-link>
+      <button @click="saveStudent()" :id_student="student.id_student" :disabled="isDisabled()">Salvar</button>
       <button  v-if="isNewStudent" @click="router.push('/alunos')">Cancelar</button>
       <button  v-else @click="removeStudent()">Remover</button>
     </div>

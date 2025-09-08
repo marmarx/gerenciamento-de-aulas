@@ -6,6 +6,9 @@ import inputToggle from '@/components/inputToggle.vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
+import { useAgendaStore } from '@/stores/agendaStore'
+const agendaStore = useAgendaStore()
+
 import { ref } from 'vue'
 const fileInput = ref(null)
 
@@ -13,9 +16,16 @@ const copyToClipboard = async () => {
   try {await navigator.clipboard.writeText('c8a13647-4a71-44b1-967a-259079645ace'); alert("Chave Pix copiada para a área de transferência!")}
   catch (err) {console.log("Failure: " + err)}
 }
+
+const importAction = (ev) => {
+  dataStore.importStorage(ev, () => {
+    agendaStore.generateEvents()
+    router.push('/agenda')
+  })
+}
 </script>
 
-<template>  
+<template>
   <div class="section">
 
     <h2>Configurações</h2>
@@ -48,11 +58,11 @@ const copyToClipboard = async () => {
         <template #title>Finalizar aulas automaticamente</template>
         <template #helpText>Aulas agendadas serão marcadas como aulas dadas quando sua respectiva data chegar</template>
       </inputToggle>
-      
+
       <label class="inline-label">
         <span>
-          <p class="title">Tempo finalização automática</p>
-          <p class="helpText">A finalização automática ocorre {{ dataStore.data.config.autoFinishOffset }} minutos após o horário agendado de cada aula</p>
+          <p class="title">Período de finalização</p>
+          <p class="helpText">A finalização automática ocorre {{ dataStore.data.config.autoFinishOffset }} minuto{{dataStore.data.config.autoFinishOffset>0?'s':''}} após o horário agendado de cada aula</p>
         </span>
         <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.autoFinishOffset">
       </label>
@@ -99,7 +109,7 @@ const copyToClipboard = async () => {
       <p class="justify mb">Caso deseje exluir todos os dados, por favor, utilize o botão a seguir. Eles <b>não</b> poderão ser recuperados.</p>
 
       <button @click="dataStore.exportStorage()">Exportar dados</button>
-      <input type="file" ref="fileInput" style="display:none" @change="dataStore.importStorage($event);router.push('/agenda')" accept=".json" />
+      <input type="file" ref="fileInput" style="display:none" @change="importAction($event)" accept=".json" />
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
@@ -122,8 +132,4 @@ span p.helpText { font-size: 1em; opacity: .9; }
 input[type="color"]{ border:0; padding: 0; width: 2.5em; height: 2.5em; cursor: pointer; }
 p.justify{text-align: justify; line-height: 1.6em; margin: .5em}
 p.justify.mb{margin-bottom: 2em}
-
 </style>
-
-
-

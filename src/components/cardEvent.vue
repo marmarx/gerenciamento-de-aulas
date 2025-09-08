@@ -4,7 +4,7 @@ const props = defineProps({ id: { type: String, required: true }, add: { type: B
 
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
-const event = computed(() => dataStore.sortedEvents.find(l => l.id_event === props.id))
+const event = computed(() => dataStore.sortedEvents.find(e => e.id_event === props.id))
 const student = computed(() => dataStore.sortedStudents.find(s => s.id_student === event.value.id_student))
 
 import { mapsLink, whatsappLink, weekDay, dateLabel, horaBR } from '@/stores/utility';

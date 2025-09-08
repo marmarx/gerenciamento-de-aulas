@@ -30,8 +30,8 @@ export const useDataStore = defineStore(storageTitle, () => {
     if(!data.value) return;
     const text = `Tem certeza que deseja apagar todos os dados?\n\nAtenção: essa operação não poderá ser desfeita!`
     if(!confirm(text)) return;
-    data.value = newData()
     localStorage.removeItem(storageTitle)
+    data.value = newData()
     console.log('--- All data deleted ---')
   }
 
@@ -45,11 +45,14 @@ export const useDataStore = defineStore(storageTitle, () => {
     a.click();
   }
 
-  const importStorage = (e) => {
+  const importStorage = (e, onDone) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => data.value = JSON.parse(reader.result)
+    reader.onload = () => {
+      data.value = JSON.parse(reader.result)
+      if (onDone) onDone()
+    }
     reader.readAsText(file);
   }
 
@@ -152,8 +155,13 @@ export const useDataStore = defineStore(storageTitle, () => {
     return payment.value
   }
 
+  watch(data,() => {
+    console.log(data.value)
+    console.log(data.value.students.length,data.value.events.length,data.value.payments.length)
+  })
+
   const removeStudent = id => data.value.students.splice(data.value.students.findIndex(s => s.id_student === id), 1)
-  const removeEvent = id => data.value.events.splice(data.value.events.findIndex(e => e.id_event === id), 1)
+  const removeEvent   = id => data.value.events  .splice(data.value.events  .findIndex(e => e.id_event === id), 1)
   const removePayment = id => data.value.payments.splice(data.value.payments.findIndex(p => p.id_pay === id), 1)
 
   const sortedStudents = computed(() => data.value.students.sort((a, b) => a.student_name.toLowerCase().localeCompare(b.student_name.toLowerCase())))
@@ -192,5 +200,4 @@ export const useDataStore = defineStore(storageTitle, () => {
     student, studentEvents, studentPayments,
     data
   }
-
 });

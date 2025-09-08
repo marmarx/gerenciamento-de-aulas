@@ -3,6 +3,9 @@ import inputToggle from '@/components/inputToggle.vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
+import { computed } from 'vue'
+const autoFinishOffset = computed(() => !isNaN(dataStore.data.config.autoFinishOffset) ? Number(dataStore.data.config.autoFinishOffset) : 30)
+
 if(!dataStore.selectedEvent) {
   const newEvent = dataStore.newEvent()
   dataStore.data.events.push(newEvent)
@@ -31,7 +34,7 @@ const saveEvent = () => {
   if(dataStore.data.config.autoFinishEvents) {
     const now = new Date();
     const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
-    const finishThreshold = new Date(eventDateTime.getTime() + 60 * 60 * 1000)  //1-hour offset
+    const finishThreshold = new Date(eventDateTime.getTime() + autoFinishOffset * 60 * 1000)
     event.status = finishThreshold <= now ? 'done' : 'scheduled'
   }
   event.duration = event.duration || dataStore.data.config.defaultClassDuration
