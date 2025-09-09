@@ -62,7 +62,7 @@ const importAction = (ev) => {
       <label class="inline-label">
         <span>
           <p class="title">Período de finalização</p>
-          <p class="helpText">A finalização automática ocorre {{ dataStore.data.config.autoFinishOffset }} minuto{{dataStore.data.config.autoFinishOffset>0?'s':''}} após o horário agendado de cada aula</p>
+          <p class="helpText">As aulas serão automaticamente marcadas como aulas dadas {{ dataStore.data.config.autoFinishOffset }} minuto{{dataStore.data.config.autoFinishOffset>0?'s':''}} após o horário agendado de cada aula</p>
         </span>
         <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.autoFinishOffset">
       </label>

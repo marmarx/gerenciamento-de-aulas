@@ -20,6 +20,7 @@ const currentEventTime = event.time
 const restoreEvent = () => {
   if(event.originalDate) event.date = currentEventDate || event.originalDate
   if(event.originalTime) event.time = currentEventTime || event.originalTime
+  event.rescheduled = false
   saveEvent()
 }
 
@@ -31,12 +32,13 @@ const router = useRouter()
 
 import { dateISO, timeISO, formatTime } from '@/stores/utility';
 const saveEvent = () => {
-  if(dataStore.data.config.autoFinishEvents) {
+  if(dataStore.data.config.autoFinishEvents.value) {
     const now = new Date();
     const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
-    const finishThreshold = new Date(eventDateTime.getTime() + autoFinishOffset * 60 * 1000)
+    const finishThreshold = new Date(eventDateTime.getTime() + autoFinishOffset.value * 60 * 1000)
     event.status = finishThreshold <= now ? 'done' : 'scheduled'
   }
+  event.rescheduled = event.date !== event.originalDate || event.time !== event.originalTime
   event.duration = event.duration || dataStore.data.config.defaultClassDuration
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
   router.push('/agenda')
@@ -49,8 +51,6 @@ const cancelEvent = () => {
 
 const doEventNow = () => {
   event.status = 'done'
-  event.originalDate = event.date
-  event.originalTime = event.time
   const now = new Date();
   event.date = dateISO(now); // YYYY-MM-DD format
   event.time = timeISO(now); // HH:mm

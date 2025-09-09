@@ -10,7 +10,7 @@ const newData = () => (
     students:[], events:[], payments:[], config:
     {
       numberOfDays: 14, defaultClassDuration: 1, defaultClassCost: 50,
-      autoFinishEvents: false, autoFinishOffset: 60, autoRemovePastEvents: false, color: '#44289e',
+      autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, color: '#44289e',
     }
   }
 )
@@ -155,10 +155,7 @@ export const useDataStore = defineStore(storageTitle, () => {
     return payment.value
   }
 
-  watch(data,() => {
-    console.log(data.value)
-    console.log(data.value.students.length,data.value.events.length,data.value.payments.length)
-  })
+  // watch(data,() => console.log(data.value))
 
   const removeStudent = id => data.value.students.splice(data.value.students.findIndex(s => s.id_student === id), 1)
   const removeEvent   = id => data.value.events  .splice(data.value.events  .findIndex(e => e.id_event === id), 1)

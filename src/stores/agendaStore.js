@@ -23,20 +23,19 @@ export const useAgendaStore = defineStore('agenda', () => {
         const now = new Date()
         let nextCheckDelay = Infinity
 
-        activeStudents.forEach(s => {
-          if (s.paused || s.weekly_schedule.length === 0) return
+        sortedEvents.forEach(event => {
+          if (event.status !== 'scheduled') return
 
-          sortedEvents.forEach(event => {
-            if (event.status !== 'scheduled') return
-            const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`)
-            const finishThreshold = new Date(eventDateTime.getTime() + Number(autoFinishOffset.value) * 60 * 1000)
+          const student = activeStudents.find(s => s.student_id === event.student_id)
+          if (student.paused || student.weekly_schedule.length === 0) return
 
-            if (finishThreshold <= now) event.status = 'done' // overdue → mark done immediately
-            else {
-              const delay = finishThreshold.getTime() - now.getTime()
-              if (delay < nextCheckDelay) nextCheckDelay = delay
-            }
-          })
+          const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`)
+          const finishThreshold = new Date(eventDateTime.getTime() + Number(autoFinishOffset.value) * 60 * 1000)
+          if (finishThreshold <= now) event.status = 'done' // overdue → mark done immediately
+          else {
+            const delay = finishThreshold.getTime() - now.getTime()
+            if (delay < nextCheckDelay) nextCheckDelay = delay
+          }
         })
 
         clearTimeout(timeoutId)
@@ -91,7 +90,6 @@ export const useAgendaStore = defineStore('agenda', () => {
               newEvent.added_manually = false
               newEvent.status = 'scheduled'
               dataStore.data.events.push(newEvent)
-              // console.log(`Creating event ${newEvent.id_event}`)
             }
           }
         })
@@ -111,11 +109,13 @@ export const useAgendaStore = defineStore('agenda', () => {
   }
 
   const stripUndonePastEvents = () => {
-    const today = new Date()
+    const now = new Date()
     dataStore.data.events = dataStore.data.events
       .map(e => {
-        if (new Date(e.date) < today) {
-          if (autoFinishEvents.value && e.status !== 'done') e.status = 'done'
+        const eventDateTime = new Date(`${e.date}T${formatTime(e.time)}`)
+        const finishThreshold = new Date(eventDateTime.getTime() + Number(autoFinishOffset.value) * 60 * 1000)
+        if (finishThreshold <= now) {
+          if (autoFinishEvents.value     && e.status !== 'done') e.status = 'done'
           if (autoRemovePastEvents.value && e.status !== 'done') return null
         }
         return e
@@ -145,6 +145,21 @@ export const useAgendaStore = defineStore('agenda', () => {
       stripUndonePastEvents()
     })
   }
+
+  watch(
+    () => dataStore.sortedEvents,
+    (newEvents, oldEvents) => {
+      newEvents.forEach((event, i) => {
+        if (oldEvents[i] && event.status !== oldEvents[i].status) {
+          console.log(
+            `Event ${event.id_event} status changed: ${oldEvents[i].status} → ${event.status}`
+          )
+          console.trace() // 👈 shows where the change originated
+        }
+      })
+    },
+    { deep: true }
+  )
 
   return { initAutoFinishWatcher, setupEventWatcher, generateEvents }
 })

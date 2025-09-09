@@ -14,9 +14,11 @@ const students = dataStore.activeStudents
 
 const isDisabled = () => !event.id_student || !event.date || !event.time
 
-import { onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
+import { onBeforeUnmount, computed } from 'vue'
+const autoFinishOffset = computed(() => !isNaN(dataStore.data.config.autoFinishOffset) ? Number(dataStore.data.config.autoFinishOffset) : 30)
 
 const saveEvent = () => {
   event.originalDate = event.originalDate || event.date
@@ -26,10 +28,10 @@ const saveEvent = () => {
   event.status = 'scheduled'
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
 
-  if(dataStore.data.config.autoFinishEvents) {
+  if(dataStore.data.config.autoFinishEvents.value) {
     const now = new Date();
     const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
-    const finishThreshold = new Date(eventDateTime.getTime() + 60 * 60 * 1000)  //1-hour offset
+    const finishThreshold = new Date(eventDateTime.getTime() + autoFinishOffset.value * 60 * 1000)  //1-hour offset
     if(finishThreshold <= now) event.status = 'done'
   }
 
