@@ -15,7 +15,8 @@
 @media (prefers-color-scheme: dark) {
   :root{
     --body-back: #1f1f2e; --tab-back: #2a2a3b;
-    --black-main: #cccccc; --black-washed: #aaaaaa; --black-back: #333333;
+    --black-main: #999; --black-washed: #808080; --black-back: #333333;
+    /* #ccc, #aaa */
     --black: #e5e7eb; --white: #111111; --over-trans: #0000004d;
     --table-head: #1d1d29; --table-even: #2a2a3b; --table-odd: #242435; --table-balance: #ffffff; --table-border: #444;
     --card-bg: #2c2c3d; --card-br: #444; --accent: #f5f5f5; --btn-br: #555;
