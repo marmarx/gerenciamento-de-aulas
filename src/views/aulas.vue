@@ -73,7 +73,7 @@ const editEvent = (id) => {
         </tr></tbody>
       </table>
     </div>
-    <p class="tac">Clique em uma aula para editar. Clique em um cabeçalho para organizar.</p>
+    <p class="tac">Clique em uma aula para editar. Clique no cabeçalho para organizar.</p>
   </div>
 </template>
 

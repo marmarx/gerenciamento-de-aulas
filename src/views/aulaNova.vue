@@ -9,7 +9,7 @@ if(!dataStore.selectedEvent) {
   dataStore.selectedEvent = newEvent.id_event
 }
 
-const event = dataStore.sortedEvents.find(l => l.id_event === dataStore.selectedEvent)
+const event = dataStore.sortedEvents.find(e => e.id_event === dataStore.selectedEvent)
 const students = dataStore.activeStudents
 
 const isDisabled = () => !event.id_student || !event.date || !event.time

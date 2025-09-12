@@ -53,7 +53,7 @@ button {
 .button { width:25px; height:25px; padding:1em; margin:0; cursor: pointer; background-color:var(--black-main); display: flex; border-radius: 10px}
 .button:hover,button:hover {background-color: var(--black-washed)}
 button:disabled{ opacity: 0.6; cursor: not-allowed }
-button:disabled:hover{ background-color: var(--black-main) }
+button:disabled:hover{ background-color: var() }
 
 #config-button{
   width: 32px; height: 32px; position: absolute; right: 18px; top: 18px;

@@ -115,14 +115,13 @@ export const useAgendaStore = defineStore('agenda', () => {
         const eventDateTime = new Date(`${e.date}T${formatTime(e.time)}`)
         const finishThreshold = new Date(eventDateTime.getTime() + Number(autoFinishOffset.value) * 60 * 1000)
         if (finishThreshold <= now) {
-          if (autoFinishEvents.value     && e.status !== 'done') e.status = 'done'
-          if (autoRemovePastEvents.value && e.status !== 'done') return null
+          if (autoFinishEvents.value && e.status === 'scheduled') e.status = 'done'   // mark past scheduled events as done, avoids canceled events
+          if (autoRemovePastEvents.value && e.status !== 'done')  return null // replace scheduled and canceled events will null
         }
         return e
       })
-      .filter(Boolean) // remove nulls (only when autoRemovePastEvents applies)
+      .filter(Boolean) // remove nulls (when autoRemovePastEvents applies)
   }
-
 
   //Generate events watcher
   const setupEventWatcher = () => {
@@ -145,21 +144,6 @@ export const useAgendaStore = defineStore('agenda', () => {
       stripUndonePastEvents()
     })
   }
-
-  watch(
-    () => dataStore.sortedEvents,
-    (newEvents, oldEvents) => {
-      newEvents.forEach((event, i) => {
-        if (oldEvents[i] && event.status !== oldEvents[i].status) {
-          console.log(
-            `Event ${event.id_event} status changed: ${oldEvents[i].status} → ${event.status}`
-          )
-          console.trace() // 👈 shows where the change originated
-        }
-      })
-    },
-    { deep: true }
-  )
 
   return { initAutoFinishWatcher, setupEventWatcher, generateEvents }
 })

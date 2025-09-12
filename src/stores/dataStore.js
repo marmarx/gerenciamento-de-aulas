@@ -176,7 +176,7 @@ export const useDataStore = defineStore(storageTitle, () => {
   const selectedPayment = ref('')
 
   const student         = computed(() => sortedStudents.value.find  (s => s.id_student === selectedStudent.value))
-  const studentEvents   = computed(() => sortedEvents.value.filter  (e => e.id_student === selectedStudent.value))
+  const studentEvents   = computed(() => sortedEvents.value  .filter(e => e.id_student === selectedStudent.value))
   const studentPayments = computed(() => sortedPayments.value.filter(p => p.id_student === selectedStudent.value))
 
   const color_label = ['nav-back','nav-hover','nav-line','header-left','header-right','head-text']

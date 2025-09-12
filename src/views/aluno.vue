@@ -6,17 +6,17 @@ const dataStore = useDataStore()
 
 import { useRouter } from 'vue-router'
 if (!dataStore.selectedStudent) useRouter().push('/alunos')
-
 const student = dataStore.student
-const weekDays = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
 
 import { invertDateISO, horaBR, currency, whatsappLink } from '@/stores/utility';
 const studentSchedules = computed(() => student.weekly_schedule.filter(e => e.weekDay || e.timeDay).map(e => `${weekDays[e.weekDay]} ${horaBR(e.timeDay)}`).join('  •  '))
-const completedEvents = computed(() => dataStore.doneEvents.filter(l => l.id_student === student.id_student))
-const completedEventsValue = computed(() => completedEvents.value.filter(l => l.experimental === false).reduce((sum, l) => sum + l.cost * l.duration, 0))
-const completedEventsTime = computed(() => completedEvents.value.reduce((sum, l) => sum + l.duration, 0))
+const completedEvents = computed(() => dataStore.doneEvents.filter(e => e.id_student === student.id_student))
+const completedEventsValue = computed(() => completedEvents.value.filter(e => e.experimental === false).reduce((sum, e) => sum + e.cost * e.duration, 0))
+const completedEventsTime = computed(() => completedEvents.value.reduce((sum, e) => sum + e.duration, 0))
 const completedPayments = computed(() => dataStore.sortedPayments.filter(p => p.id_student === student.id_student).reduce((sum, p) => sum + p.value, 0))
 const balance = computed(() => completedPayments.value - completedEventsValue.value)
+
+const weekDays = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
 </script>
 
 <template>

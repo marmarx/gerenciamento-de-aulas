@@ -12,7 +12,7 @@ if(!dataStore.selectedEvent) {
   dataStore.selectedEvent = newEvent.id_event//sortedEvents
 }
 
-const event = dataStore.sortedEvents.find(l => l.id_event === dataStore.selectedEvent)
+const event = dataStore.sortedEvents.find(e => e.id_event === dataStore.selectedEvent)
 const currentEventDate = event.date
 const currentEventTime = event.time
 

@@ -61,7 +61,7 @@ import { invertDateISOnoYear, currency } from '@/stores/utility';
         </tr></tbody>
       </table>
     </div>
-    <p class="tac">Clique em um pagamento para editar.</p>
+    <p class="tac">Clique em um pagamento para editar. Clique no cabeçalho para organizar.</p>
   </div>
 </template>
 

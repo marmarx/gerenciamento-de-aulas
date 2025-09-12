@@ -140,7 +140,7 @@ const sortBy = (key) => {
       </table>
     </div>
     <p v-else>Selecione um período acima.</p>
-    <p class="tac">Clique em um aluno para ver o relatório.  Clique em um cabeçalho para organizar.</p>
+    <p class="tac">Clique em um aluno para ver o relatório.  Clique no cabeçalho para organizar.</p>
     <div class="flexContainer">
       <button @click="router.push('/aulas')">Todas as Aulas</button>
       <button @click="router.push('/pagamentos')">Todos os Pagamentos</button>

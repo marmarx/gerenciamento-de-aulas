@@ -14,7 +14,7 @@ const fileInput = ref(null)
 
 const copyToClipboard = async () => {
   try {await navigator.clipboard.writeText('c8a13647-4a71-44b1-967a-259079645ace'); alert("Chave Pix copiada para a área de transferência!")}
-  catch (err) {console.log("Failure: " + err)}
+  catch (err) {("Failure: " + err)}
 }
 
 const importAction = (ev) => {
@@ -113,7 +113,7 @@ const importAction = (ev) => {
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-    <p>v 1.0.0</p>
+    <p>v 1.0.1</p>
     
   </div>
 </template>
