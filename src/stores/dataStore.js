@@ -35,16 +35,6 @@ export const useDataStore = defineStore(storageTitle, () => {
     console.log('--- All data deleted ---')
   }
 
-  const exportStorage = () => {
-    const content = JSON.stringify(data.value, null, 2);
-    const blob = new Blob([content], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'backup.json';
-    a.click();
-  }
-
   const importStorage = (e, onDone) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -54,6 +44,18 @@ export const useDataStore = defineStore(storageTitle, () => {
       if (onDone) onDone()
     }
     reader.readAsText(file);
+  }
+
+  const fileDate = () => new Date().toLocaleDateString('en-CA').replaceAll('-','.')
+
+  const exportStorage = () => {
+    const content = JSON.stringify(data.value, null, 2);
+    const blob = new Blob([content], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileDate()} - backup.json`;
+    a.click();
   }
 
   const exportTSV = () => {
@@ -89,7 +91,7 @@ export const useDataStore = defineStore(storageTitle, () => {
       const url = URL.createObjectURL(blob)
       const link = document.createElement("a")
       link.href = url
-      link.download = `${key}.tsv`
+      link.download = `${fileDate()} - ${key}.tsv`
       link.click()
       URL.revokeObjectURL(url)
     })
