@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router'
 import Header from '@/components/header.vue'
 import fab from '@/components/fab.vue'
+import installPrompt from './components/installPrompt.vue'
 
 import { useAgendaStore } from './stores/agendaStore'
 const agendaStore = useAgendaStore()
@@ -80,6 +81,7 @@ onUnmounted(() => {
   </div>
  
   <fab />
+  <installPrompt />
 </template>
 
 <style>
@@ -89,7 +91,7 @@ onUnmounted(() => {
   background: var(--white);
 }
 
-.view-container { position: relative; flex: 1; overflow: hidden }
+.view-container {position:relative; flex:1; overflow:hidden}
 
 /* .slide-left-enter-active, .slide-left-leave-active,
 .slide-right-enter-active, .slide-right-leave-active {transition: all 1s ease} */

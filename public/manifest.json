@@ -2,7 +2,7 @@
   "name": "Gestão de Aulas",
   "short_name": "Aulas",
   "start_url": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#ffffff",
   "theme_color": "#777777",
   "description": "Uma ferramenta simples para gerenciar aulas, alunos e pagamentos.",

@@ -47,6 +47,7 @@ export const useAgendaStore = defineStore('agenda', () => {
 
   // Generate events function
   const generateEvents = () => {
+    if (!dataStore.data.config.autoCreateEvents) return
     if (!dataStore.data.students || dataStore.data.students.length === 0) return
     const studentsWithSchedule = activeStudents.filter(s => s.weekly_schedule.length > 0)
     const validEvents = [] // keep a map of valid events that *should* exist

@@ -23,6 +23,9 @@ const importAction = (ev) => {
     router.push('/agenda')
   })
 }
+
+import { currency } from '@/stores/utility'
+import { isInstalled, installButtonVisible, isIOS, installApp } from "@/stores/installPWA.js"
 </script>
 
 <template>
@@ -33,15 +36,20 @@ const importAction = (ev) => {
       <label class="inline-label">
         <span>
           <p class="title">Dias na agenda</p>
-          <p class="helpText">Número de dias futuros que serão exibidos na agenda</p>
+          <p class="helpText">Serão exibidos {{dataStore.data.config.numberOfDays}} dia{{dataStore.data.config.numberOfDays==1?'':'s'}} futuros na agenda</p>
         </span>
         <input class="tac" type="Number" min="0" step="1" placeholder="Dias" v-model.number="dataStore.data.config.numberOfDays">
       </label>
 
+      <inputToggle v-model="dataStore.data.config.autoCreateEvents">
+        <template #title>Criar agendamentos recorrentes</template>
+        <template #helpText>Aulas semanais {{ dataStore.data.config.autoCreateEvents?'':'não ' }} serão criadas automaticamente considerando o horário de cada aluno - você ainda poderá editar, cancelar e adicionar aulas manualmente</template>
+      </inputToggle>
+
       <label class="inline-label">
         <span>
           <p class="title">Duração das aulas</p>
-          <p class="helpText">A duração padrão das aulas em horas será utilizado quando não especificado em cada evento - não afeta aulas existentes (passadas e agendadas)</p>
+          <p class="helpText">As aulas terão {{dataStore.data.config.defaultClassDuration}} hora{{dataStore.data.config.defaultClassDuration==1?'':'s'}} de duração padrão, caso não especificado individualmente em cada evento - não afeta aulas existentes (passadas e agendadas)</p>
         </span>
         <input class="tac" type="Number" min="0" step=".25" placeholder="Horas" v-model.number="dataStore.data.config.defaultClassDuration">
       </label>
@@ -49,14 +57,14 @@ const importAction = (ev) => {
       <label class="inline-label">
         <span>
           <p class="title">Valor das aulas</p>
-          <p class="helpText">O valor padrão da hora aula será utilizado quando não especificado na ficha de cada aluno - não afeta alunos ou aulas existentes (passadas e agendadas)</p>
+          <p class="helpText">O valor hora aula de {{ currency(dataStore.data.config.defaultClassCost) }} será utilizado como padrão, caso não especificado individualmente na ficha de cada aluno - não afeta alunos ou aulas existentes (passadas e agendadas)</p>
         </span>
         <input class="tac" type="Number" min="0" step=".05" placeholder="R$" v-model.number="dataStore.data.config.defaultClassCost">
       </label>
 
       <inputToggle v-model="dataStore.data.config.autoFinishEvents">
         <template #title>Finalizar aulas automaticamente</template>
-        <template #helpText>Aulas agendadas serão marcadas como aulas dadas quando sua respectiva data chegar</template>
+        <template #helpText>Aulas agendadas {{ dataStore.data.config.autoFinishEvents?'':'não ' }}serão automaticamente marcadas como aulas dadas quando sua respectiva data chegar</template>
       </inputToggle>
 
       <label class="inline-label">
@@ -69,7 +77,7 @@ const importAction = (ev) => {
 
       <inputToggle v-model="dataStore.data.config.autoRemovePastEvents">
         <template #title>Remover aulas automaticamente</template>
-        <template #helpText>Aulas passadas não finalizadas serão removidas da lista de todas as aulas (pode reduzir o uso de memória)</template>
+        <template #helpText>Aulas passadas agendas e canceladas {{ dataStore.data.config.autoRemovePastEvents?'':'não ' }}serão removidas da lista de todas as aulas (pode reduzir o uso de memória)</template>
       </inputToggle>
 
       <label class="inline-label">
@@ -86,8 +94,14 @@ const importAction = (ev) => {
 
     <div class="flexContainer mw500">
       <h3>Sobre o aplicativo</h3>
-      <p class="justify">Este aplicativo é desenvolvido por <a href="https://github.com/marmarx/" target="_blank" rel="noopener">Marco Martins</a> de forma independente e está disponível gratuitamente no GitHub.</p>
-      <p class="justify">Você pode utilizar esse aplicativo offline, se desejar instale-o no seu celular, tablet ou computador. Veja o <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">suporte Google</a> para instruções detalhadas.</p>
+      <p class="justify">Este aplicativo é desenvolvido por <a href="https://github.com/marmarx/" target="_blank" rel="noopener">Marco Martins</a> de forma independente e é disponibilizado gratuitamente.</p>
+
+      <template v-if="!isInstalled">
+        <p class="justify">Você pode utilizar esse aplicativo offline, se desejar instale-o no seu celular, tablet ou computador.</p>
+        <p v-if="isIOS">Para instalar, clique em "Compartilhamento" e depois em "Adicionar à tela inicial".</p>
+        <button v-else @click="installApp()">Instalar App</button>
+      </template>
+
       <p class="justify">Se desejar suportar o desenvolvimento, fique a vontade para fazer doações por Pix.</p>
       <button @click="copyToClipboard()">Copiar Chave Pix</button>
     </div>
@@ -113,7 +127,7 @@ const importAction = (ev) => {
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-    <p>v 1.0.1</p>
+    <p>v 1.0.2</p>
     
   </div>
 </template>
