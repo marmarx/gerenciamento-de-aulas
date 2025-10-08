@@ -77,7 +77,7 @@ import { isInstalled, installButtonVisible, isIOS, installApp } from "@/stores/i
 
       <inputToggle v-model="dataStore.data.config.autoRemovePastEvents">
         <template #title>Remover aulas automaticamente</template>
-        <template #helpText>Aulas passadas agendas e canceladas {{ dataStore.data.config.autoRemovePastEvents?'':'não ' }}serão removidas da lista de todas as aulas (pode reduzir o uso de memória)</template>
+        <template #helpText>Aulas passadas não finalizadas (agendas ou canceladas) {{ dataStore.data.config.autoRemovePastEvents?'':'não ' }}serão removidas da lista de todas as aulas (pode reduzir o uso de memória)</template>
       </inputToggle>
 
       <label class="inline-label">
@@ -127,7 +127,7 @@ import { isInstalled, installButtonVisible, isIOS, installApp } from "@/stores/i
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-    <p>v 1.0.2</p>
+    <p>v 1.0.3</p>
     
   </div>
 </template>

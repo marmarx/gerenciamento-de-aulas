@@ -1,11 +1,7 @@
 <script setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
-
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const students = dataStore.sortedStudents || []
-const student = dataStore.student
 
 import { ref, computed } from 'vue'
 import { dateISO, invertDateISO, currency } from '@/stores/utility'
@@ -22,7 +18,7 @@ const listCompletedLessons = () => {
     type: 'aula',
     date: e.date,
     duration: e.duration || 1,
-    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || student.cost)),
+    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || dataStore.student.cost)),
     experimental: e.experimental || false
   }));
 };
@@ -82,7 +78,7 @@ const report = computed(() => {
 })
 
 const copyToClipboard = () => {
-  const details = `<b>Aluno</b>: ${student.student_name}<br><br><b>Período</b>:<br>de ${invertDateISO(filterStart.value)} à ${invertDateISO(filterEnd.value)}<br><br>`
+  const details = `<b>Aluno</b>: ${dataStore.student.student_name}<br><br><b>Período</b>:<br>de ${invertDateISO(filterStart.value)} à ${invertDateISO(filterEnd.value)}<br><br>`
 
   const reportContent = (details + report.value)
     .replace(/<\/?b>/gi, "*") // Replace <b> tags with asterisks
