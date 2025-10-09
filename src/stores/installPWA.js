@@ -15,9 +15,25 @@ const installApp = async () => {
 
   deferredPrompt.value.prompt()
   const { outcome } = await deferredPrompt.value.userChoice
-  //console.log(`User response: ${outcome}`)
+
+  if (outcome === "accepted") {
+    localStorage.setItem("GestãoPWAinstalled", "true")
+    isInstalled.value = true
+  }
+
   deferredPrompt.value = null
   installButtonVisible.value = false
 }
 
-export { deferredPrompt, isInstalled, installButtonVisible, isIOS, installApp, hideInstallButton }
+const updatedVisibility = () => {
+  const modes = ['fullscreen', 'standalone', 'minimal-ui']
+  const matchedDisplay = 
+    modes.some(mode => window.matchMedia(`(display-mode: ${mode})`).matches) ||  // android and windows
+    window.navigator.standalone // for IOs
+  const wasInstalled = localStorage.getItem("GestãoPWAinstalled") === "true"
+
+  isInstalled.value = matchedDisplay || wasInstalled
+  installButtonVisible.value = !(matchedDisplay || wasInstalled)
+}
+
+export { deferredPrompt, isInstalled, installButtonVisible, isIOS, installApp, hideInstallButton, updatedVisibility }

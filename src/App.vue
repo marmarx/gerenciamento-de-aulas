@@ -2,9 +2,11 @@
 import { RouterView } from 'vue-router'
 import Header from '@/components/header.vue'
 import fab from '@/components/fab.vue'
-import installPrompt from './components/installPrompt.vue'
 
-import { useAgendaStore } from './stores/agendaStore'
+import { updatedVisibility } from '@/stores/installPWA'
+import installPrompt from '@/components/installPrompt.vue'
+
+import { useAgendaStore } from '@/stores/agendaStore'
 const agendaStore = useAgendaStore()
 agendaStore.initAutoFinishWatcher()
 agendaStore.setupEventWatcher()
@@ -61,6 +63,8 @@ watch(() => route.path, (newPath) => {
 }, { immediate: true })
 
 onMounted(() => {
+  updatedVisibility()
+  document.addEventListener("visibilitychange", updatedVisibility)
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
   window.addEventListener('touchend',   handleTouchEnd,   { passive: true })
   router.push('/agenda')
@@ -69,6 +73,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('touchstart', handleTouchStart)
   window.removeEventListener('touchend',   handleTouchEnd)
+  document.removeEventListener("visibilitychange", updatedVisibility)
 })
 </script>
 
