@@ -40,9 +40,10 @@ onMounted(() => {
 .installPrompt{
   position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
   padding: 6px 16px; border-radius: 4px;
-  color: #014361; background: aliceblue;
+  background: aliceblue;
   z-index: 1000;
 }
+.installPrompt *{color:#014361}
 .pwabtn{
   gap: 5px; padding: 5px 10px;
   color: currentColor;

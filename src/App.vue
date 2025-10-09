@@ -19,20 +19,23 @@ const homeViews = ['/agenda','/alunos','/panorama']
 const currentIndex = ref(0) //agenda is the starting view
 const transitionName = ref('slide-left')
 
-let touchStartX = 0
-const SWIPE_THRESHOLD = 50
+let touchStart = [0, 0]
+const SWIPE_THRESHOLD = 70
 
-const handleTouchStart = (event) => touchStartX = event.touches[0].clientX
+const handleTouchStart = (event) => touchStart = [event.touches[0].clientX, event.touches[0].clientY]
 const handleTouchEnd = (event) => {
   if (!homeViews.some(v => route.path.includes(v))) return //break if current view isn't one of the home views
 
-  const diff = touchStartX - event.changedTouches[0].clientX
+  const h_diff = touchStart[0] - event.changedTouches[0].clientX
+  const v_diff = touchStart[1] - event.changedTouches[0].clientY
 
-  if (diff > SWIPE_THRESHOLD) {
+  if (Math.abs(v_diff) > Math.abs(h_diff)) return //ignore if vertical swipe
+
+  if (h_diff > SWIPE_THRESHOLD) {
     currentIndex.value++
     transitionName.value = 'slide-left'
   }
-  else if (diff < -SWIPE_THRESHOLD) {
+  else if (h_diff < -SWIPE_THRESHOLD) {
     currentIndex.value--
     transitionName.value = 'slide-right'
   }
