@@ -9,8 +9,10 @@ const newData = () => (
   {
     students:[], events:[], payments:[], config:
     {
-      numberOfDays: 14, autoCreateEvents: true, defaultClassDuration: 1, defaultClassCost: 50,
-      autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, color: '#44289e'
+      numberOfDays: 14, autoCreateEvents: true, autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, // agenda settings
+      minutesBefore: 15, permissionGranted: false,  // notifications settings
+      defaultClassDuration: 1, defaultClassCost: 50,  // classes default settings
+      color: '#44289e'  // user interface settings
     }
   }
 )

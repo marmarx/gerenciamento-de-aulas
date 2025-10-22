@@ -24,8 +24,11 @@ const importAction = (ev) => {
   })
 }
 
+import { useNotificationStore } from '@/stores/notificationsStore.js'
+const notificationStore = useNotificationStore()
+
 import { currency } from '@/stores/utility'
-import { isInstalled, installButtonVisible, isIOS, installApp } from "@/stores/installPWA.js"
+import { isInstalled, isIOS, installApp } from "@/stores/installPWA.js"
 </script>
 
 <template>
@@ -45,6 +48,19 @@ import { isInstalled, installButtonVisible, isIOS, installApp } from "@/stores/i
         <template #title>Criar agendamentos recorrentes</template>
         <template #helpText>Aulas semanais {{ dataStore.data.config.autoCreateEvents?'':'não ' }} serão criadas automaticamente considerando o horário de cada aluno - você ainda poderá editar, cancelar e adicionar aulas manualmente</template>
       </inputToggle>
+
+      <inputToggle :model-value="dataStore.data.config.permissionGranted" @update:model-value="notificationStore.handlePermissionToggle">
+        <template #title>Permitir notificações</template>
+        <template #helpText>Notificações {{ dataStore.data.config.permissionGranted?'':'não ' }} serão enviadas antes de cada evento</template>
+      </inputToggle>
+
+      <label class="inline-label">
+        <span>
+          <p class="title">Período de envio de notificações</p>
+          <p class="helpText">Se permitido, notificações serão enviadas com {{dataStore.data.config.minutesBefore}} minuto{{dataStore.data.config.minutesBefore==1?'':'s'}} de antecedência ao horário de cada evento - para permitir veja a configuração anterior</p>
+        </span>
+        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Min" v-model.number="dataStore.data.config.minutesBefore">
+      </label>
 
       <label class="inline-label">
         <span>
@@ -127,7 +143,7 @@ import { isInstalled, installButtonVisible, isIOS, installApp } from "@/stores/i
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-    <p>v 1.0.3</p>
+    <p>v 1.1.3 - 2025.10.22</p>
     
   </div>
 </template>
