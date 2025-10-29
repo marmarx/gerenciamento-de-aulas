@@ -3,13 +3,17 @@ import { RouterView } from 'vue-router'
 import Header from '@/components/header.vue'
 import fab from '@/components/fab.vue'
 
-import { updatedVisibility } from '@/stores/installPWA'
+import { updatedVisibility, isWeb } from '@/stores/installPWA'
 import installPrompt from '@/components/installPrompt.vue'
 
 import { useAgendaStore } from '@/stores/agendaStore'
 const agendaStore = useAgendaStore()
 agendaStore.initAutoFinishWatcher()
 agendaStore.setupEventWatcher()
+
+import { useNotificationStore } from '@/stores/notificationStore'
+const notificationStore = useNotificationStore()
+notificationStore.setupNotificationWatcher()
 
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute()
@@ -62,7 +66,7 @@ watch(() => route.path, (newPath) => {
   }
 }, { immediate: true })
 
-onMounted(() => {
+onMounted(async () => {
   updatedVisibility()
   document.addEventListener("visibilitychange", updatedVisibility)
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
@@ -89,7 +93,9 @@ onUnmounted(() => {
   </div>
  
   <fab />
-  <installPrompt />
+  <template v-if="isWeb">
+    <installPrompt />
+  </template>
 </template>
 
 <style>

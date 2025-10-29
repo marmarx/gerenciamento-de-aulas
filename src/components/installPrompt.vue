@@ -1,21 +1,19 @@
 <script setup>
 import { onMounted } from "vue"
-import { deferredPrompt, isInstalled, installButtonVisible, isIOS, installApp, hideInstallButton, updatedVisibility } from "@/stores/installPWA.js"
+import { deferredPrompt, isInstalled, installButtonVisible, isIOS, installApp, hideInstallButton } from "@/stores/installPWA.js"
 
 onMounted(() => { 
-  window.addEventListener("beforeinstallprompt", (e) => {
+  window.addEventListener("beforeinstallprompt", async (e) => {
     e.preventDefault() // Prevents the mini-infobar from appearing on mobile
     deferredPrompt.value = e
     installButtonVisible.value = true
   })
 
   window.addEventListener("appinstalled", () => {
-    //console.log("PWA installed")
     installButtonVisible.value = false
     isInstalled.value = true
   })
 })
-
 </script>
 
 <template>

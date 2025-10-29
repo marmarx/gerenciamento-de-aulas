@@ -18,17 +18,14 @@ const copyToClipboard = async () => {
 }
 
 const importAction = (ev) => {
-  dataStore.importStorage(ev, () => {
+  dataStore.importData(ev, () => {
     agendaStore.generateEvents()
     router.push('/agenda')
   })
 }
 
-import { useNotificationStore } from '@/stores/notificationsStore.js'
-const notificationStore = useNotificationStore()
-
 import { currency } from '@/stores/utility'
-import { isInstalled, isIOS, installApp } from "@/stores/installPWA.js"
+import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
 </script>
 
 <template>
@@ -36,12 +33,13 @@ import { isInstalled, isIOS, installApp } from "@/stores/installPWA.js"
 
     <h2>Configurações</h2>
     <div class="flexContainer mw500" style="max-width: 500px">
+
       <label class="inline-label">
         <span>
-          <p class="title">Dias na agenda</p>
-          <p class="helpText">Serão exibidos {{dataStore.data.config.numberOfDays}} dia{{dataStore.data.config.numberOfDays==1?'':'s'}} futuros na agenda</p>
+          <p class="title">Período de envio de notificações</p>
+          <p class="helpText">Se permitido, notificações serão enviadas com {{dataStore.data.config.minutesBefore}} minuto{{dataStore.data.config.minutesBefore==1?'':'s'}} de antecedência ao horário de cada evento</p>
         </span>
-        <input class="tac" type="Number" min="0" step="1" placeholder="Dias" v-model.number="dataStore.data.config.numberOfDays">
+        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Min" v-model.number="dataStore.data.config.minutesBefore">
       </label>
 
       <inputToggle v-model="dataStore.data.config.autoCreateEvents">
@@ -49,17 +47,12 @@ import { isInstalled, isIOS, installApp } from "@/stores/installPWA.js"
         <template #helpText>Aulas semanais {{ dataStore.data.config.autoCreateEvents?'':'não ' }} serão criadas automaticamente considerando o horário de cada aluno - você ainda poderá editar, cancelar e adicionar aulas manualmente</template>
       </inputToggle>
 
-      <inputToggle :model-value="dataStore.data.config.permissionGranted" @update:model-value="notificationStore.handlePermissionToggle">
-        <template #title>Permitir notificações</template>
-        <template #helpText>Notificações {{ dataStore.data.config.permissionGranted?'':'não ' }} serão enviadas antes de cada evento</template>
-      </inputToggle>
-
       <label class="inline-label">
         <span>
-          <p class="title">Período de envio de notificações</p>
-          <p class="helpText">Se permitido, notificações serão enviadas com {{dataStore.data.config.minutesBefore}} minuto{{dataStore.data.config.minutesBefore==1?'':'s'}} de antecedência ao horário de cada evento - para permitir veja a configuração anterior</p>
+          <p class="title">Dias na agenda</p>
+          <p class="helpText">Serão exibidos {{dataStore.data.config.numberOfDays}} dia{{dataStore.data.config.numberOfDays==1?'':'s'}} futuros na agenda</p>
         </span>
-        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Min" v-model.number="dataStore.data.config.minutesBefore">
+        <input class="tac" type="Number" min="0" step="1" placeholder="Dias" v-model.number="dataStore.data.config.numberOfDays">
       </label>
 
       <label class="inline-label">
@@ -109,25 +102,9 @@ import { isInstalled, isIOS, installApp } from "@/stores/installPWA.js"
     <hr style="width:80%; max-width:450px" />
 
     <div class="flexContainer mw500">
-      <h3>Sobre o aplicativo</h3>
-      <p class="justify">Este aplicativo é desenvolvido por <a href="https://github.com/marmarx/" target="_blank" rel="noopener">Marco Martins</a> de forma independente e é disponibilizado gratuitamente.</p>
-
-      <template v-if="!isInstalled">
-        <p class="justify">Você pode utilizar esse aplicativo offline, se desejar instale-o no seu celular, tablet ou computador.</p>
-        <p v-if="isIOS">Para instalar, clique em "Compartilhamento" e depois em "Adicionar à tela inicial".</p>
-        <button v-else @click="installApp()">Instalar App</button>
-      </template>
-
-      <p class="justify">Se desejar suportar o desenvolvimento, fique a vontade para fazer doações por Pix.</p>
-      <button @click="copyToClipboard()">Copiar Chave Pix</button>
-    </div>
-
-    <hr style="width:80%; max-width:450px" />
-
-    <div class="flexContainer mw500">
       <h3>Exportar tabelas</h3>
-      <p class="justify">Caso desejado, utilize a opção a seguir para exportar todos os dados para arquivos .tsv que podem ser importados no Google Sheets ou Microsoft Excel.</p>
-      <button @click="dataStore.exportTSV()">Exportar tabelas</button>
+      <p class="justify">Utilize a opção a seguir para exportar todos os dados para uma planilha que pode ser aberta utilizando Google Sheets, Microsoft Excel ou outro aplicativo de sua preferência.</p>
+      <button @click="dataStore.exportTables()">Exportar tabelas</button>
     </div>
 
     <hr style="width:80%; max-width:450px" />
@@ -136,14 +113,33 @@ import { isInstalled, isIOS, installApp } from "@/stores/installPWA.js"
       <h3>Gerenciar dados</h3>
       <p class="justify">Todos os dados são armazenados <b>apenas</b> localmente neste dispositivo, ou seja, nada é armazenado online ou em outro dispositivo.</p>
       <p class="justify">Use as opções <b>importar</b> e <b>exportar</b> para transferir seu personagem entre dispositivos.</p>
-      <p class="justify mb">Caso deseje exluir todos os dados, por favor, utilize o botão a seguir. Eles <b>não</b> poderão ser recuperados.</p>
+      <p class="justify mb">Para exluir todos os dados, por favor, utilize o botão a seguir. Os dados <b>não</b> poderão ser recuperados.</p>
 
-      <button @click="dataStore.exportStorage()">Exportar dados</button>
+      <button @click="dataStore.exportData()">Exportar dados</button>
       <input type="file" ref="fileInput" style="display:none" @change="importAction($event)" accept=".json" />
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-    <p>v 1.1.3 - 2025.10.22</p>
+
+    <hr style="width:80%; max-width:450px" />
+
+    <div class="flexContainer mw500">
+      <h3>Sobre o aplicativo</h3>
+      <p class="justify">Este aplicativo é desenvolvido por <a href="https://github.com/marmarx/" target="_blank" rel="noopener">Marco Martins</a> de forma independente e é disponibilizado gratuitamente.</p>
+
+      <template v-if="!isInstalled && isWeb">
+        <p class="justify">Você pode utilizar esse aplicativo offline, para isso instale-o no seu celular, tablet ou computador.</p>
+        <p class="justify" v-if="isIOS">Para instalar, clique em "Compartilhamento" e depois em "Adicionar à tela inicial".</p>
+        <button v-else @click="installApp()">Instalar App</button>
+        <p class="justify">Para receber notificações em um celular ou tablet, é necessário instalar à partir da <a target="_blank" href="https://play.google.com/store/apps">Google Play Store</a> ou da <a target="_blank" href="https://apple.com/br/app-store/">Apple App Store</a>, podem haver cobranças.</p>
+      </template>
+
+      <div class="flexContainer mw500">
+        <p class="justify">Se desejar suportar o desenvolvimento, fique a vontade para fazer doações por Pix.</p>
+        <button @click="copyToClipboard()">Copiar Chave Pix</button>
+      </div>
+      <p class="justify">v 1.2.0 - 2025.10.29</p>
+    </div>
     
   </div>
 </template>

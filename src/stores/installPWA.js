@@ -1,5 +1,7 @@
 import { ref } from "vue"
+import { Capacitor } from '@capacitor/core'
 
+const isWeb = Capacitor.getPlatform() === 'web'
 const deferredPrompt = ref(null)
 const installButtonVisible = ref(false)
 const isInstalled = ref(false)
@@ -26,6 +28,11 @@ const installApp = async () => {
 }
 
 const updatedVisibility = () => {
+  if(!isWeb) {
+    isInstalled.value = false
+    installButtonVisible.value = false
+    return
+  }
   const modes = ['fullscreen', 'standalone', 'minimal-ui']
   const matchedDisplay = 
     modes.some(mode => window.matchMedia(`(display-mode: ${mode})`).matches) ||  // android and windows
@@ -34,6 +41,7 @@ const updatedVisibility = () => {
 
   isInstalled.value = matchedDisplay || wasInstalled
   installButtonVisible.value = !(matchedDisplay || wasInstalled)
+  //console.log('[installPWA]:', {wasInstalled: wasInstalled, isInstalled: isInstalled.value, installButtonVisible: installButtonVisible.value})
 }
 
-export { deferredPrompt, isInstalled, installButtonVisible, isIOS, installApp, hideInstallButton, updatedVisibility }
+export { deferredPrompt, isInstalled, installButtonVisible, isIOS, isWeb, installApp, hideInstallButton, updatedVisibility }

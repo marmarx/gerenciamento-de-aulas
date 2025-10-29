@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
-import { uuidv4, today, dateISO, timeISO, weekDays } from './utility';
+import { uuidv4, today, dateISO, timeISO } from './utility';
 import { paletteFromBase } from './colorStore';
+import { importStorage, exportStorage, exportXLSX } from './importExportStore';
 // import dummyData from '@/unpublished/dummyData'
 
 const storageTitle = 'gestaoDeAulas'
@@ -10,7 +11,7 @@ const newData = () => (
     students:[], events:[], payments:[], config:
     {
       numberOfDays: 14, autoCreateEvents: true, autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, // agenda settings
-      minutesBefore: 15, permissionGranted: false,  // notifications settings
+      minutesBefore: 15, // notifications settings
       defaultClassDuration: 1, defaultClassCost: 50,  // classes default settings
       color: '#44289e'  // user interface settings
     }
@@ -19,13 +20,13 @@ const newData = () => (
 
 export const useDataStore = defineStore(storageTitle, () => {
   const saveStorage = () => {
-    console.log('--- Data saved in localStorage ---')
+    console.log('[dataStore] Data saved in localStorage')
     localStorage.setItem(storageTitle, JSON.stringify(data.value))
   }
 
   const loadStorage = () => {
-    try{console.log('--- Data loaded from localStorage ---'); return JSON.parse(localStorage.getItem(storageTitle)) || newData()}
-    catch(error){console.error('--- Error parsing localStorage! ---\n',error); return newData()}
+    try{console.log('[dataStore] Data loaded from localStorage'); return JSON.parse(localStorage.getItem(storageTitle)) || newData()}
+    catch(error){console.error('[dataStore] Error parsing localStorage!\n',error); return newData()}
   }
 
   const clearStorage = () => {
@@ -34,70 +35,18 @@ export const useDataStore = defineStore(storageTitle, () => {
     if(!confirm(text)) return;
     localStorage.removeItem(storageTitle)
     data.value = newData()
-    console.log('--- All data deleted ---')
+    console.log('[dataStore] All data deleted')
   }
 
-  const importStorage = (e, onDone) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      data.value = JSON.parse(reader.result)
-      if (onDone) onDone()
-    }
-    reader.readAsText(file);
-  }
-
-  const fileDate = () => new Date().toLocaleDateString('en-CA').replaceAll('-','.')
-
-  const exportStorage = () => {
-    const content = JSON.stringify(data.value, null, 2);
-    const blob = new Blob([content], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${fileDate()} - backup.json`;
-    a.click();
-  }
-
-  const exportTSV = () => {
-    Object.entries(data.value).forEach(([key, value]) => {
-      if (!Array.isArray(value) || value.length === 0 || key === 'config') return
-
-      // Get headers from object keys
-      const headers = Object.keys(value[0])
-
-      // Build TSV content
-      // const rows = value.map(obj => headers.map(h => String(obj[h] ?? "")).join("\t"))
-      const rows = value.map(obj =>
-        headers.map(h => {
-          const cell = obj[h]
-
-          // If property is an array of objects, join values
-          if (Array.isArray(cell) && cell.every(item => typeof item === "object")) {
-            return cell
-              .map(item => {
-                if ("weekDay" in item && "timeDay" in item) return `${weekDays[item.weekDay]} ${item.timeDay}`
-                return Object.values(item).join(" ")
-              }).join(", ")
-          }
-
-          return String(cell ?? "")
-        }).join("\t")
-      )
-
-      const tsvContent = [headers.join("\t"), ...rows].join("\n")
-
-      // Create and download file
-      const blob = new Blob([tsvContent], { type: "text/tab-separated-values" })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `${fileDate()} - ${key}.tsv`
-      link.click()
-      URL.revokeObjectURL(url)
+  const importData = (evOrCallback, maybeCallback) => {
+    importStorage(evOrCallback, (content) => {
+      data.value = content
+      if (typeof maybeCallback === 'function') maybeCallback()
     })
   }
+
+  const exportData    = async () => await exportStorage(data.value)
+  const exportTables  = async () => await exportXLSX   (data.value)
 
   const data = ref()
 
@@ -159,7 +108,7 @@ export const useDataStore = defineStore(storageTitle, () => {
     return payment.value
   }
 
-  // watch(data,() => console.log(data.value))
+  // watch(data,() => console.log('[dataStore]', data.value))
 
   const removeStudent = id => data.value.students.splice(data.value.students.findIndex(s => s.id_student === id), 1)
   const removeEvent   = id => data.value.events  .splice(data.value.events  .findIndex(e => e.id_event === id), 1)
@@ -192,8 +141,10 @@ export const useDataStore = defineStore(storageTitle, () => {
   }, { deep: true, immediate: true })
 
   return { 
-    saveStorage, clearStorage, exportStorage, importStorage, exportTSV,
-    newStudent, newEvent, newPayment, removeStudent, removeEvent, removePayment,
+    saveStorage, clearStorage,
+    importData, exportData, exportTables,
+    newStudent, newEvent, newPayment,
+    removeStudent, removeEvent, removePayment,
     selectedStudent, selectedEvent, selectedPayment,
     sortedStudents, sortedEvents, sortedPayments,
     activeStudents, pausedStudents,

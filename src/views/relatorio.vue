@@ -86,7 +86,7 @@ const copyToClipboard = () => {
     .replace(/<[^>]+>/g, ""); // Remove any other HTML tags just in case
 
   navigator.clipboard.writeText(reportContent)
-    .then(() => console.log('Report copied to clipboard!') )
+    .then(() => console.log('[Relatorio] Report copied to clipboard!') )
     .catch(err => {
       console.error('Failure to copy to clipboard:', err);
       alert('Erro ao copiar o relatório.');

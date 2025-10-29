@@ -10,8 +10,8 @@ export const useAgendaStore = defineStore('agenda', () => {
   const autoFinishOffset = computed(() => !isNaN(dataStore.data.config.autoFinishOffset) ? Number(dataStore.data.config.autoFinishOffset) : 30)
   const autoRemovePastEvents = computed(() => dataStore.data.config.autoRemovePastEvents)
 
-  const activeStudents = dataStore.activeStudents
-  const sortedEvents = dataStore.sortedEvents
+  const activeStudents = computed(() => dataStore.activeStudents)
+  const sortedEvents = computed(() => dataStore.sortedEvents)
 
   //Autofinish events watcher
   const initAutoFinishWatcher = () => {
@@ -23,10 +23,10 @@ export const useAgendaStore = defineStore('agenda', () => {
         const now = new Date()
         let nextCheckDelay = Infinity
 
-        sortedEvents.forEach(event => {
+        sortedEvents.value.forEach(event => {
           if (event.status !== 'scheduled') return
 
-          const student = activeStudents.find(s => s.student_id === event.student_id)
+          const student = activeStudents.value.find(s => s.student_id === event.student_id)
           if (student.paused || student.weekly_schedule.length === 0) return
 
           const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`)
@@ -49,7 +49,7 @@ export const useAgendaStore = defineStore('agenda', () => {
   const generateEvents = () => {
     if (!dataStore.data.config.autoCreateEvents) return
     if (!dataStore.data.students || dataStore.data.students.length === 0) return
-    const studentsWithSchedule = activeStudents.filter(s => s.weekly_schedule.length > 0)
+    const studentsWithSchedule = activeStudents.value.filter(s => s.weekly_schedule.length > 0)
     const validEvents = [] // keep a map of valid events that *should* exist
 
     const datesToCheck = []
@@ -71,7 +71,7 @@ export const useAgendaStore = defineStore('agenda', () => {
               originalTime: schedule.timeDay
             })
 
-            const exists = dataStore.sortedEvents.find(e =>
+            const exists = sortedEvents.value.find(e =>
               e.id_student === student.id_student &&
               d.date === (e.originalDate || e.date) &&
               schedule.timeDay === (e.originalTime || e.time)
@@ -128,11 +128,13 @@ export const useAgendaStore = defineStore('agenda', () => {
   const setupEventWatcher = () => {
     // re-run when numberOfDays changes
     watch(() => numberOfDays.value, (newVal, oldVal) => { if (newVal > 0 && newVal > oldVal) generateEvents() }, { immediate: true } )
+    watch(() => activeStudents.value, () => generateEvents(), { deep: true, immediate: true } )
+    watch(() => dataStore.data.config.autoCreateEvents, (newVal) => { if (newVal) generateEvents() }, { immediate: true } )
 
     // re-run when schedules change
     watchEffect(() => {
       // dependencies: schedules
-      activeStudents.forEach(s => s.weekly_schedule)
+      activeStudents.value.forEach(s => s.weekly_schedule)
 
       // dependencies: config toggles
       autoRemovePastEvents.value
