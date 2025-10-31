@@ -34,7 +34,7 @@ const restoreEvent = () => { event.value.status = 'scheduled' }
       <a v-if="student.parent_phone"  title="Whatsapp" class="btn parent"     :href="whatsappLink(student.parent_phone)"  target="_blank" rel="noopener noreferrer"></a>
     </div>
     <div v-else class="btns">
-      <router-link to="/aula/editar"  title="Editar"   class="btn edit"       @click="dataStore.selectedEvent = event.id_event"></router-link>
+      <router-link to="/aula"  title="Editar"   class="btn edit"       @click="dataStore.selectedEvent = event.id_event"></router-link>
       <a v-if="student.address && !student.meeting"    class="btn navigation" :href="mapsLink(student.address)"           target="_blank" rel="noopener noreferrer" title="Navegar"></a>
       <a v-if="student.student_phone" title="Whatsapp" class="btn whatsapp"   :href="whatsappLink(student.student_phone)" target="_blank" rel="noopener noreferrer"></a>
       <a v-if="student.parent_phone"  title="Whatsapp" class="btn parent"     :href="whatsappLink(student.parent_phone)"  target="_blank" rel="noopener noreferrer"></a>

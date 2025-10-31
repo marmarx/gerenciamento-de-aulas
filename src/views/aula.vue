@@ -4,18 +4,18 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 import { dateISO, timeISO, formatTime, isValidDate } from '@/stores/utility';
-import { onBeforeUnmount, computed, watch } from 'vue'
+import { onBeforeUnmount, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const autoFinishOffset = computed(() => !isNaN(dataStore.data.config.autoFinishOffset) ? Number(dataStore.data.config.autoFinishOffset) : 30)
-let newEvent = false
+let isNewEvent = ref(false)
 
 if(!dataStore.selectedEvent) {
   const newEvent = dataStore.newEvent()
   dataStore.data.events.push(newEvent)
   dataStore.selectedEvent = newEvent.id_event
-  newEvent = true
+  isNewEvent.value = true
 }
 
 const students = dataStore.activeStudents
@@ -23,10 +23,6 @@ const event = dataStore.data.events.find(e => e.id_event === dataStore.selectedE
 let updating = false
 
 const isDisabled = () => !event.id_student || !event.date || !event.time
-
-
-
-
 
 const backupEvent = {
   date: event.date,
@@ -46,20 +42,34 @@ const restoreEvent = () => {
 }
 
 const saveEvent = () => {
+  event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
+  event.duration = event.duration || dataStore.data.config.defaultClassDuration
+
+  if(isNewEvent.value) {
+    event.status = 'scheduled'
+    event.originalDate = event.originalDate || event.date
+    event.originalTime = event.originalTime || event.time
+    event.cost = students.find(s => s.id_student === event.id_student).cost || dataStore.data.config.defaultClassCost
+  }
+  else event.rescheduled = event.date !== event.originalDate || event.time !== event.originalTime
+
   if(dataStore.data.config.autoFinishEvents.value) {
     const now = new Date();
     const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
     const finishThreshold = new Date(eventDateTime.getTime() + autoFinishOffset.value * 60 * 1000)
-    event.status = finishThreshold <= now ? 'done' : 'scheduled'
+    if(finishThreshold <= now) event.status = 'done'
   }
-  event.rescheduled = event.date !== event.originalDate || event.time !== event.originalTime
-  event.duration = event.duration || dataStore.data.config.defaultClassDuration
-  event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
+
   router.push('/agenda')
 }
 
 const cancelEvent = () => {
   event.status = event.status === 'canceled' ? 'scheduled' : 'canceled'
+  router.push('/agenda')
+}
+
+const removeEvent = () => {
+  dataStore.removeEvent(event.id_event)
   router.push('/agenda')
 }
 
@@ -86,10 +96,6 @@ const finishEventNow = () => {
   router.push('/agenda')
   setTimeout(() => updating = false, 50)
 }
-
-
-
-
 
 // change dateEnd and timeEnd upon changing start date, preserves duration
 watch(() => event.date, (newVal, oldVal) => {
@@ -162,14 +168,19 @@ watch([() => event.dateEnd, () => event.timeEnd], ([newDateEnd, newTimeEnd], [_,
 
   setTimeout(() => updating = false, 50) // to avoid immediate retriggering
 })
+
+const timeMin = computed(() => event.dateEnd === event.date ? event.time : '')
+
+// remove event if no student, no date or no time is given when leaving the page
+onBeforeUnmount(() => { if(isNewEvent.value && isDisabled()) dataStore.removeEvent(event.id_event) })
 </script>
 
 <template>
   <div class="section">
-    <h2>Editar Aula</h2>
+    <h2>{{ isNewEvent ? 'Nova' : 'Editar' }} Aula</h2>
     <div class="container">
       <label>Nome do aluno
-      <select name="aluno" v-model="event.id_student" disabled>
+      <select name="aluno" v-model="event.id_student" required> <!-- disabled -->
         <option value="" selected>Nome do aluno</option>
         <option v-for="student in students" :key="student" :value="student.id_student">{{student.student_name}}</option>
       </select>
@@ -189,7 +200,7 @@ watch([() => event.dateEnd, () => event.timeEnd], ([newDateEnd, newTimeEnd], [_,
           <input name="horario" type="text" placeholder="Hora de início (hh:mm)" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'" v-model="event.time" required>
         </label>
         <label class="half">Horário de fim
-          <input name="horario" type="text" placeholder="Hora de fim (hh:mm)" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'" v-model="event.timeEnd" required>
+          <input name="horario" type="text" placeholder="Hora de fim (hh:mm)" :min="timeMin" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'" v-model="event.timeEnd" required>
         </label>
       </div>
 
@@ -206,11 +217,22 @@ watch([() => event.dateEnd, () => event.timeEnd], ([newDateEnd, newTimeEnd], [_,
       </inputToggle>
 
     </div>
-    <div class="flexContainer">
+
+    <div v-if="isNewEvent" class="flexContainer">
       <button @click="saveEvent()" :disabled="isDisabled()">Salvar</button>
-      <button @click="finishEventNow()">Finalizar Agora</button>
-      <button @click="cancelEvent()">{{event.status === 'canceled' ? 'Restaurar Aula' : 'Cancelar Aula'}}</button>
-      <button @click="restoreEvent()">Cancelar Edição</button>
+      <button @click="removeEvent()">Cancelar</button>
     </div>
+    <template v-else>
+      <div class="flexContainer">
+        <button @click="finishEventNow()">Finalizar Agora</button>
+        <button @click="cancelEvent()">{{event.status === 'canceled' ? 'Restaurar Aula' : 'Cancelar Aula'}}</button>
+      </div>
+      <div class="flexContainer">
+        <button @click="saveEvent()" :disabled="isDisabled()">Salvar Alterações</button>
+        <button @click="restoreEvent()">Cancelar Alterações</button>
+        <button @click="removeEvent()">Excluir Aula</button>
+      </div>
+    </template>
+    
   </div>
 </template>

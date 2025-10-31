@@ -19,17 +19,15 @@ const blobToBase64 = (blob) => new Promise((resolve) => {
 const importStorage = async (eOrOnDone, maybeOnDone) => {
   
   let onDone, event;
-
   if (typeof eOrOnDone === 'function') onDone = eOrOnDone // Native call: only callback passed
   else {  // Web call: file input event + callback
     event = eOrOnDone
     onDone = maybeOnDone
   }
 
-
   // Web version - no need to ask for permission
   if (!isNative) {
-    const file = e.target.files[0]
+    const file = event.target.files[0]
     if (!file) return
     const reader = new FileReader()
     reader.onload = () => {
@@ -171,47 +169,5 @@ const exportXLSX = async (data) => {
   }
   catch (err) { console.error('[exportXLSHandler] Export failed:', err) }
 }
-
-
-
-
-
-// const exportXLSX = async (data) => {
-//   const workbook = XLSX.utils.book_new()
-//   const filename = `${fileDate()} - backup.xlsx`
-
-//   // Create one sheet per dataset
-//   for (const [key, value] of Object.entries(data)) {
-//     if (!Array.isArray(value) || value.length === 0 || key === 'config') continue
-//     const sheet = XLSX.utils.json_to_sheet(value)
-//     XLSX.utils.book_append_sheet(workbook, sheet, key.slice(0, 31))
-//   }
-
-//   // Web version - no need to ask for permission
-//   if (!isNative) {
-//     XLSX.writeFile(workbook, filename)
-//     return
-//   }
-
-//   // Native (Capacitor)
-//   const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
-//   const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-//   const base64 = await blobToBase64(blob)
-
-//   try {
-//     const result = await Filesystem.writeFile({
-//       path: filename,
-//       data: base64,
-//       directory: Directory.Cache, // app-private and permission-free
-//     })
-//     await Share.share({
-//       title: 'Gestão de Aulas - Dados Exportados',
-//       text: 'Dados exportados em formato Excel',
-//       url: result.uri,
-//       dialogTitle: 'Compartilhe a planilha exportada',
-//     })
-//   }
-//   catch (err) { console.error('[exportXLSHandler] Export failed:', err) }
-// }
 
 export { importStorage, exportStorage, exportXLSX }

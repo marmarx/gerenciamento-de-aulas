@@ -6,7 +6,7 @@ const dataStore = useDataStore()
 
 const reset = () => {
   dataStore.selectedStudent = ''
-  dataStore.selectedEvent = ''
+  dataStore.selectedEvent   = ''
   dataStore.selectedPayment = ''
 }
 
@@ -28,12 +28,12 @@ const toggleFab = () => {
   // set today day for icon
   const today = new Date()
   document.documentElement.style.setProperty('--today-day', `"${today.getDate()}"`)
+  reset()
 }
 
 // text, icon, link
 const fabs = [
   ['Aluno','student','aluno/editar'],
-  // ['aula dada','lesson','aula'],
   ['Aula','event','aula'],
   ['Pagamento','payment','pagamento'],
   ['Configurações','config','config']
@@ -43,7 +43,7 @@ const fabs = [
 <template>
   <div id="overlay" class="negative-z-index" @click="toggleFab()"></div>
   <div class="fab-container negative-z-index">
-    <router-link v-for="fab in fabs" :key="`btn-${fab[0]}`" :to="`/${fab[2]}`" @click="toggleFab();reset()" class="fab-option">
+    <router-link v-for="fab in fabs" :key="`btn-${fab[0]}`" :to="`/${fab[2]}`" @click="toggleFab()" class="fab-option">
       <div class="fab-label">{{ fab[0] }}</div>
       <div class="fab"><div class="icon" :class="`icon-${fab[1]}`"></div></div>
     </router-link>

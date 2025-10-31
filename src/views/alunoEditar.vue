@@ -4,7 +4,7 @@ const dataStore = useDataStore()
 
 import { ref, watch, onBeforeUnmount } from 'vue'
 const isNewStudent = ref(false)
-// if no student is selected, create a new one and select it
+
 if(!dataStore.selectedStudent) {
   const newStudent = dataStore.newStudent()
   dataStore.data.students.push(newStudent)
@@ -22,7 +22,7 @@ const normalizeSchedule = () => {
   }
   const last = student.weekly_schedule.at(-1)
   if (!last || hasContent(last)) student.weekly_schedule.push({ weekDay: '', timeDay: '', subject: '' })
-  // trigger agende refactor --HERE--
+  // trigger agenda refactor --HERE--
 }
 
 // add or remove items to schedule whenever it is changed
@@ -58,7 +58,7 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
 
 <template>
   <div class="section">
-    <h2>{{ student.student_name ? `Editar` : 'Novo' }} Aluno</h2>
+    <h2>{{ isNewStudent ? 'Novo' : 'Editar' }} Aluno</h2>
     <div class="halfContainer">
       <div class="half">
         <label>Nome do aluno

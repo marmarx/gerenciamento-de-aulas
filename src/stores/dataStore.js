@@ -82,6 +82,8 @@ export const useDataStore = defineStore(storageTitle, () => {
       added_on: new Date(),
       date: dateISO(today()),       //required
       time: timeISO(today()),       //required
+      dateEnd: dateISO(today()),
+      timeEnd: timeISO(new Date(new Date().getTime() + (data.value.config.defaultClassDuration || 1) * 60* 60 * 1000)),
       originalDate: '',
       originalTime: '',
       duration: data.value.config.defaultClassDuration || 1,  //hours

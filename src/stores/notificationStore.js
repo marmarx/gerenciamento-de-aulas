@@ -11,26 +11,27 @@ import { whatsappLink, mapsLink } from '@/stores/utility'
 
 export const useNotificationStore = defineStore('notificationStore', () => {
   const dataStore = useDataStore()
-  const permissionGranted = ref(false)
 
   // Silent check for notifiction permission
-  const checkPermissions = async () => {
-    const check = await LocalNotifications.checkPermissions() // {receive: "granted"}
-    return check.receive === 'granted' // returns true or false
+  const checkPermission = async () => {
+    const check = await LocalNotifications.checkPermissions() // {display: "granted"}
+    return check.display === 'granted' // returns true or false
   }
 
   // Request user notification permission
-  const requestPermissions = async () => {
+  const requestPermission = async () => {
     const request = await LocalNotifications.requestPermissions()  // {display: "granted"}
     return request.display === 'granted' // returns true or false
   }
 
   // Request notification permission on the device -> returns true if granted
   const notificationPermission = async () => {
-    const check = await checkPermissions()
-    const request = check ? check : await requestPermissions()
-    permissionGranted.value = request
-    console.log('[notificationStore] Permission granted:', request)
+    const check = await checkPermission()
+    console.log('[notificationStore] Permission check:', check)
+    if (check) return check
+
+    const request = await requestPermission()
+    console.log('[notificationStore] Permission request:', request)
     return request
   }
   
@@ -49,18 +50,19 @@ export const useNotificationStore = defineStore('notificationStore', () => {
   }
 
   const hashUUID = (uuid) => {
-  let hash = 0
-  for (let i = 0; i < uuid.length; i++) {
-    hash = (hash << 5) - hash + uuid.charCodeAt(i)
-    hash |= 0
+    let hash = 0
+    for (let i = 0; i < uuid.length; i++) {
+      hash = (hash << 5) - hash + uuid.charCodeAt(i)
+      hash |= 0
+    }
+    return Math.abs(hash)
   }
-  return Math.abs(hash)
-}
 
   // Schedule notifications
   const scheduleNotifications = async (students, events, minutesBefore = 15) => {
-    const permission = await notificationPermission()
-    if (!permission) return
+    const check = await checkPermission()  // silent check - no need to bother the user every time the function is called
+    console.log('[notificationStore] Scheduling notifications - permission check:', check)
+    if (!check) return
 
     console.log(`[notificationStore] Scheduling notifications for ${events.length} event(s), ${minutesBefore} minute(s) before each.`)
     await removeDeliveredNotifications()
@@ -68,13 +70,13 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     const now = Date.now()
     const notifications = []
 
-    const dummyEvents = events.slice(0, 3) // debug - get only the first 3 events
-    let offset = 0  // debug
+    //const dummyEvents = events.slice(0, 3) // debug - get only the first 3 events
+    //let offset = 0  // debug
 
-    // for (const e of events) {
-    for (const e of dummyEvents) {  // debug
-      offset++; // debug
-      const dummyTrigger = new Date(Date.now() + offset * 30 * 1000)  // debug - 30 seconds
+    for (const e of events) {
+    //for (const e of dummyEvents) {  // debug
+      // offset++; // debug
+      // const dummyTrigger = new Date(Date.now() + offset * 60 * 1000)  // debug - 60 seconds
 
       if (!e.date || !e.time) continue
       const eventDate = new Date(`${e.date}T${e.time}`)
@@ -92,21 +94,21 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           id, // must be numeric and unique
           title: e.student_name.trim().replace(/\s+/g, ' '),
           body: body.trim().replace(/\s+/g, ' '),
-          // schedule: { at: trigger },
-          schedule: { at: dummyTrigger, allowWhileIdle: true }, // debug
+          schedule: { at: trigger, allowWhileIdle: true },
+          // schedule: { at: dummyTrigger, allowWhileIdle: true }, // debug
           sound: null,
           smallIcon: 'ic_launcher',
           actionTypeId: 'event_actions',
           extra: { whatsapp: whatsappLink(phone), maps: mapsLink(address), eventId: e.id_event }
         })
-        console.log(`[notificationStore] Notification set for event ${e.id_event} - ${id}\n${trigger.toLocaleString()}\n${trigger}`)  // debug
       }
     }
 
     if (notifications.length) {
       await LocalNotifications.schedule({ notifications })
       console.log(`[notificationStore] Scheduled ${notifications.length} notification(s):`, notifications)
-    } else console.log('[notificationStore] No upcoming events to schedule.')
+    }
+    else console.log('[notificationStore] No upcoming events to schedule.')
   }
 
   // Register actions/buttons for notifictions
@@ -142,7 +144,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           console.log('[notificationStore] User opened details for', notif.title)
           if(notif.extra?.eventId){
             useDataStore().selectedEvent = notif.extra?.eventId
-            router.push('/aula/editar')
+            router.push('/aula')  //'/aula/editar'
           } else router.push('/')
           break
 
@@ -173,7 +175,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
   onMounted(async () => {
     console.log('[notificationStore] Checking permission on app start...')
     await notificationPermission()
-
+    
     await registerNotificationActions()
     await addActionListeners()
     await new Promise(r => setTimeout(r, 1000))

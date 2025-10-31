@@ -37,7 +37,7 @@ const router = useRouter()
 
 const editEvent = (id) => {
   dataStore.selectedEvent = id
-  router.push('/aula/editar')
+  router.push('/aula') //'/aula/editar'
 }
 </script>
 

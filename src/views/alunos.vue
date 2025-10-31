@@ -20,7 +20,8 @@ const pausedStudents = computed(() => dataStore.pausedStudents.filter(s => s.stu
       <div v-if="activeStudents.length" class="container grid">
         <cardStudent v-for="student in activeStudents" :key="student.id_student" :id="student.id_student" />
       </div>
-      <p v-else class="tac">Nenhum aluno ainda, <a href="/aluno/editar">adicione</a> um.</p>
+      
+      <p v-else class="tac">Nenhum aluno ainda, <router-link to="/aluno/editar" title="Novo aluno" @click="dataStore.selectedStudent = null">adicione um</router-link>.</p>
     </div>
 
     <div v-if="pausedStudents.length" class="alunos">

@@ -125,7 +125,7 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
 
     <div class="flexContainer mw500">
       <h3>Sobre o aplicativo</h3>
-      <p class="justify">Este aplicativo é desenvolvido por <a href="https://github.com/marmarx/" target="_blank" rel="noopener">Marco Martins</a> de forma independente e é disponibilizado gratuitamente.</p>
+      <p class="justify">Este aplicativo é desenvolvido de forma independente e é disponibilizado gratuitamente.</p>
 
       <template v-if="!isInstalled && isWeb">
         <p class="justify">Você pode utilizar esse aplicativo offline, para isso instale-o no seu celular, tablet ou computador.</p>
@@ -138,7 +138,9 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
         <p class="justify">Se desejar suportar o desenvolvimento, fique a vontade para fazer doações por Pix.</p>
         <button @click="copyToClipboard()">Copiar Chave Pix</button>
       </div>
-      <p class="justify">v 1.2.0 - 2025.10.29</p>
+
+      <hr style="width:80%; max-width:450px" />
+      <p class="justify">v 1.2.1 - 2025.10.31</p>
     </div>
     
   </div>
