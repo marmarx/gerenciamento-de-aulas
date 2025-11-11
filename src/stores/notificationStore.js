@@ -42,7 +42,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
   const cancelPendingNotifications = async () => {
     try {
       const pending = await listPendingNotifications()
-      console.log('[notificationStore] Cancelling pending notifications:', JSON.stringify(pending))
+      console.log('[notificationStore] Cancelling pending notifications:', pending)
       if (pending?.notifications?.length) await LocalNotifications.cancel(pending)  // Android & iOS compatible
       else console.log('[notificationStore] No pending notifications to cancel.')
     }
@@ -64,7 +64,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     console.log('[notificationStore] Scheduling notifications - permission check:', check)
     if (!check) return
 
-    console.log(`[notificationStore] Scheduling notifications for ${events.length} event(s), ${minutesBefore} minute(s) before each.`)
+    console.log(`[notificationStore] Scheduling notifications for ${events.length} event(s)`)
     await removeDeliveredNotifications()
     await cancelPendingNotifications()
     const now = Date.now()
@@ -80,7 +80,8 @@ export const useNotificationStore = defineStore('notificationStore', () => {
 
       if (!e.date || !e.time) continue
       const eventDate = new Date(`${e.date}T${e.time}`)
-      const trigger = new Date(eventDate.getTime() - minutesBefore * 60 * 1000) // mileseconds -> minutes
+      const timeBefore = e.minutesBefore || minutesBefore
+      const trigger = new Date(eventDate.getTime() - timeBefore * 60 * 1000) // mileseconds -> minutes
       const id = hashUUID(e.id_event)
 
       const student = students.find(s => s.id_student === e.id_student)
@@ -89,15 +90,15 @@ export const useNotificationStore = defineStore('notificationStore', () => {
       
       if (trigger.getTime() > now) {
   
-        const body = `Sua próxima aula com ${e.student_name} é em ${minutesBefore} minuto${minutesBefore==1?'':'s'} (duração: ${e.duration} hora${e.duration==1?'':'s'})`
+        const body = `Sua próxima aula com ${e.student_name} é em ${timeBefore} minuto${timeBefore==1?'':'s'} (duração: ${e.duration} hora${e.duration==1?'':'s'})`
         notifications.push({
           id, // must be numeric and unique
           title: e.student_name.trim().replace(/\s+/g, ' '),
           body: body.trim().replace(/\s+/g, ' '),
           schedule: { at: trigger, allowWhileIdle: true },
           // schedule: { at: dummyTrigger, allowWhileIdle: true }, // debug
-          sound: null,
-          smallIcon: 'ic_launcher',
+          // sound: null,
+          smallIcon: 'notification_icon',
           actionTypeId: 'event_actions',
           extra: { whatsapp: whatsappLink(phone), maps: mapsLink(address), eventId: e.id_event }
         })

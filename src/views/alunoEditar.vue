@@ -5,6 +5,8 @@ const dataStore = useDataStore()
 import { ref, watch, onBeforeUnmount } from 'vue'
 const isNewStudent = ref(false)
 
+import { currency } from '@/stores/utility';
+
 if(!dataStore.selectedStudent) {
   const newStudent = dataStore.newStudent()
   dataStore.data.students.push(newStudent)
@@ -13,6 +15,7 @@ if(!dataStore.selectedStudent) {
 }
 
 const student = dataStore.student
+student.minutesBefore = (student?.minutesBefore || student?.minutesBefore === 0) ? student.minutesBefore : dataStore.data.config.minutesBefore
 student.weekly_schedule.push({ weekDay: '', timeDay: '', subject: '' })
 
 const hasContent = (item) => item.weekDay || item.timeDay || item.subject //true if any subitem has content, false if all are empty
@@ -93,8 +96,10 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
             <!-- <input type="text" placeholder="Matéria" v-model="schedule.subject"> -->
           </div>
         </label>
-        <label>Valor da hora aula
+        <label>Valor da hora aula <span class="graySpan">({{ currency(student.cost) }})</span>
         <input type="number" min="0" step="0.01" placeholder="Valor da hora aula" v-model.number="student.cost"></label>
+        <label>Notificação <span class="graySpan">({{student.minutesBefore}} minuto{{student.minutesBefore==1 ? '' : 's'}} antes)</span>
+        <input type="number" min="0" max="120" step="5" placeholder="Notificações (minutos antes)" v-model.number="student.minutesBefore"></label>
         <label>Início e fim de contrato
           <div class="inputFlex">
             <input name="inicioContrato" type="text" placeholder="Início contrato" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="student.start_date">

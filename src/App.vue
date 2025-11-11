@@ -15,70 +15,21 @@ import { useNotificationStore } from '@/stores/notificationStore'
 const notificationStore = useNotificationStore()
 notificationStore.setupNotificationWatcher()
 
-import { useRoute, useRouter } from 'vue-router';
-const route = useRoute()
+import { useRouter } from 'vue-router';
 const router = useRouter()
 
-//Swipe actions
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-const homeViews = ['/agenda','/alunos','/panorama']
-const currentIndex = ref(0) //agenda is the starting view
-const transitionName = ref('slide-left')
+import { setBackGesture, setSwipeGesture, transitionName } from '@/stores/gestureControl'
 
-let touchStart = [0, 0]
-const SWIPE_THRESHOLD = 70
-
-const handleTouchStart = (event) => touchStart = [event.touches[0].clientX, event.touches[0].clientY]
-const handleTouchEnd = (event) => {
-  if (!homeViews.some(v => route.path.includes(v))) return //break if current view isn't one of the home views
-
-  const h_diff = touchStart[0] - event.changedTouches[0].clientX
-  const v_diff = touchStart[1] - event.changedTouches[0].clientY
-
-  if (Math.abs(v_diff) > Math.abs(h_diff)) return //ignore if vertical swipe
-
-  if (h_diff > SWIPE_THRESHOLD) {
-    currentIndex.value++
-    transitionName.value = 'slide-left'
-  }
-  else if (h_diff < -SWIPE_THRESHOLD) {
-    currentIndex.value--
-    transitionName.value = 'slide-right'
-  }
-
-  currentIndex.value = (currentIndex.value + homeViews.length) % homeViews.length  //infinite wrap-around
-}
-
-let isNavigating = false
-watch(currentIndex, async (idx) => {
-  if (isNavigating) return //safe guard - if the user swipes repeatedly before navigation finishes
-  isNavigating = true
-  await router.push(homeViews[idx])
-  isNavigating = false
-})
-
-watch(() => route.path, (newPath) => {
-  if (isNavigating) return
-  const idx = homeViews.findIndex(v => newPath.includes(v))
-  if (idx !== -1) {
-    transitionName.value = currentIndex.value > idx ? 'slide-right' : 'slide-left'
-    currentIndex.value = idx
-  }
-}, { immediate: true })
-
+import { onMounted, onUnmounted } from 'vue'
 onMounted(async () => {
+  setBackGesture()
+  setSwipeGesture()
   updatedVisibility()
   document.addEventListener("visibilitychange", updatedVisibility)
-  window.addEventListener('touchstart', handleTouchStart, { passive: true })
-  window.addEventListener('touchend',   handleTouchEnd,   { passive: true })
   router.push('/agenda')
 })
 
-onUnmounted(() => {
-  window.removeEventListener('touchstart', handleTouchStart)
-  window.removeEventListener('touchend',   handleTouchEnd)
-  document.removeEventListener("visibilitychange", updatedVisibility)
-})
+onUnmounted(() => document.removeEventListener("visibilitychange", updatedVisibility))
 </script>
 
 <template>
@@ -106,9 +57,6 @@ onUnmounted(() => {
 }
 
 .view-container {position:relative; flex:1; overflow:hidden}
-
-/* .slide-left-enter-active, .slide-left-leave-active,
-.slide-right-enter-active, .slide-right-leave-active {transition: all 1s ease} */
 
 .slide-left-enter-active, .slide-right-enter-active {position:relative; z-index:2}
 .slide-left-leave-active, .slide-right-leave-active {position:absolute; z-index:1}

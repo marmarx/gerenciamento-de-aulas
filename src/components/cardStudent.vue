@@ -6,7 +6,7 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const student = dataStore.sortedStudents.find(s => s.id_student === props.id)
 
-import { horaBR, currency } from '@/stores/utility';
+import { horaBR, currency } from '@/stores/utility'
 const studentSchedules = computed(() => student.weekly_schedule.filter(e => e.weekDay || e.timeDay).map(e => `${weekDays[e.weekDay]} ${horaBR(e.timeDay)}`).join('  •  '))
 const completedEvents = computed(() => dataStore.doneEvents.filter(e => e.id_student === student.id_student))
 const completedEventsValue = computed(() => completedEvents.value.filter(e => e.experimental === false).reduce((sum, e) => sum + e.cost * e.duration, 0))

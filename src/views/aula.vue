@@ -3,7 +3,7 @@ import inputToggle from '@/components/inputToggle.vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
-import { dateISO, timeISO, formatTime, isValidDate } from '@/stores/utility';
+import { dateISO, timeISO, formatTime, isValidDate, currency } from '@/stores/utility';
 import { onBeforeUnmount, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -20,9 +20,26 @@ if(!dataStore.selectedEvent) {
 
 const students = dataStore.activeStudents
 const event = dataStore.data.events.find(e => e.id_event === dataStore.selectedEvent)
-let updating = false
 
+let updating = false
 const isDisabled = () => !event.id_student || !event.date || !event.time
+
+const initialUpdate = () => { // added due to the recent changes in the data structure: added event.minutesBefore, event.dateEnd, and event.timeEnd
+  const student = students.find(s => s.id_student === event.id_student)
+  event.minutesBefore =
+    (event.minutesBefore || event.minutesBefore === 0) ? event.minutesBefore :
+    (student?.minutesBefore || student?.minutesBefore === 0) ? student.minutesBefore :
+    dataStore.data.config.minutesBefore
+
+  if(!event.duration && event.duration != 0) return
+  updating = true
+    const start = new Date(`${event.date}T${event.time}`)
+    const end = new Date(start.getTime() + event.duration * 60 * 60 * 1000)
+    event.dateEnd = event.dateEnd || dateISO(end)
+    event.timeEnd = event.timeEnd || timeISO(end)
+  setTimeout(() => updating = false, 50)
+}
+if(!isNewEvent.value) initialUpdate()
 
 const backupEvent = {
   date: event.date,
@@ -96,6 +113,31 @@ const finishEventNow = () => {
   router.push('/agenda')
   setTimeout(() => updating = false, 50)
 }
+
+// update minutesBefore, cost, duration upon changing student
+watch(() => event.id_student, (newId, oldId) => {
+  const oldStudent = dataStore.data.students.find(s => s.id_student === oldId)
+  const newStudent = dataStore.data.students.find(s => s.id_student === newId)
+
+  if (!newStudent) return
+
+  // Use the old student’s values to detect if user changed them manually
+  const oldCost          = oldStudent?.cost
+  const oldDuration      = oldStudent?.duration
+  const oldMinutesBefore = oldStudent?.minutesBefore
+
+  if (event.cost === oldCost || event.cost == null)
+    event.cost = newStudent.cost ?? dataStore.data.config.defaultClassCost
+
+  if (event.duration === oldDuration || event.duration == null)
+    event.duration = newStudent.duration ?? dataStore.data.config.defaultClassDuration
+
+  if (event.minutesBefore === oldMinutesBefore || event.minutesBefore == null)
+    event.minutesBefore = newStudent.minutesBefore ?? dataStore.data.config.minutesBefore
+})
+
+// ?? -> null, undefined
+// || or :? -> false, 0, '', null, undefined, NaN
 
 // change dateEnd and timeEnd upon changing start date, preserves duration
 watch(() => event.date, (newVal, oldVal) => {
@@ -204,11 +246,18 @@ onBeforeUnmount(() => { if(isNewEvent.value && isDisabled()) dataStore.removeEve
         </label>
       </div>
 
-      <label>Duração (horas)
+      <label>Duração <span class="graySpan">({{event.duration}} hora{{event.duration==1 ? '' : 's'}})</span>
         <input name="duração" type="number" placeholder="Duração (horas)" step="0.1" v-model="event.duration">
       </label>
+
+      <label>Valor da hora aula <span class="graySpan">({{ currency(event.cost) }})</span>
+        <input name="valor" type="number" placeholder="Valor da hora aula" step="0.5" v-model="event.cost">
+      </label>
+
+      <label>Notificação <span class="graySpan">({{event.minutesBefore}} minuto{{event.minutesBefore==1 ? '' : 's'}} antes)</span>
+        <input name="notificação" type="Number" min="0" max="120" step="5" placeholder="Notificação (minutos antes do evento)" v-model="event.minutesBefore">
+      </label>
       
-      <!-- <label>Valor da hora aula<input name="valor" type="number" placeholder="Valor da hora aula" step="0.5" v-model="event.cost"></label> -->
       <label>Observações<textarea name="obs" placeholder="Observações" v-model="event.obs"></textarea></label>
 
       <inputToggle v-model="event.experimental">
@@ -224,7 +273,7 @@ onBeforeUnmount(() => { if(isNewEvent.value && isDisabled()) dataStore.removeEve
     </div>
     <template v-else>
       <div class="flexContainer">
-        <button @click="finishEventNow()">Finalizar Agora</button>
+        <button v-if="event.status === 'scheduled'" @click="finishEventNow()">Finalizar Agora</button>
         <button @click="cancelEvent()">{{event.status === 'canceled' ? 'Restaurar Aula' : 'Cancelar Aula'}}</button>
       </div>
       <div class="flexContainer">

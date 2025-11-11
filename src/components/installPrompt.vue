@@ -55,6 +55,6 @@ onMounted(() => {
 .pwaicon.install {background-image:url('@/svg/PWAinstall.svg')}
 .pwaicon.info {background-image:url('@/svg/PWAinfo.svg')}
 @media screen and (max-width: 992px) {
-  .installPrompt{top: auto; bottom: 15px; flex-direction: column; gap: 5px}
+  .installPrompt{top: auto; bottom: 80px; padding: 6px 25px 15px; flex-direction: column; gap: 5px}
 }
 </style>

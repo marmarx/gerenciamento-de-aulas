@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
 import { uuidv4, today, dateISO, timeISO } from './utility';
 import { paletteFromBase } from './colorStore';
-import { importStorage, exportStorage, exportXLSX } from './importExportStore';
+import { importStorage, exportStorage, exportXLSX } from './importExport';
 // import dummyData from '@/unpublished/dummyData'
 
 const storageTitle = 'gestaoDeAulas'
@@ -68,6 +68,7 @@ export const useDataStore = defineStore(storageTitle, () => {
       scholl: '', year: '',
       weekly_schedule: [{ weekDay: null, timeDay: '', subject: '' }], // { weekDay: 0-6, timeDay: 'hh:mm', subject: '' }
       cost: data.value.config.defaultClassCost || 50,
+      minutesBefore: data.value.config.minutesBefore || 15,
       start_date: dateISO(today()), end_date: '',
       obs: ''
     })
@@ -86,8 +87,9 @@ export const useDataStore = defineStore(storageTitle, () => {
       timeEnd: timeISO(new Date(new Date().getTime() + (data.value.config.defaultClassDuration || 1) * 60* 60 * 1000)),
       originalDate: '',
       originalTime: '',
+      cost: data.value.config.defaultClassCost || 50, //number
       duration: data.value.config.defaultClassDuration || 1,  //hours
-      cost: data.value.config.defaultClassCost || 50, // number
+      minutesBefore: data.value.config.minutesBefore || 15, //number
       experimental: false, //boolean
       added_manually: true,
       rescheduled: false,

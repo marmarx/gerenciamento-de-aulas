@@ -1,4 +1,5 @@
 <script setup>
+import { weekLabel, dateLabel, monthLabel, currency, toSentenceCase } from '@/stores/utility'
 import { computed } from 'vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
@@ -9,22 +10,21 @@ const listCompletedLessons = () => {
   const events = dataStore.doneEvents.filter(e => e.id_student === dataStore.selectedStudent);
 
   return events.map(e => ({
-    type: 'aula',
+    type: 'Aula',
     date: e.date,
-    duration: e.duration || 1,
-    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || student.cost)),
-    experimental: e.experimental || false
-  }));
-};
+    value: e.experimental ? 0 : -((e.duration || 1) * (e.cost || student.cost)),
+    details: `${e.experimental ? 'Experimental' : currency(e.cost || student.cost)}  •  ${e.duration || 1} hora${e.duration != 1 ? 's' : ''}`
+  }))
+}
 
 const listPayments = () => {
   const studentPayments = dataStore.studentPayments
-    .map(payment => ({
-      type: "payment",
-      date: payment.date,
-      value: payment.value || 0
-  }));
-  return studentPayments;
+
+  return studentPayments.map(p => ({
+    type: "Pagamento",
+    date: p.date,
+    value: p.value || 0
+  }))
 }
 
 const history = computed(() => {
@@ -39,62 +39,93 @@ const statement = computed(() => {
   let balance = 0
   let rows = []
   let previousDate = null
+  let previousMonth = null
+
+  console.log('history', history.value)
 
   history.value.forEach(item => {
     if (item.date !== previousDate) {
-      if (previousDate) rows.push({ type: 'saldo', date: previousDate, balance })
+      if (previousDate) rows.push({ type: 'Saldo', date: previousDate, value: balance, today: 1 })
       previousDate = item.date
     }
 
-    balance += item.value
+    const month = monthLabel(item.date) 
+    if (month !== previousMonth) {
+      if (previousMonth) rows.push({ type: 'month', details: toSentenceCase(previousMonth)})
+      previousMonth = month
+    }
 
-    rows.push({
-      type: item.type,
-      date: item.date,
-      value: item.experimental ? 0 : item.value,
-      description: item.type === "payment" ? 'Pagamento' : `Aula ${item.experimental ? 'experimental' : `(${item.duration} hora${item.duration > 1 ? 's' : ''})`}`
-    })
+    balance += item.value
+    rows.push({ type: item.type, date: item.date, value: item.value, details: item.details })
   })
 
-  if (previousDate) rows.push({ type: 'saldo', date: previousDate, balance }) //last balance
+  if (previousDate)  rows.push({ type: 'Saldo', date: previousDate, value: balance }) //last balance
+  if (previousMonth) rows.push({ type: 'month', details: toSentenceCase(previousMonth)})
+  console.log('rows', JSON.parse(JSON.stringify(rows)))
   return rows.reverse()
 })
-import { invertDateISO, currency } from '@/stores/utility'
 </script>
 
 <template>
   <div class="section">
     <h2>Extrato</h2>
-    <div class="container">
+    <div class="container smallContainer">
       <select name="aluno" v-model="dataStore.selectedStudent" required>
         <option value="" selected>Selecione um aluno</option>
         <option v-for="student in students" :key="student.id_student" :value="student.id_student">{{student.student_name}}</option>
       </select>
     </div>
-    <div v-if="dataStore.selectedStudent" class="container">
-      <table v-if="statement.length">
-        <thead>
-          <tr class="table-balance">
-            <th>Item</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, i) in statement" :key="i" class="table-balance">
-            <template v-if="row.type === 'saldo'">
-              <td><b>{{ invertDateISO(row.date) }}</b></td>
-              <td>Saldo: <span :style="{ color: row.balance < 0 ? 'var(--money-red)' : 'var(--money-green)' }">{{ currency(row.balance) }}</span></td>
-            </template>
+    <div v-if="dataStore.selectedStudent" class="container smallContainer">
 
-            <template v-else>
-              <td>{{ row.description }}</td>
-              <td>{{ currency(row.value) }}</td>
-            </template>
-          </tr>
-        </tbody>
-      </table>
+      <template v-if="statement.length">
+        <div v-for="(row, i) in statement" :key="i" class="exCol">
+
+          <div v-if="row.type==='month'" class="exMonth">
+            {{ row.details }}
+          </div>
+
+          <div v-else-if="row.type==='Saldo'" class="exBalance">
+            <div class="exRow">
+              <div>{{weekLabel(row.date)}}, {{dateLabel(row.date) }}</div>
+              <div>Saldo <span :style="{ color: row.value < 0 ? 'var(--money-red)' : 'var(--money-green)' }">{{ currency(row.value) }}</span></div>
+            </div>
+          </div>
+
+          <div v-else-if="row.type==='Aula'" class="exItem">
+            <div class="exRow">
+              <div class="exCol">
+                <div class="exTitle">{{ row.type }}</div>
+                <div class="smallTxt">{{ row.details }}</div>
+              </div>
+              <div class="exValue" :style="{ color: row.value < 0 ? 'var(--money-red)' : 'var(--money-green)' }">{{ currency(row.value) }}</div>
+            </div>
+          </div>
+
+          <div v-else-if="row.type==='Pagamento'" class="exItem">
+            <div class="exRow">
+              <div class="exTitle">{{ row.type }}</div>
+              <div class="exValue" :style="{ color: row.value < 0 ? 'var(--money-red)' : 'var(--money-green)' }">{{ currency(row.value) }}</div>
+            </div>
+          </div>
+
+        </div>
+      </template>
       <p class="tac" v-else>Não há dados para o aluno selecionado.</p>
     </div>
     <p v-else>Selecione um aluno acima.</p>
   </div>
 </template>
+
+<style scoped>
+.exCol, .exRow { width: 100%; display: flex }
+.exCol { flex-direction: column; margin: 5px 0}
+.exRow { flex-direction: row; justify-content: space-between }
+.exGap{gap:10px}
+
+.exMonth { font-size: 1.5em; font-weight: bold; margin: 20px 0 10px }
+.exBalance { font-size: .95em; border-bottom: 1px solid currentColor; padding: 5px 0 }
+.exTitle { font-weight: bold; margin: 0 0 5px}
+.exTitle:nth-child(even){background-color: var(--table-even)}
+.exValue { text-wrap: nowrap; margin: auto 0}
+.exItem { margin: 5px 0 }
+</style>

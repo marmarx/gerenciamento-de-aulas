@@ -29,7 +29,7 @@ const weekDays = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
         <p v-if="student.weekly_schedule"><b>Horários:</b> {{studentSchedules}}</p>
         <p v-if="student.student_phone"><b>Telefone:</b> <a target="_blank" :href="whatsappLink(student.student_phone)" rel="noopener noreferrer">{{student.student_phone}}</a></p>
 
-        <hr>
+        <hr/>
         <p><b>Responsável:</b> {{student.parent}}</p>
         <p><b>Telefone:</b> <a target="_blank" :href="whatsappLink(student.parent_phone)" rel="noopener noreferrer">{{student.parent_phone}}</a></p>
         <p v-if="student.parent_2"><b>Responsável:</b> {{student.parent_2}}</p>
@@ -37,13 +37,13 @@ const weekDays = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
         <p v-if="student.address"><b>Endereço:</b> {{student.address}}</p>
 
         <div v-if="student.scholl || student.year">
-          <hr>
+          <hr/>
           <p v-if="student.scholl"><b>Escola:</b> {{student.scholl}}</p>
           <p v-if="student.year"><b>Série:</b> {{student.year}}</p>
         </div>
       </div>
       <div id="student-statement" class="half">
-        <hr class="mob"/>
+        <hr class="mob" />
         <p><b>Aulas dadas:</b> {{ completedEvents.length }} aula{{ completedEvents.length>1?'s':'' }}</p>
         <p><b>Horas totais:</b> {{ completedEventsTime }} hora{{ completedEventsTime>1?'s':'' }}</p>
         <p><b>Hora aula atual:</b> {{ currency(student.cost) }}</p>
@@ -52,13 +52,13 @@ const weekDays = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
         <p><b>Saldo:</b> <span class="status" :class="{paused: balance < 0}" style="font-weight:bold">{{ currency(balance) }}</span></p>
         
         <div v-if="student.start_date || student.end_date">
-          <hr>
+          <hr/>
           <p v-if="student.start_date"><b>Início:</b> {{ invertDateISO(student.start_date) }}</p>
           <p v-if="student.end_date"><b>Fim:</b> {{ invertDateISO(student.end_date) }}</p>
         </div>
         
         <div v-if="student.obs">
-          <hr>
+          <hr/>
           <p><b>Observações:</b> {{student.obs }}</p>
         </div>
       </div>

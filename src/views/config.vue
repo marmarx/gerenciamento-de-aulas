@@ -39,7 +39,7 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
           <p class="title">Período de envio de notificações</p>
           <p class="helpText">Se permitido, notificações serão enviadas com {{dataStore.data.config.minutesBefore}} minuto{{dataStore.data.config.minutesBefore==1?'':'s'}} de antecedência ao horário de cada evento</p>
         </span>
-        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Min" v-model.number="dataStore.data.config.minutesBefore">
+        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.minutesBefore">
       </label>
 
       <inputToggle v-model="dataStore.data.config.autoCreateEvents">
@@ -99,7 +99,7 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
 
     </div>
 
-    <hr style="width:80%; max-width:450px" />
+    <hr/>
 
     <div class="flexContainer mw500">
       <h3>Exportar tabelas</h3>
@@ -107,7 +107,7 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
       <button @click="dataStore.exportTables()">Exportar tabelas</button>
     </div>
 
-    <hr style="width:80%; max-width:450px" />
+    <hr/>
 
     <div class="flexContainer mw500">
       <h3>Gerenciar dados</h3>
@@ -121,7 +121,7 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
 
-    <hr style="width:80%; max-width:450px" />
+    <hr/>
 
     <div class="flexContainer mw500">
       <h3>Sobre o aplicativo</h3>
@@ -139,8 +139,8 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
         <button @click="copyToClipboard()">Copiar Chave Pix</button>
       </div>
 
-      <hr style="width:80%; max-width:450px" />
-      <p class="justify">v 1.2.1 - 2025.10.31</p>
+      <hr/>
+      <p class="justify">v 1.3.2 - 2025.11.10</p>
     </div>
     
   </div>

@@ -7,8 +7,8 @@ const dataStore = useDataStore()
 const event = computed(() => dataStore.sortedEvents.find(e => e.id_event === props.id))
 const student = computed(() => dataStore.sortedStudents.find(s => s.id_student === event.value.id_student))
 
-import { mapsLink, whatsappLink, weekDay, dateLabel, horaBR } from '@/stores/utility';
-const eventSchedule = computed(() => `${dateLabel(event.value.date)}  •  ${weekDay(event.value.date)}  •  ${horaBR(event.value.time)}`)
+import { mapsLink, whatsappLink, weekLabel, dateLabel, horaBR } from '@/stores/utility';
+const eventSchedule = computed(() => `${weekLabel(event.value.date)}  •  ${dateLabel(event.value.date)}  •  ${horaBR(event.value.time)}`)
 
 const markAsDone = () => {
   event.value.duration = event.value.duration || dataStore.data.config.defaultClassDuration

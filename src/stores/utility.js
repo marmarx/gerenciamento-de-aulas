@@ -9,9 +9,10 @@ const addDays = (d,n) => {
   return date.setDate(date.getDate() + n)
 }
 
+const monthLabel = d => new Date(d).toLocaleString('default', { month: 'long' }) //2025-10-25 -> November
 const dateISO = d => new Date(d).toLocaleDateString('en-CA') //Date() -> 2025-10-25
 
-const invertDateISO = d => { //2025-10-25 -> 25-10-2025
+const invertDateISO = d => { //2025-10-25 -> 25/10/2025
   if (!d) return '';
   const [year, month, day] = d.split('-');
   return `${day}/${month}/${year}`;
@@ -25,11 +26,28 @@ const invertDateISOnoYear = d => invertDateISO(d).slice(0,invertDateISO(d).lastI
 const weekDay = d => ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d).getDay()+1]
 const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 
-const dateLabel = dataISO => {  //YYYY-MM-DD -> return Hoje, Amanhã, 26 de ago
+const weekLabel = d => {
   const today = dateISO(new Date())
   const tomorrow = dateISO(addDays(0,1))
-  const format = new Intl.DateTimeFormat('pt-BR',{ day:'2-digit', month:'short' })
-  return dataISO === today ? 'Hoje' : (dataISO === tomorrow ? 'Amanhã' : format.format(new Date(dataISO + 'T00:00:00')).replace('.', '').toLowerCase())
+  const yesterday = dateISO(addDays(0,-1))
+
+  if (d === today) return 'Hoje'
+  if (d === tomorrow) return 'Amanhã'
+  if (d === yesterday) return 'Ontem'
+  return ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d).getDay()+1]
+}
+
+const dateLabel = dataISO => {  // YYYY-MM-DD -> "26 de ago" OR "26 de ago de 2024"
+  const date = new Date(dataISO);
+  const sameYear = date.getFullYear() === new Date().getFullYear()
+
+  const format = new Intl.DateTimeFormat('default', {
+    day: '2-digit',
+    month: 'short',
+    ...(sameYear ? {} : { year: 'numeric' }),
+  })
+
+  return format.format(new Date(dataISO + 'T00:00:00')).replace('.', '').toLowerCase()
 }
 
 // Time formatting functions
@@ -59,7 +77,7 @@ const toTimeString = (minutes) => {
 }
 
 // Text formating function
-const currency = val => val.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })//.replace('-R$','- R$')
+const currency = val => val.toLocaleString('default', { style: 'currency', currency: 'BRL' })//.replace('-R$','- R$')
 const toSentenceCase = str => str.charAt(0).toUpperCase() + str.toLowerCase().slice(1)
 
 // Link functions
@@ -72,7 +90,7 @@ const sortByDate = (arr, prop) => arr.sort((a, b) => (a.date + a.time).localeCom
 export {
   uuidv4,
   today, addDays, dateISO, invertDateISO, invertDateISOnoYear, isValidDate,
-  weekDay, weekDays, dateLabel,
+  weekDay, weekDays, dateLabel, weekLabel, monthLabel,
   timeISO, horaBR, formatTime, toTimeString, toMinutes,
   currency, toSentenceCase, whatsappLink, mapsLink
 }
