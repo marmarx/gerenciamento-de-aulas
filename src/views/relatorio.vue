@@ -79,8 +79,8 @@ const report = computed(() => {
     })
   }
 
-  //if(previousBalance) report += `<br><b>Saldo anterior</b>: <span style="color:${previousBalance < 0 ? 'var(--money-red)' : 'var(--money-green)'}">${currency(previousBalance)}</span><br>`
-  report += `<br><b>Total</b>: <span style="color:${balance < 0 ? 'var(--money-red)' : 'var(--money-green)'}">${currency(balance)}</span>`
+  //if(previousBalance) report += `<br><b>Saldo anterior</b>: <span style="color:${previousBalance < 0 ? 'var(--red)' : 'var(--green)'}">${currency(previousBalance)}</span><br>`
+  report += `<br><b>Total</b>: <span style="color:${balance < 0 ? 'var(--red)' : 'var(--green)'}">${currency(balance)}</span>`
   return report
 })
 
@@ -115,7 +115,7 @@ const sendParent = (parent, phone) => {
     <div class="flexContainer">
       <label class="third">
         Aluno:
-        <select name="aluno" style="text-align: center" v-model="dataStore.selectedStudent" required>
+        <select name="aluno" v-model="dataStore.selectedStudent" required>
           <option value="" selected disabled>Selecione um aluno</option>
           <option v-for="student in students" :key="student.id_student" :value="student.id_student">{{student.student_name}}</option>
         </select>

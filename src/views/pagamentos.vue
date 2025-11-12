@@ -3,9 +3,32 @@ import { ref, computed } from 'vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+import { isMob } from '@/stores/gestureControl'
+import { invertDateISOnoYear, currency, weekLabel, dateLabel, toSentenceCase } from '@/stores/utility';
+
 dataStore.selectedStudent = ''
 const students = dataStore.sortedStudents
 const payments = computed(() => dataStore.sortedPayments.filter(e => !dataStore.selectedStudent || e.id_student === dataStore.selectedStudent))
+
+const paymentsGroupedByMonth = computed(() => {
+  const groups = {}
+
+  for (const item of payments.value) {
+    const d = new Date(item.date)
+    const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
+    if (!groups[monthKey]) groups[monthKey] = []
+    groups[monthKey].push(item)
+  }
+
+  for (const key in groups) {
+    groups[key].sort((a, b) => new Date(a.date) - new Date(b.date))
+  }
+
+  return groups
+})
 
 const sortKey = ref('date')
 const sortReverse = ref(true)
@@ -27,15 +50,10 @@ const sortBy = (key) => {
   }
 }
 
-import { useRouter } from 'vue-router'
-const router = useRouter()
-
 const editPayment = (id) => {
   dataStore.selectedPayment = id
   router.push('/pagamento')
 }
-
-import { invertDateISOnoYear, currency } from '@/stores/utility';
 </script>
 
 <template>
@@ -47,7 +65,32 @@ import { invertDateISOnoYear, currency } from '@/stores/utility';
         <option v-for="student in students" :key="student.id_student" :value="student.id_student">{{student.student_name}}</option>
       </select>
     </div>
-    <div class="container">
+
+    <div v-if="isMob" class="mobList">
+
+      <div v-for="(items, month) in paymentsGroupedByMonth" :key="month">
+        <div class="exHead">
+          <p class="exMonth">{{ toSentenceCase(month) }}</p>
+          <p class="exText">{{ currency(items.reduce((total, e) => total + e.value, 0)) }}</p>
+        </div>
+        <div v-for="payment in items" :key="payment.id_pay" class="exItem" @click="editEvent(payment.id_event)">
+
+          <div class="exRow">
+            <div class="exCol">
+              <div class="exTitle">{{ payment.student_name }}</div>
+              <div class="exText">{{ weekLabel(payment.date) }}, {{ dateLabel(payment.date) }}</div>
+            </div>
+            <div class="exCol">
+              <div style="margin:auto">{{ currency(payment.value) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <p class="tac">Clique em uma aula para editar.</p>
+    </div>
+
+    <div v-else class="container">
       <table>
         <thead><tr>
           <th @click="sortBy('student_name')">Aluno   <span v-if="sortKey === 'student_name'">{{ sortReverse ? '▲' : '▼' }}</span></th>
@@ -60,11 +103,13 @@ import { invertDateISOnoYear, currency } from '@/stores/utility';
           <td>{{ currency(payment.value) }}</td>
         </tr></tbody>
       </table>
+      <br/>
+      <p class="tac">Clique em um pagamento para editar. Clique no cabeçalho para organizar.</p>
     </div>
-    <p class="tac">Clique em um pagamento para editar. Clique no cabeçalho para organizar.</p>
+
   </div>
 </template>
 
 <style scoped>
-tr{cursor:pointer}
+@import "@/assets/list.css";
 </style>

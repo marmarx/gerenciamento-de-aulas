@@ -19,9 +19,14 @@ import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+const exitView = () => {
+  if (router.options.history.state.back) router.back()
+  else router.push('/agenda')
+}
+
 const cancelPayment = () => {
   dataStore.removePayment(payment.id_pay)
-  router.push('/alunos')
+  exitView()
 }
 
 // remove payment if no student, no date or no value is given when leaving the page
@@ -46,8 +51,8 @@ onBeforeUnmount(() => {
       <label>Observações<textarea name="obs" placeholder="Observações" v-model="payment.obs"></textarea></label>
     </div>
     <div class="flexContainer">
-      <button @click="router.push('/alunos')" :disabled="isDisabled()">Salvar</button>
-      <button  v-if="isNewPayment" @click="router.push('/alunos')">Cancelar</button>
+      <button @click="exitView()" :disabled="isDisabled()">Salvar</button>
+      <button  v-if="isNewPayment" @click="exitView()">Cancelar</button>
       <button  v-else @click="cancelPayment()">Remover</button>
     </div>
   </div>

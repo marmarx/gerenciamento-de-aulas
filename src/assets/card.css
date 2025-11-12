@@ -9,8 +9,8 @@
 
 .name{display:inline-flex; justify-content:space-between; font-weight:600; font-size:1.05rem; word-break:break-word}
 .ampel{width: 8px; height: 8px; border-radius: 100%; background: currentColor}
-.status{color: var(--money-green); font-weight:bold}
-.paused{color: var(--money-red)}
+.status{color: var(--green); font-weight:bold}
+.paused{color: var(--red)}
 
 .details{font-size:.98rem; color:var(--accent); display:flex; align-items:center; gap:8px; padding-top:0; white-space:pre}
 .details:nth-child(3){padding-bottom:22px}

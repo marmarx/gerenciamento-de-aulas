@@ -1,4 +1,4 @@
-import { ref, watch, onUnmounted } from 'vue'
+import { ref, watch, computed, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 
 // Android back button action
@@ -98,4 +98,9 @@ const setSwipeGesture = () => {
   })
 }
 
-export { setBackGesture, setSwipeGesture, transitionName }
+//window resize
+const windowWidth = ref(window.innerWidth)
+window.addEventListener('resize', () => windowWidth.value = window.innerWidth)
+const isMob = computed(() => windowWidth.value < 993)
+
+export { setBackGesture, setSwipeGesture, transitionName, isMob }

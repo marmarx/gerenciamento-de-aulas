@@ -52,9 +52,11 @@ onUnmounted(() => document.removeEventListener("visibilitychange", updatedVisibi
 <style>
 .section{
   display: flex; flex-direction: column; align-items: center; gap:25px;
-  padding: 50px 30px 60px; border-radius: 6px; margin: 10px; width: calc(100% - 80px);
+  padding: 50px 30px 6em; border-radius: 6px; margin: 10px; width: calc(100% - 80px);
   background: var(--white);
 }
+
+@media screen and (max-width: 992px) {  .section{margin: 0; width: calc(100% - 60px)} }
 
 .view-container {position:relative; flex:1; overflow:hidden}
 

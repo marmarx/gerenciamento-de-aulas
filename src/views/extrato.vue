@@ -87,7 +87,7 @@ const statement = computed(() => {
           <div v-else-if="row.type==='Saldo'" class="exBalance">
             <div class="exRow">
               <div>{{weekLabel(row.date)}}, {{dateLabel(row.date) }}</div>
-              <div>Saldo <span :style="{ color: row.value < 0 ? 'var(--money-red)' : 'var(--money-green)' }">{{ currency(row.value) }}</span></div>
+              <div>Saldo <span :style="{ color: row.value < 0 ? 'var(--red)' : 'var(--green)' }">{{ currency(row.value) }}</span></div>
             </div>
           </div>
 
@@ -97,14 +97,14 @@ const statement = computed(() => {
                 <div class="exTitle">{{ row.type }}</div>
                 <div class="smallTxt">{{ row.details }}</div>
               </div>
-              <div class="exValue" :style="{ color: row.value < 0 ? 'var(--money-red)' : 'var(--money-green)' }">{{ currency(row.value) }}</div>
+              <div class="exValue" :style="{ color: row.value < 0 ? 'var(--red)' : 'var(--green)' }">{{ currency(row.value) }}</div>
             </div>
           </div>
 
           <div v-else-if="row.type==='Pagamento'" class="exItem">
             <div class="exRow">
               <div class="exTitle">{{ row.type }}</div>
-              <div class="exValue" :style="{ color: row.value < 0 ? 'var(--money-red)' : 'var(--money-green)' }">{{ currency(row.value) }}</div>
+              <div class="exValue" :style="{ color: row.value < 0 ? 'var(--red)' : 'var(--green)' }">{{ currency(row.value) }}</div>
             </div>
           </div>
 
@@ -125,7 +125,6 @@ const statement = computed(() => {
 .exMonth { font-size: 1.5em; font-weight: bold; margin: 20px 0 10px }
 .exBalance { font-size: .95em; border-bottom: 1px solid currentColor; padding: 5px 0 }
 .exTitle { font-weight: bold; margin: 0 0 5px}
-.exTitle:nth-child(even){background-color: var(--table-even)}
 .exValue { text-wrap: nowrap; margin: auto 0}
 .exItem { margin: 5px 0 }
 </style>

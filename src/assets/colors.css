@@ -9,7 +9,7 @@
   --black: #1f2937; --white:#fff; --over-trans:#ffffff3b;
   --table-head: #bbb; --table-even: #f2f2f2; --table-odd: #ddd; --table-balance: #0e0d0d; --table-border: #ddd;
   --card-bg:#fff; --card-br:#e6e6e6; --accent:#111827; --btn-br:#d1d5db;
-  --money-green: green; --money-red: red;
+  --green: green; --red: red;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,6 +20,6 @@
     --black: #e5e7eb; --white: #111111; --over-trans: #0000004d;
     --table-head: #1d1d29; --table-even: #2a2a3b; --table-odd: #242435; --table-balance: #ffffff; --table-border: #444;
     --card-bg: #2c2c3d; --card-br: #444; --accent: #f5f5f5; --btn-br: #555;
-    --money-green: #49e048; --money-red: red;
+    --green: #49e048; --red: red;
   }
 }

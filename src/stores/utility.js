@@ -23,7 +23,7 @@ const isValidDate = d => !isNaN(new Date(d))  // true for valid date strings
 const invertDateISOnoYear = d => invertDateISO(d).slice(0,invertDateISO(d).lastIndexOf('/')) //2025-10-25 -> 25/10
 
 // Weekday formatting functions
-const weekDay = d => ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d).getDay()+1]
+const weekDay = d => ["Seg","Ter","Qua","Qui","Sex","Sáb", "Dom"][new Date(d).getDay()]
 const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 
 const weekLabel = d => {
@@ -34,7 +34,7 @@ const weekLabel = d => {
   if (d === today) return 'Hoje'
   if (d === tomorrow) return 'Amanhã'
   if (d === yesterday) return 'Ontem'
-  return ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date(d).getDay()+1]
+  return weekDay(d)
 }
 
 const dateLabel = dataISO => {  // YYYY-MM-DD -> "26 de ago" OR "26 de ago de 2024"

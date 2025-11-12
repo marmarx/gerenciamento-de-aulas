@@ -58,6 +58,11 @@ const restoreEvent = () => {
   saveEvent()
 }
 
+const exitView = () => {
+  if (router.options.history.state.back) router.back()
+  else router.push('/agenda')
+}
+
 const saveEvent = () => {
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
   event.duration = event.duration || dataStore.data.config.defaultClassDuration
@@ -76,18 +81,17 @@ const saveEvent = () => {
     const finishThreshold = new Date(eventDateTime.getTime() + autoFinishOffset.value * 60 * 1000)
     if(finishThreshold <= now) event.status = 'done'
   }
-
-  router.push('/agenda')
+  exitView()
 }
 
 const cancelEvent = () => {
   event.status = event.status === 'canceled' ? 'scheduled' : 'canceled'
-  router.push('/agenda')
+  exitView()
 }
 
 const removeEvent = () => {
   dataStore.removeEvent(event.id_event)
-  router.push('/agenda')
+  exitView()
 }
 
 const finishEventNow = () => {
@@ -110,8 +114,8 @@ const finishEventNow = () => {
   }, 100)
 
   event.status = 'done'
-  router.push('/agenda')
   setTimeout(() => updating = false, 50)
+  exitView()
 }
 
 // update minutesBefore, cost, duration upon changing student

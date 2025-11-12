@@ -75,6 +75,6 @@ const weekDays = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
 </template>
 
 <style>
-.status{color: var(--money-green); font-weight: bold}
-.paused{color: var(--money-red)}
+.status{color: var(--green); font-weight: bold}
+.paused{color: var(--red)}
 </style>

@@ -1,6 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { invertDateISOnoYear, weekDay, currency, formatTime } from '@/stores/utility';
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+import { isMob } from '@/stores/gestureControl'
+import { invertDateISOnoYear, weekDay, currency, formatTime, weekLabel, dateLabel, horaBR, toSentenceCase } from '@/stores/utility';
 const status = { 'scheduled':'Agendada', 'done':'Finalizada', 'canceled':'Cancelada' }
 
 import { useDataStore } from "@/stores/dataStore"
@@ -9,6 +14,19 @@ const dataStore = useDataStore()
 dataStore.selectedStudent = ''
 const students = dataStore.sortedStudents
 const events = computed(() => dataStore.sortedEvents.filter(e => !dataStore.selectedStudent || e.id_student === dataStore.selectedStudent))
+
+const eventsGroupedByMonth = computed(() => {
+  const groups = {}
+
+  for (const item of events.value.reverse()) {
+    const d = new Date(item.date)
+    const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
+    if (!groups[monthKey]) groups[monthKey] = []
+    groups[monthKey].push(item)
+  }
+
+  return groups
+})
 
 const sortKey = ref('date')
 const sortReverse = ref(true)
@@ -32,8 +50,11 @@ const sortBy = (key) => {
   }
 }
 
-import { useRouter } from 'vue-router'
-const router = useRouter()
+const monthlySum = () => {
+  sum = 0
+
+  return currency(sum)
+}
 
 const editEvent = (id) => {
   dataStore.selectedEvent = id
@@ -51,7 +72,32 @@ const editEvent = (id) => {
       </select>
     </div>
     
-    <div class="container">
+    <div v-if="isMob" class="mobList">
+      <div v-for="(items, month) in eventsGroupedByMonth" :key="month">
+        <div class="exHead">
+          <p class="exMonth">{{ toSentenceCase(month) }}</p>
+          <p class="exText">{{ currency(items.reduce((total, e) => total + (e.experimental ? 0 : (e.status !== 'canceled' ? e.cost * e.duration : 0)), 0)) }}</p>
+        </div>
+        <div v-for="event in items" :key="event.id" class="exItem" @click="editEvent(event.id_event)">
+          <div class="exRow">
+            <div class="exCol">
+              <div class="exTitle">{{ event.student_name }}</div>
+              <div class="exText">{{ weekLabel(event.date) }}, {{ dateLabel(event.date) }}  •  {{ horaBR(event.time) }}</div>
+              <div class="exText">{{ event.experimental ? 'Experimental' : currency(event.cost) }}  •  {{event.duration}} hora{{event.duration>1?'s':''}}</div> 
+            </div>
+            <div class="icon-wrapper">
+              <div v-if="event.status === 'scheduled'" class="icon icon-event" :style="{'--today-day': `'${new Date(event.date).getDate()+1}'`}"></div>
+              <div v-else-if="event.status === 'canceled'" class="icon icon-canceled"></div>
+              <div v-else-if="event.status === 'done'" class="icon icon-done"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <p class="tac">Clique em uma aula para editar.</p>
+    </div>
+
+    <div v-else class="container">
       <table>
         <thead><tr>
           <th             @click="sortBy('student_name')">Aluno   <span v-if="sortKey === 'student_name'">{{ sortReverse ? '▲' : '▼' }}</span></th>
@@ -72,11 +118,12 @@ const editEvent = (id) => {
           <td>{{ status[event.status] }}</td>
         </tr></tbody>
       </table>
+      <br/>
+      <p class="tac">Clique em uma aula para editar. Clique no cabeçalho para organizar.</p>
     </div>
-    <p class="tac">Clique em uma aula para editar. Clique no cabeçalho para organizar.</p>
   </div>
 </template>
 
 <style scoped>
-tr{cursor:pointer}
+@import "@/assets/list.css";
 </style>

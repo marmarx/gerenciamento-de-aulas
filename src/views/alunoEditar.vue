@@ -39,7 +39,10 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const isDisabled = () => !student.student_name
-const saveStudent = () => router.push('/alunos')
+const exitView = () => {
+  if (router.options.history.state.back) router.back()
+  else router.push('/alunos')
+}
 
 // remove existing student on user request
 const removeStudent = () => {
@@ -112,8 +115,8 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
       </div>
     </div>
     <div class="flexContainer">
-      <button @click="saveStudent()" :id_student="student.id_student" :disabled="isDisabled()">Salvar</button>
-      <button  v-if="isNewStudent" @click="router.push('/alunos')">Cancelar</button>
+      <button @click="exitView()" :id_student="student.id_student" :disabled="isDisabled()">Salvar</button>
+      <button  v-if="isNewStudent" @click="exitView()">Cancelar</button>
       <button  v-else @click="removeStudent()">Remover</button>
     </div>
   </div>
