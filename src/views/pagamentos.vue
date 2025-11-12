@@ -73,7 +73,7 @@ const editPayment = (id) => {
           <p class="exMonth">{{ toSentenceCase(month) }}</p>
           <p class="exText">{{ currency(items.reduce((total, e) => total + e.value, 0)) }}</p>
         </div>
-        <div v-for="payment in items" :key="payment.id_pay" class="exItem" @click="editEvent(payment.id_event)">
+        <div v-for="payment in items" :key="payment.id_pay" class="exItem" @click="editPayment(payment.id_pay)">
 
           <div class="exRow">
             <div class="exCol">
