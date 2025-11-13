@@ -16,15 +16,11 @@ const payments = computed(() => dataStore.sortedPayments.filter(e => !dataStore.
 const paymentsGroupedByMonth = computed(() => {
   const groups = {}
 
-  for (const item of payments.value) {
-    const d = new Date(item.date)
+  for (const item of payments.value.reverse()) {
+    const d = new Date(`${item.date}T00:00`)
     const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
     if (!groups[monthKey]) groups[monthKey] = []
     groups[monthKey].push(item)
-  }
-
-  for (const key in groups) {
-    groups[key].sort((a, b) => new Date(a.date) - new Date(b.date))
   }
 
   return groups
@@ -87,7 +83,7 @@ const editPayment = (id) => {
         </div>
       </div>
       <br/>
-      <p class="tac">Clique em uma aula para editar.</p>
+      <p class="tac">Clique em um pagamento para editar.</p>
     </div>
 
     <div v-else class="container">

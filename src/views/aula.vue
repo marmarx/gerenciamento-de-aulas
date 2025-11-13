@@ -101,8 +101,6 @@ const finishEventNow = () => {
   event.time = timeISO(now) // HH:mm
 
   const end = new Date(now.getTime() + event.duration * 60 * 60 * 1000)
-  console.log(end)  // prints: Fri Oct 31 2025 12:56:39 GMT-0300 (Horário Padrão de Brasília)
-  console.log(dateISO(end)) // prints: 2025-10-31
   event.dateEnd = dateISO(end)
   event.timeEnd = timeISO(end)
 

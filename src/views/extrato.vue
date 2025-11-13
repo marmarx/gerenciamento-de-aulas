@@ -64,6 +64,19 @@ const statement = computed(() => {
   console.log('rows', JSON.parse(JSON.stringify(rows)))
   return rows.reverse()
 })
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const editEvent = (id) => {
+  dataStore.selectedEvent = id
+  router.push('/aula')
+}
+
+const editPayment = (id) => {
+  dataStore.selectedPayment = id
+  router.push('/pagamento')
+}
 </script>
 
 <template>
@@ -91,7 +104,7 @@ const statement = computed(() => {
             </div>
           </div>
 
-          <div v-else-if="row.type==='Aula'" class="exItem">
+          <div v-else-if="row.type==='Aula'" class="exItem"  @click="editEvent(row.id_event)">
             <div class="exRow">
               <div class="exCol">
                 <div class="exTitle">{{ row.type }}</div>
@@ -101,7 +114,7 @@ const statement = computed(() => {
             </div>
           </div>
 
-          <div v-else-if="row.type==='Pagamento'" class="exItem">
+          <div v-else-if="row.type==='Pagamento'" class="exItem" @click="editPayment(row.id_pay)">
             <div class="exRow">
               <div class="exTitle">{{ row.type }}</div>
               <div class="exValue" :style="{ color: row.value < 0 ? 'var(--red)' : 'var(--green)' }">{{ currency(row.value) }}</div>

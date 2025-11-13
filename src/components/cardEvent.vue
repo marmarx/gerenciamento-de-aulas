@@ -8,7 +8,6 @@ const event = computed(() => dataStore.sortedEvents.find(e => e.id_event === pro
 const student = computed(() => dataStore.sortedStudents.find(s => s.id_student === event.value.id_student))
 
 import { mapsLink, whatsappLink, weekLabel, dateLabel, horaBR } from '@/stores/utility';
-const eventSchedule = computed(() => `${weekLabel(event.value.date)}  •  ${dateLabel(event.value.date)}  •  ${horaBR(event.value.time)}`)
 
 const markAsDone = () => {
   event.value.duration = event.value.duration || dataStore.data.config.defaultClassDuration
@@ -22,7 +21,7 @@ const restoreEvent = () => { event.value.status = 'scheduled' }
 <template>
   <div v-if="!student.paused" class="card" :class="{partiallyVisible: event.status === 'canceled'}">
     <div class="name">{{student.student_name}}</div>
-    <div class="details">{{eventSchedule}}</div>
+    <div class="details">{{weekLabel(event.date)}}  •  {{dateLabel(event.date)}}  •  {{horaBR(event.time)}}</div>
     <div v-if="add" class="btns">
       <div v-if="event.status === 'canceled'"                 title="Restaurar" class="btn undo"      @click="restoreEvent()"></div>
       <div v-else-if="dataStore.data.config.autoFinishEvents" title="Cancelar"  class="btn cancel"    @click="cancelEvent()"></div>

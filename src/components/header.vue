@@ -26,7 +26,7 @@ const toSentenceCase = str => str.charAt(0).toUpperCase() + str.toLowerCase().sl
 header { color: var(--head-text); padding: 10px 0 0; background: var(--header-back);}
 h1 { padding: 25px 10px; margin: 0; color: currentColor; text-align: center; }
 
-.nav {position: sticky; top:0; margin-top: -1px; width:100%; display: flex; background: var(--header-back); z-index: 1}
+.nav {position: sticky; top:0; margin-top: -1px; width:100%; display: flex; background: var(--header-back); z-index: 999}
 nav { position: relative; display: flex; justify-content: space-around; }
 .tab-label {
   display: inline-block; flex: 1;

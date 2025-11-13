@@ -17,7 +17,7 @@
 
 .btns{ display:inline-flex; margin-top:5px; border-top:1px solid var(--card-br) }
 .btn{
-  width: 100%; height: 20px;
+  width: 100%; height: 22px;
   padding:10px 0; border:0; border-right:1px solid var(--btn-br);
   font-weight:600; color: var(--white); text-align:center; text-decoration: none;
   appearance: none; cursor:pointer;

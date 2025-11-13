@@ -19,7 +19,7 @@ const eventsGroupedByMonth = computed(() => {
   const groups = {}
 
   for (const item of events.value.reverse()) {
-    const d = new Date(item.date)
+    const d = new Date(`${item.date}T00:00`)
     const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
     if (!groups[monthKey]) groups[monthKey] = []
     groups[monthKey].push(item)
@@ -48,12 +48,6 @@ const sortBy = (key) => {
     sortKey.value = key
     sortReverse.value = false
   }
-}
-
-const monthlySum = () => {
-  sum = 0
-
-  return currency(sum)
 }
 
 const editEvent = (id) => {

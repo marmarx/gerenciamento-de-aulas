@@ -23,7 +23,7 @@ const isValidDate = d => !isNaN(new Date(d))  // true for valid date strings
 const invertDateISOnoYear = d => invertDateISO(d).slice(0,invertDateISO(d).lastIndexOf('/')) //2025-10-25 -> 25/10
 
 // Weekday formatting functions
-const weekDay = d => ["Seg","Ter","Qua","Qui","Sex","Sáb", "Dom"][new Date(d).getDay()]
+const weekDay = d => toSentenceCase(new Date(d).toLocaleString('default', {weekday: 'short'}).replace('.',''))
 const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 
 const weekLabel = d => {
