@@ -5,7 +5,7 @@ const dataStore = useDataStore()
 import { ref, watch, onBeforeUnmount } from 'vue'
 const isNewStudent = ref(false)
 
-import { currency } from '@/stores/utility';
+import { longWeekdays, formatDuration, currency } from '@/stores/utility';
 
 if(!dataStore.selectedStudent) {
   const newStudent = dataStore.newStudent()
@@ -46,7 +46,8 @@ const exitView = () => {
 
 // remove existing student on user request
 const removeStudent = () => {
-  if(!confirm(`Tem certeza que deseja remover o aluno ${student.student_name}?\nTodas as aulas e pagamentos relacionados a este aluno também serão removidos. Esta ação não pode ser desfeita.`)) return
+  const text = `Tem certeza que deseja remover o aluno ${student.student_name}?\nTodas as aulas e pagamentos relacionados a este aluno também serão removidos. Esta ação não pode ser desfeita.`
+  if(!confirm(text)) return
   dataStore.data.events = dataStore.data.events.filter(e => e.id_student !== student.id_student)
   dataStore.data.payments = dataStore.data.payments.filter(p => p.id_student !== student.id_student)
   dataStore.removeStudent(student.id_student)
@@ -58,8 +59,6 @@ onBeforeUnmount(() => {
   if(student.student_name) return
   dataStore.removeStudent(student.id_student)
 })
-
-const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 </script>
 
 <template>
@@ -93,7 +92,7 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
           <div class="inputFlex schedule" v-for="(schedule, j) in student.weekly_schedule" :key="j">
             <select name="diaSemana" v-model="schedule.weekDay" required>
               <option value="" selected>Dia da semana</option>
-              <option v-for="(day, i) in weekDays" :key="day" :value="i">{{day}}</option>
+              <option v-for="(day, i) in longWeekdays" :key="day" :value="i">{{day}}</option>
             </select>
             <input type="text" placeholder="Horário" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'" v-model="schedule.timeDay">
             <!-- <input type="text" placeholder="Matéria" v-model="schedule.subject"> -->
@@ -101,7 +100,7 @@ const weekDays = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábad
         </label>
         <label>Valor da hora aula <span class="graySpan">({{ currency(student.cost) }})</span>
         <input type="number" min="0" step="0.01" placeholder="Valor da hora aula" v-model.number="student.cost"></label>
-        <label>Notificação <span class="graySpan">({{student.minutesBefore}} minuto{{student.minutesBefore==1 ? '' : 's'}} antes)</span>
+        <label>Notificação <span v-if="student.minutesBefore" class="graySpan">({{ formatDuration(student.minutesBefore/60) }} antes)</span>
         <input type="number" min="0" max="120" step="5" placeholder="Notificações (minutos antes)" v-model.number="student.minutesBefore"></label>
         <label>Início e fim de contrato
           <div class="inputFlex">

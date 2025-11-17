@@ -37,7 +37,7 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
       <label class="inline-label">
         <span>
           <p class="title">Período de envio de notificações</p>
-          <p class="helpText">Se permitido, notificações serão enviadas com {{dataStore.data.config.minutesBefore}} minuto{{dataStore.data.config.minutesBefore==1?'':'s'}} de antecedência ao horário de cada evento</p>
+          <p class="helpText">Se permitido, notificações serão enviadas por padrão com {{dataStore.data.config.minutesBefore}} minuto{{dataStore.data.config.minutesBefore==1?'':'s'}} de antecedência</p>
         </span>
         <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.minutesBefore">
       </label>
@@ -66,10 +66,15 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
       <label class="inline-label">
         <span>
           <p class="title">Valor das aulas</p>
-          <p class="helpText">O valor hora aula de {{ currency(dataStore.data.config.defaultClassCost) }} será utilizado como padrão, caso não especificado individualmente na ficha de cada aluno - não afeta alunos ou aulas existentes (passadas e agendadas)</p>
+          <p class="helpText">O valor hora aula de {{ currency(dataStore.data.config.defaultClassCost) }} será utilizado como padrão, caso não especificado individualmente em cada aluno ou cada aula - não afeta alunos ou aulas existentes (passadas e agendadas)</p>
         </span>
         <input class="tac" type="Number" min="0" step=".05" placeholder="R$" v-model.number="dataStore.data.config.defaultClassCost">
       </label>
+
+      <inputToggle v-model="dataStore.data.config.variableCost">
+        <template #title>Valor unitário</template>
+        <template #helpText>O valor das aulas {{dataStore.data.config.variableCost?'':'in'}}depende da respectiva duração, ou seja, elas tem valor {{dataStore.data.config.variableCost?'variável':'fixo'}}.</template>
+      </inputToggle>
 
       <inputToggle v-model="dataStore.data.config.autoFinishEvents">
         <template #title>Finalizar aulas automaticamente</template>
@@ -140,7 +145,7 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
       </div>
 
       <hr/>
-      <p class="justify">v 1.3.2 - 2025.11.10</p>
+      <p class="justify">v 1.4.0 - 2025.11.17</p>
     </div>
     
   </div>
@@ -160,4 +165,8 @@ span p.helpText { font-size: 1em; opacity: .9; }
 input[type="color"]{ border:0; padding: 0; width: 2.5em; height: 2.5em; cursor: pointer; }
 p.justify{text-align: justify; line-height: 1.6em; margin: .5em}
 p.justify.mb{margin-bottom: 2em}
+</style>
+
+<style scoped>
+hr{width:80%; max-width:450px; margin:25px auto}
 </style>

@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router'
 import Header from '@/components/header.vue'
 import fab from '@/components/fab.vue'
+import toast from '@/components/toast.vue'
 
 import { updatedVisibility, isWeb } from '@/stores/installPWA'
 import installPrompt from '@/components/installPrompt.vue'
@@ -47,6 +48,7 @@ onUnmounted(() => document.removeEventListener("visibilitychange", updatedVisibi
   <template v-if="isWeb">
     <installPrompt />
   </template>
+  <toast />
 </template>
 
 <style>

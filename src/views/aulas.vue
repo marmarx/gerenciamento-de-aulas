@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 import { isMob } from '@/stores/gestureControl'
-import { invertDateISOnoYear, weekDay, currency, formatTime, weekLabel, dateLabel, horaBR, toSentenceCase } from '@/stores/utility';
+import { invertDateISOnoYear, shortWeekday, currency, formatTime, formatDuration, weekLabel, dateLabel, horaBR, toSentenceCase } from '@/stores/utility';
 const status = { 'scheduled':'Agendada', 'done':'Finalizada', 'canceled':'Cancelada' }
 
 import { useDataStore } from "@/stores/dataStore"
@@ -77,7 +77,7 @@ const editEvent = (id) => {
             <div class="exCol">
               <div class="exTitle">{{ event.student_name }}</div>
               <div class="exText">{{ weekLabel(event.date) }}, {{ dateLabel(event.date) }}  •  {{ horaBR(event.time) }}</div>
-              <div class="exText">{{ event.experimental ? 'Experimental' : currency(event.cost) }}  •  {{event.duration}} hora{{event.duration>1?'s':''}}</div> 
+              <div class="exText">{{ event.experimental ? 'Experimental' : currency(event.cost) }}  •  {{ formatDuration(event.duration) }}</div> 
             </div>
             <div class="icon-wrapper">
               <div v-if="event.status === 'scheduled'" class="icon icon-event" :style="{'--today-day': `'${new Date(event.date).getDate()+1}'`}"></div>
@@ -105,7 +105,7 @@ const editEvent = (id) => {
         <tbody><tr v-for="event in sortedEvents" :key="event.id_event" @click="editEvent(event.id_event)">
           <td>{{ event.student_name }}</td>
           <td>{{ invertDateISOnoYear(event.date) }}</td>
-          <td class="web">{{ weekDay(event.date) }}</td>
+          <td class="web">{{ shortWeekday(event.date) }}</td>
           <td class="web">{{ event.time }}</td>
           <td class="web">{{ `${event.duration} hora${event.duration>1?'s':''}` }}</td>
           <td class="web">{{ event.experimental ? currency(0) : currency(event.cost) }}</td>

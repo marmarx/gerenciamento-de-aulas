@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
-import { uuidv4, today, dateISO, timeISO } from './utility';
+import { uuidv4, dateISO, timeISO } from './utility';
 import { paletteFromBase } from './colorStore';
 import { importStorage, exportStorage, exportXLSX } from './importExport';
 // import dummyData from '@/unpublished/dummyData'
@@ -12,7 +12,7 @@ const newData = () => (
     {
       numberOfDays: 14, autoCreateEvents: true, autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, // agenda settings
       minutesBefore: 15, // notifications settings
-      defaultClassDuration: 1, defaultClassCost: 50,  // classes default settings
+      defaultClassDuration: 1, defaultClassCost: 50, variableCost: true, // classes default settings
       color: '#44289e'  // user interface settings
     }
   }
@@ -69,7 +69,7 @@ export const useDataStore = defineStore(storageTitle, () => {
       weekly_schedule: [{ weekDay: null, timeDay: '', subject: '' }], // { weekDay: 0-6, timeDay: 'hh:mm', subject: '' }
       cost: data.value.config.defaultClassCost || 50,
       minutesBefore: data.value.config.minutesBefore || 15,
-      start_date: dateISO(today()), end_date: '',
+      start_date: dateISO(new Date()), end_date: '',
       obs: ''
     })
     return student.value
@@ -81,9 +81,9 @@ export const useDataStore = defineStore(storageTitle, () => {
       id_student: '',               //required
       student_name: '',
       added_on: new Date(),
-      date: dateISO(today()),       //required
-      time: timeISO(today()),       //required
-      dateEnd: dateISO(today()),
+      date: dateISO(new Date()),       //required
+      time: timeISO(new Date()),       //required
+      dateEnd: dateISO(new Date()),
       timeEnd: timeISO(new Date(new Date().getTime() + (data.value.config.defaultClassDuration || 1) * 60* 60 * 1000)),
       originalDate: '',
       originalTime: '',
@@ -105,7 +105,7 @@ export const useDataStore = defineStore(storageTitle, () => {
       id_student: '',                 //required
       student_name: '',
       added_on: new Date(),
-      date: dateISO(today()),         //required
+      date: dateISO(new Date()),         //required
       value: 0,                       //required
       obs: ''
     })

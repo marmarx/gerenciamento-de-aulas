@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import { ref, watch, onMounted } from 'vue'
+import { watch, onMounted } from 'vue'
 import router from '@/router'
 
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { Browser } from '@capacitor/browser'
+import { showToast } from '@/stores/showToast'
 
 import { useDataStore } from '@/stores/dataStore'
 import { whatsappLink, mapsLink } from '@/stores/utility'
@@ -78,6 +79,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
       // offset++; // debug
       // const dummyTrigger = new Date(Date.now() + offset * 60 * 1000)  // debug - 60 seconds
 
+      if(!e.id_student) return
       if (!e.date || !e.time) continue
       const eventDate = new Date(`${e.date}T${e.time}`)
       const timeBefore = e.minutesBefore || minutesBefore
@@ -146,7 +148,10 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           if(notif.extra?.eventId){
             useDataStore().selectedEvent = notif.extra?.eventId
             router.push('/aula')  //'/aula/editar'
-          } else router.push('/')
+          } else {
+            router.push('/')
+            showToast('Aula não encontrada')
+          }
           break
 
         case 'maps':
@@ -154,7 +159,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           if(notif.extra?.maps) await Browser.open({ url: notif.extra?.maps })
           else {
             router.push('/')
-            alert('Não há endereço cadastrado')
+            showToast('Não há endereço cadastrado')
           }
           break
 
@@ -163,7 +168,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           if(notif.extra?.whatsapp) await Browser.open({ url: notif.extra?.whatsapp })
           else {
             router.push('/')
-            alert('Não há telefone cadastrado')
+            showToast('Não há telefone cadastrado')
           }
           break
           

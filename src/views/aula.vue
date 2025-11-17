@@ -3,7 +3,7 @@ import inputToggle from '@/components/inputToggle.vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
-import { dateISO, timeISO, formatTime, isValidDate, currency } from '@/stores/utility';
+import { dateISO, timeISO, formatTime, formatDuration, isValidDate, currency } from '@/stores/utility';
 import { onBeforeUnmount, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -104,13 +104,6 @@ const finishEventNow = () => {
   event.dateEnd = dateISO(end)
   event.timeEnd = timeISO(end)
 
-  console.log('Immediately after set', event.dateEnd) // prints: 2025-10-31
-
-  setTimeout(() => {
-    console.log('After 100ms', event.dateEnd) // prints: 2025-10-19
-    console.log('From store', dataStore.data.events.find(e => e.id_event === event.id_event)?.dateEnd) // prints: 2025-10-19
-  }, 100)
-
   event.status = 'done'
   setTimeout(() => updating = false, 50)
   exitView()
@@ -143,7 +136,6 @@ watch(() => event.id_student, (newId, oldId) => {
 
 // change dateEnd and timeEnd upon changing start date, preserves duration
 watch(() => event.date, (newVal, oldVal) => {
-  console.log('change dateEnd and timeEnd upon changing start date')
   if (updating) return
   if (!newVal || !oldVal || !event.dateEnd) return
   if (!isValidDate(newVal) || !isValidDate(oldVal)) return
@@ -248,15 +240,15 @@ onBeforeUnmount(() => { if(isNewEvent.value && isDisabled()) dataStore.removeEve
         </label>
       </div>
 
-      <label>Duração <span class="graySpan">({{event.duration}} hora{{event.duration==1 ? '' : 's'}})</span>
+      <label>Duração <span v-if="event.duration" class="graySpan">({{ formatDuration(event.duration) }})</span>
         <input name="duração" type="number" placeholder="Duração (horas)" step="0.1" v-model="event.duration">
       </label>
 
-      <label>Valor da hora aula <span class="graySpan">({{ currency(event.cost) }})</span>
+      <label>Valor da hora aula <span v-if="event.cost" class="graySpan">({{ currency(event.cost) }})</span>
         <input name="valor" type="number" placeholder="Valor da hora aula" step="0.5" v-model="event.cost">
       </label>
 
-      <label>Notificação <span class="graySpan">({{event.minutesBefore}} minuto{{event.minutesBefore==1 ? '' : 's'}} antes)</span>
+      <label>Notificação <span v-if="event.minutesBefore" class="graySpan">({{formatDuration(event.minutesBefore/60)}} antes)</span>
         <input name="notificação" type="Number" min="0" max="120" step="5" placeholder="Notificação (minutos antes do evento)" v-model="event.minutesBefore">
       </label>
       

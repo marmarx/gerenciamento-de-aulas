@@ -4,6 +4,7 @@ const dataStore = useDataStore()
 const students = dataStore.sortedStudents || []
 
 import { ref, computed } from 'vue'
+import { showToast } from '@/stores/showToast'
 import { dateISO, invertDateISO, currency } from '@/stores/utility'
 const today = new Date();
 const year  = today.getFullYear();
@@ -85,7 +86,7 @@ const report = computed(() => {
 })
 
 const reportContent = computed(() => {
-  const details = `<b>Aluno</b>: ${dataStore.student.student_name}<br><br><b>Período</b>: de ${invertDateISO(filterStart.value)} à ${invertDateISO(filterEnd.value)}<br><br>`
+  const details = `<b>Aluno(a)</b>: ${dataStore.student.student_name}<br><br><b>Período</b>: de ${invertDateISO(filterStart.value)} à ${invertDateISO(filterEnd.value)}<br><br>`
 
   return (details + report.value)
     .replace(/<\/?b>/gi, "*")       // Replace <b> tags with asterisks
@@ -95,10 +96,10 @@ const reportContent = computed(() => {
 
 const copyToClipboard = () => {
   navigator.clipboard.writeText(reportContent.value)
-    .then(() => console.log('[Relatorio] Report copied to clipboard!') )
+    .then(() => showToast('Relatório copiado para a área de transferência!') )
     .catch(err => {
       console.error('Failure to copy to clipboard:', err);
-      alert('Erro ao copiar o relatório.');
+      showToast('Erro ao copiar o relatório.');
   });
 }
 

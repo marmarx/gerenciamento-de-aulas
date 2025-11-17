@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 // Android back button action
 import { Capacitor } from '@capacitor/core'
 import { App } from '@capacitor/app'      // npm install @capacitor/app
-import { Toast } from '@capacitor/toast'  // npm install @capacitor/toast
+import { showToast } from '@/stores/showToast'
 
 let backGestureSet = false
 let swipeGestureSet = false
@@ -24,7 +24,7 @@ const setBackGesture = () => {
       if (now - lastPress < 2000) App.exitApp()
       else {
         lastPress = now
-        await Toast.show({ text: 'Press back again to exit' })
+        await showToast(message)
       }
     }
   }

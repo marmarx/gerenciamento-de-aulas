@@ -56,12 +56,12 @@ const fabs = [
 
 #overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5); z-index: 1;
+  background-color: rgba(0, 0, 0, 0.5); z-index: 4;
   opacity: 0; pointer-events: none; visibility: hidden;
 }
 #overlay.visible { opacity: 1; pointer-events: auto; visibility: visible; }
 
-#floatButton, .fab-container {position: fixed; right: 20px; z-index: 2}
+#floatButton, .fab-container {position: fixed; right: 20px; z-index: 5}
 #floatButton {bottom: 20px;}
 .fab-container { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; bottom: 91px }
 .negative-z-index {z-index: -1}

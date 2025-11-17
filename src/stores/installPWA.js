@@ -1,5 +1,6 @@
 import { ref } from "vue"
 import { Capacitor } from '@capacitor/core'
+import { showToast } from '@/stores/showToast'
 
 const isWeb = Capacitor.getPlatform() === 'web'
 const deferredPrompt = ref(null)
@@ -10,7 +11,7 @@ const isIOS = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())
 const hideInstallButton = () => installButtonVisible.value = false
 const installApp = async () => {
   if (isIOS) {
-    alert('Para instalar, toque o ícone de "Compartilhamento" e depois "Adicionar à Tela de Início"')
+    showToast('Para instalar, toque o ícone de "Compartilhamento" e depois "Adicionar à Tela de Início"')
     return
   }
   if (!deferredPrompt.value) return

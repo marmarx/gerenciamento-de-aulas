@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { FilePicker } from '@capawesome/capacitor-file-picker';
-import { weekDays } from './utility';
+import { longWeekdays } from './utility';
 
 // helper function
 const fileDate = () => new Date().toLocaleDateString('en-CA').replaceAll('-', '.')
@@ -126,7 +126,7 @@ const exportXLSX = async (data) => {
           newObj[prop] = cell
             .map(item => {
               if ("weekDay" in item && "timeDay" in item) {
-                if (typeof item.weekDay === 'number') return `${weekDays[item.weekDay]} ${item.timeDay}`
+                if (typeof item.weekDay === 'number') return `${longWeekdays[item.weekDay]} ${item.timeDay}`
                 return null
               }
               return Object.values(item).join(" ")

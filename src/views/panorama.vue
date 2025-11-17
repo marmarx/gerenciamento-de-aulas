@@ -1,4 +1,5 @@
 <script setup>
+import indicadores from '@/components/indicadores.vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
@@ -10,8 +11,10 @@ import { dateISO } from '@/stores/utility'
 const today = new Date();
 const year  = today.getFullYear();
 const month = today.getMonth();
-const filterStart = ref(dateISO(new Date(year, month, 1)))
-const filterEnd   = ref(dateISO(new Date(year, month + 1, 0)))
+// const filterStart = ref(dateISO(new Date(year, month, 1)))
+// const filterEnd   = ref(dateISO(new Date(year, month + 1, 0)))
+const filterStart = ref(dateISO(new Date(year, month - 1, 1)))
+const filterEnd   = ref(dateISO(new Date(year, month, 0)))
 
 const panorama = computed(() => {
   const startDate = filterStart.value ? new Date(filterStart.value) : new Date("2000-01-01")
@@ -22,8 +25,12 @@ const panorama = computed(() => {
   const payments = dataStore.sortedPayments || []
 
   const eventCost = (student, event) => {
-    const duration = Number(event.duration) || Number(dataStore.data.config.defaultClassDuration) // 0 is not valid
+    if(event.experimental) return 0
+
     const cost = !isNaN(event.cost) ? Number(event.cost) : (!isNaN(student.cost) ? Number(student.cost) : Number(dataStore.data.config.defaultClassCost)) // 0 is valid
+    if(!dataStore.data.config.variableCost) return cost
+
+    const duration = Number(event.duration) || Number(dataStore.data.config.defaultClassDuration) // 0 is not valid
     return duration * cost
     // a || b -> 0, '', null and undefined are falsy and defaults to b
     // a ?? b -> only null and undefined are falsy -> 0 and '' are truthy
@@ -49,16 +56,16 @@ const panorama = computed(() => {
     const uncanceledEvents = eventsInRange.filter(e => e.status !== 'canceled')
 
     let paid = 0
-    if(balance < 0){ paid = '0-' }  //in case previousEvents aren't fully paid 
+    let fractional = false
+    if(balance < 0){ paid = '< 0' }  //in case previousEvents aren't fully paid 
     else {
-      // Counting lessons with fractions
       for (const event of uncanceledEvents) {
         const evCost = eventCost(student, event)
         if (balance >= evCost) { paid++; balance -= evCost }
-        else if (balance > 0) { paid += balance / evCost; balance = 0 }
+        else if (balance > 0) { paid += balance / evCost; balance = 0; fractional = true; break }
       }
-      // As there may be fewer scheduled classes (depends on each user settings), balance may remain above 0
-      paid = `${parseFloat(paid.toFixed(2))}${balance>0?'+':''}`
+      
+      paid = fractional ? parseFloat(paid.toFixed(0)) + '+' : paid.toString()
     }
 
     return {
@@ -110,16 +117,22 @@ const sortBy = (key) => {
   <div class="section">
     <h2>Panorama</h2>
 
-    <div class="dateFlex">
-      <div class="half">
-        <label>Início:</label>
+     <div class="dateFlex">
+      <div class="alwaysHalf">
+        <!-- <label>Início:</label> -->
         <input class="dateFilter" type="text" placeholder="Data inicial" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="filterStart" :max="filterEnd" />
       </div>
-      <div class="half">
-        <label>Fim:</label>
+      <div class="alwaysHalf">
+        <!-- <label>Fim:</label> -->
         <input class="dateFilter" type="text" placeholder="Data final"   onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="filterEnd" :min="filterStart" />
       </div>
     </div>
+
+    <div class="container">
+      <indicadores :filterStart="filterStart" :filterEnd="filterEnd"/>
+    </div>
+
+    <h2>Aulas no Período</h2>
 
     <div v-if="filterStart && filterEnd" class="container">
       <table>
@@ -150,4 +163,5 @@ const sortBy = (key) => {
 
 <style scoped>
 tr{cursor:pointer}
+h2{margin-bottom: 0}
 </style>

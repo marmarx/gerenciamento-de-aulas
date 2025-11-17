@@ -8,9 +8,9 @@ const numberOfDays = computed(() => dataStore.data.config.numberOfDays || 0)
 const nextDaysTitle = computed(() => numberOfDays.value === 1 ? 'Amanhã' : `Próximos ${numberOfDays.value} dias`)
 const lastDate = computed(() => new Date(new Date().setDate(new Date().getDate() + numberOfDays.value)))
 
-import { today, dateISO } from '@/stores/utility';
-const eventsToday = computed(() => dataStore.undoneEvents.filter(e => e.date === dateISO(today())))
-const eventsNextDays = computed(() => dataStore.undoneEvents.filter(e => e.date > dateISO(today()) && e.date <= dateISO(lastDate.value)))
+import { dateISO } from '@/stores/utility';
+const eventsToday = computed(() => dataStore.undoneEvents.filter(e => e.date === dateISO(new Date())))
+const eventsNextDays = computed(() => dataStore.undoneEvents.filter(e => e.date > dateISO(new Date()) && e.date <= dateISO(lastDate.value)))
 </script>
 
 <template>

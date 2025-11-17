@@ -13,10 +13,14 @@ const pausedStudents = computed(() => dataStore.pausedStudents.filter(s => s.stu
 
 <template>
   <div class="section">
-    <input v-if="activeStudents.length" type="text" name="listFilter" class="listFilter" placeholder="Filtrar por nome" v-model="filterByName" />
     <div class="alunos">
       <h2 v-if="!pausedStudents.length">Alunos</h2>
       <h2 v-else>Alunos Ativos</h2>
+
+      <div class="container dateFlex">
+        <input style="margin:auto" v-if="activeStudents.length" type="text" name="listFilter" class="listFilter" placeholder="Filtrar por nome" v-model="filterByName" />
+      </div>
+
       <div v-if="activeStudents.length" class="container grid">
         <cardStudent v-for="student in activeStudents" :key="student.id_student" :id="student.id_student" />
       </div>
