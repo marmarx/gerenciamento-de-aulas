@@ -163,6 +163,7 @@ const growth = computed(() => {
       <p v-if="mostCompletedLessonsStudent">Assíduo: {{ mostCompletedLessonsStudent }}</p>
       <p v-if="mostCanceledStudent">Ausente: {{ mostCanceledStudent }}</p>
       <p v-if="studentWithGreatestOutstanding">Devedor: {{ studentWithGreatestOutstanding }}</p>
+      <p v-if="!mostCompletedLessonsStudent && !mostCanceledStudent && !studentWithGreatestOutstanding">Nenhum insight</p>
     </div>
 
     <div class="indicard">
