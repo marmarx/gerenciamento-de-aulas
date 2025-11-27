@@ -17,7 +17,7 @@ const newData = () => (
     students:[], events:[], payments:[],
     config: {
       numberOfDays: 14, autoCreateEvents: true, autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, // agenda settings
-      color: '#44289e', canceledOnReport: true, advancedOptions: false, // user interface settings
+      color: '#44289e', canceledOnReport: true, advancedOptions: false, notifyBirthday: true, // user interface settings
       ...defaults
     }
   }

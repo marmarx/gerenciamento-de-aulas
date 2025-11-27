@@ -3,6 +3,8 @@ const displayCurrency = 'BRL'   // default, BRL, USD, GBP, EUR, EUR
 const timezone = '-0300'        
 const startWeek = 0;            //-1: Saturday, 0: Sunday, 1: Monday
 
+document.documentElement.lang = lang
+
 // UUID function
 const uuidv4 = () => "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16))
 

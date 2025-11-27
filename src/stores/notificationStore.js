@@ -60,15 +60,26 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     return Math.abs(hash)
   }
 
+  const getNextBirthday = (dob) => {
+    if (!dob) return null     // dob must be 'YYYY-MM-DD'
+
+    const [year, month, day] = dob.split('-').map(Number)
+    const now = new Date()
+    let birthday = new Date(now.getFullYear(), month - 1, day)
+
+    if (birthday < now) birthday = new Date(now.getFullYear() + 1, month - 1, day)  // If birthday already passed this year → use next year
+
+    return birthday
+  }
+
   // Schedule notifications
   const scheduleNotifications = async (students, events, minutesBefore = 15) => {
     const check = await checkPermission()  // silent check - no need to bother the user every time the function is called
     // console.log('[notificationStore] Permission check:', check)
     if (!check) return
 
-    console.log(`[notificationStore] Scheduling notifications for ${events.length} event(s)`)
     await removeDeliveredNotifications()
-    await cancelPendingNotifications()
+    const a = await cancelPendingNotifications()
     const now = Date.now()
     const notifications = []
 
@@ -97,6 +108,36 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           extra: { whatsapp: whatsappLink(phone), maps: mapsLink(address), eventId: e.id_event }
         })
       }
+    }
+    console.log(`[notificationStore] Scheduling notifications for ${notifications.length} event(s)`)
+
+    if(dataStore.data.config.notifyBirthday){
+      const birthdays = []
+      for (const s of students) {
+        if (!s.dob) continue
+
+        const birthday = getNextBirthday(s.dob)
+        if (!birthday) continue
+
+        birthday.setHours(9, 0, 0, 0)  // Set birthday time to 9 AM
+        const diff = birthday.getTime() - now
+        const sevenDays = 7 * 24 * 60 * 60 * 1000
+
+        if (diff > 0 && diff <= sevenDays) {
+          const id = hashUUID(s.id_student)
+
+          birthdays.push({
+            id,
+            title: `Aniversário de ${s.student_name}`,
+            body: `${s.student_name} faz aniversário hoje! 🎉🎂`,
+            schedule: { at: birthday, allowWhileIdle: true },
+            smallIcon: 'notification_icon',
+            extra: { studentId: s.id_student }
+          })
+        }
+      }
+      console.log(`[notificationStore] Scheduling notifications for ${birthdays.length} birthday(s)`)
+      notifications.push(...birthdays)
     }
 
     if (notifications.length) {
@@ -129,6 +170,8 @@ export const useNotificationStore = defineStore('notificationStore', () => {
       const { actionId, notification: notif } = notification
       console.log('[notificationStore] Action triggered:', actionId, notif)
 
+      const toastRoute = (msg) => { router.push('/'); showToast(msg) }
+
       switch (actionId) {
 
         case 'tap':
@@ -136,32 +179,20 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           break
 
         case 'details':
-          // console.log('[notificationStore] User opened details for', notif.title)
           if(notif.extra?.eventId){
             useDataStore().selectedEvent = notif.extra?.eventId
             router.push('/aula')  //'/aula/editar'
-          } else {
-            router.push('/')
-            showToast('Aula não encontrada')
-          }
+          } else toastRoute('Aula não encontrada')
           break
 
         case 'maps':
-          // console.log('[notificationStore] User needs navigation to', notif.title)
           if(notif.extra?.maps) await Browser.open({ url: notif.extra?.maps })
-          else {
-            router.push('/')
-            showToast('Não há endereço cadastrado')
-          }
+          else toastRoute('Não há endereço cadastrado')
           break
 
         case 'whatsapp':
-          // console.log('[notificationStore] User decided to message', notif.title)
           if(notif.extra?.whatsapp) await Browser.open({ url: notif.extra?.whatsapp })
-          else {
-            router.push('/')
-            showToast('Não há telefone cadastrado')
-          }
+          else toastRoute('Não há telefone cadastrado')
           break
           
       }
@@ -192,5 +223,5 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     )
   }
 
-  return { setupNotificationWatcher }
+  return { setupNotificationWatcher, listPendingNotifications }
 })

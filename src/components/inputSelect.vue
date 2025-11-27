@@ -1,5 +1,9 @@
 <script setup>
-const props = defineProps({ modelValue: [String, Number], id: String, defaultText: String, placeholder: String, options: Array, value: String, label: String })
+const props = defineProps({
+  modelValue: [String, Number], id: String,
+  defaultText: String, defaultDisabled: {type:Boolean, default: true}, placeholder: String,
+  options: Array, value: String, label: String
+})
 defineEmits(["update:modelValue"])
 </script>
 
@@ -8,7 +12,7 @@ defineEmits(["update:modelValue"])
     <label :for="id">{{ placeholder }}</label>
 
     <select :id="id" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" required>
-      <option v-if="defaultText" value="" selected disabled>{{ defaultText }}</option>
+      <option v-if="defaultText" value="" selected :disabled="defaultDisabled">{{ defaultText }}</option>
 
       <template v-if="value && label">
         <option v-for="option in options" :key="option" :value="option[value]">{{ option[label] }}</option>

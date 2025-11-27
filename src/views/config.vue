@@ -162,14 +162,20 @@ const importAction = (ev) => {
         </template>
       </inputHelp>
 
+      <inputToggle v-model="dataStore.data.config.notifyBirthday">
+        <template #title>Notificar aniversários</template>
+        <template #helpText>Notificações {{ dataStore.data.config.notifyBirthday ? '' : 'não ' }}serão enviadas para lembrar do aniversário de cada aluno.</template>
+      </inputToggle>
+
+
+      <inputToggle v-model="dataStore.data.config.advancedOptions">
+        <template #title>Aulas: opções avançadas</template>
+        <template #helpText>Permite controlar a política de precificação e a política de cancelamento para cada aula individualmente.</template>
+      </inputToggle>
+
       <inputToggle v-model="dataStore.data.config.canceledOnReport">
         <template #title>Relatório: aulas canceladas</template>
         <template #helpText>Aulas canceladas {{ dataStore.data.config.canceledOnReport ? '' : 'não ' }} serão mostradas no relatório.</template>
-      </inputToggle>
-
-      <inputToggle v-model="dataStore.data.config.advancedOptions">
-        <template #title>Opções avançadas</template>
-        <template #helpText>Permite controlar a política de precificação e a política de cancelamento para cada aula individualmente.</template>
       </inputToggle>
 
       <inputHelp id="color" type="color" v-model.number="dataStore.data.config.color">

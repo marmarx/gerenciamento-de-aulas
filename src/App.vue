@@ -16,6 +16,11 @@ import { useNotificationStore } from '@/stores/notificationStore'
 const notificationStore = useNotificationStore()
 notificationStore.setupNotificationWatcher()
 
+// setTimeout(async () => {
+//   const scheduled = await notificationStore.listPendingNotifications()
+//   console.log(scheduled.notifications)
+// }, 6000)
+
 import { useRouter } from 'vue-router';
 const router = useRouter()
 
