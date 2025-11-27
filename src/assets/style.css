@@ -1,36 +1,26 @@
 @import "colors.css";
+@import "form.css";
 
 * { color: var(--black); transition: all 0.3s ease; }
 body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: var(--body-back); min-height: 100vh}
-table { border-collapse: collapse; width: 100%; background: var(--white); }
-
-form {position: relative}
-label{ display: block; padding: 20px 0 5px; font-weight: bold }
-input, select, textarea { 
-  width: 100%; box-sizing: border-box;
-  padding: 1.1em .8em; border: 1px solid var(--black-washed); border-radius: 5px; /* margin-bottom: 1em; */ margin-top:.5em; outline: none;
-  font-family: "Open Sans", sans-serif; font-size: 1em;
-  background: var(--body-back)
-}
-input[type="file"]{ padding:0; width: unset }
-input[type="number"].tac{padding-left: 1.6em}
-textarea{resize: vertical; min-height: 200px;}
-select:invalid, option:disabled{color:var(--black-main)}
-select{-webkit-appearance: none; appearance: none; -moz-appearance: none;}
+table { border-collapse: collapse; width: 100%; background: var(--white) }
+p { line-height: 1.6em }
 
 .dateFilter { width: 100%; text-align: center; }
-h2 { margin: 12px 0 18px; width: 100%; text-align: center; }
+h2 { margin: 12px 0 18px; width: 100%; text-align: center }
+h4 { margin: 1.6em 0.8em .6em}
 
 .flexContainer { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
 .container{ width:80% }
 .container, .halfContainer {max-width: 900px; margin: auto}
 .smallContainer {max-width: 500px}
 .halfContainer { width:100%; display: flex; flex-wrap: wrap; justify-content: space-between;}
-.halfContainer > .half{padding: 0 15px}
+.halfContainer > .half{padding: 0 25px}
 
 .half, .alwaysHalf { width: calc(49.9999% - 5px); box-sizing: border-box; }
 .alwaysHalf label{text-align: center}
 .third{ width: calc(33.3333% - 10px); box-sizing: border-box }
+.w100{ width: 100% }
 
 .tac{text-align: center; margin-top: 0}
 .graySpan{color:#9d9d9d}
@@ -77,13 +67,13 @@ a.disabled { pointer-events: none; cursor: default }
 .mob{display: none}
 
 @media screen and (max-width: 992px) {
-  .container, .halfContainer, .flexContainer{width: 100%}
+  .container, .halfContainer, .flexContainer{width: 100%; gap: 0}
   .flexContainer > label { width: 100% }
   .half, .third{width: 100%}
+  .halfContainer > .half{padding: 0}
   .web{display: none}
   .mob{display: block}
   button, a:has(button){width: 100%; margin:.5em 0}
   .button{width: 20px; height: 20px}
   #student-history{margin-top: 25px}
-  input[type="number"].tac{padding-left:.8em}
 }

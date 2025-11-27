@@ -18,7 +18,7 @@ defineEmits(["update:modelValue"])
 :root{--toogle-width: 75px; --toogle-height: 40px; --toggle-padding: 4px}
 
 .switch {
-  position: relative; width: 100%;
+  position: relative; box-sizing: border-box; width: 100%;
   display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 2.2em;
   cursor: pointer;
 }
@@ -48,7 +48,9 @@ input:checked + .slider:before { left: calc(var(--toogle-width) - var(--toogle-h
 input:checked + .slider { background-color: var(--nav-back);  }
 .slider:hover { box-shadow: 0 0 .3em .2em var(--nav-hover) }
 
-span p{ font-size: 1.1em; margin: .5em 0; font-weight: normal; user-select: none }
-span p.title { font-weight: bold }
-span p.helpText { font-size: 1em; opacity: .9; }
+span p{ font-size: 1em; margin: .5em 0; font-weight: normal; user-select: none }
+span p.title { font-weight: bold; line-height: 1.1em }
+span p.helpText { font-size: 1em; opacity: .9 }
+
+@media screen and (max-width: 992px) { .switch { padding: 0 .8em } }
 </style>

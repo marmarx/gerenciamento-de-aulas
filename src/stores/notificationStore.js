@@ -5,10 +5,10 @@ import router from '@/router'
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { Browser } from '@capacitor/browser'
-import { showToast } from '@/stores/showToast'
+import { showToast } from '@/composables/showToast'
 
 import { useDataStore } from '@/stores/dataStore'
-import { whatsappLink, mapsLink } from '@/stores/utility'
+import { parseDate, formatDuration, whatsappLink, mapsLink } from '@/composables/utility'
 
 export const useNotificationStore = defineStore('notificationStore', () => {
   const dataStore = useDataStore()
@@ -43,9 +43,10 @@ export const useNotificationStore = defineStore('notificationStore', () => {
   const cancelPendingNotifications = async () => {
     try {
       const pending = await listPendingNotifications()
-      console.log('[notificationStore] Cancelling pending notifications:', pending)
-      if (pending?.notifications?.length) await LocalNotifications.cancel(pending)  // Android & iOS compatible
-      else console.log('[notificationStore] No pending notifications to cancel.')
+      if (pending?.notifications?.length) {
+        console.log(`[notificationStore] Cancelling ${pending.notifications.length} pending notifications`)
+        await LocalNotifications.cancel(pending)
+      } else console.log('[notificationStore] No pending notifications to cancel')
     }
     catch (err) { console.error('[notificationStore] Failed to cancel notifications:', err) }
   }
@@ -62,7 +63,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
   // Schedule notifications
   const scheduleNotifications = async (students, events, minutesBefore = 15) => {
     const check = await checkPermission()  // silent check - no need to bother the user every time the function is called
-    console.log('[notificationStore] Scheduling notifications - permission check:', check)
+    // console.log('[notificationStore] Permission check:', check)
     if (!check) return
 
     console.log(`[notificationStore] Scheduling notifications for ${events.length} event(s)`)
@@ -71,17 +72,10 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     const now = Date.now()
     const notifications = []
 
-    //const dummyEvents = events.slice(0, 3) // debug - get only the first 3 events
-    //let offset = 0  // debug
-
     for (const e of events) {
-    //for (const e of dummyEvents) {  // debug
-      // offset++; // debug
-      // const dummyTrigger = new Date(Date.now() + offset * 60 * 1000)  // debug - 60 seconds
-
       if(!e.id_student) return
       if (!e.date || !e.time) continue
-      const eventDate = new Date(`${e.date}T${e.time}`)
+      const eventDate = parseDate(e.date, e.time)
       const timeBefore = e.minutesBefore || minutesBefore
       const trigger = new Date(eventDate.getTime() - timeBefore * 60 * 1000) // mileseconds -> minutes
       const id = hashUUID(e.id_event)
@@ -91,14 +85,12 @@ export const useNotificationStore = defineStore('notificationStore', () => {
       const address = student.address
       
       if (trigger.getTime() > now) {
-  
-        const body = `Sua próxima aula com ${e.student_name} é em ${timeBefore} minuto${timeBefore==1?'':'s'} (duração: ${e.duration} hora${e.duration==1?'':'s'})`
+        const body = `Sua próxima aula com ${e.student_name} é em ${formatDuration(timeBefore/60)} (duração: ${formatDuration(e.duration)})`
         notifications.push({
           id, // must be numeric and unique
           title: e.student_name.trim().replace(/\s+/g, ' '),
           body: body.trim().replace(/\s+/g, ' '),
           schedule: { at: trigger, allowWhileIdle: true },
-          // schedule: { at: dummyTrigger, allowWhileIdle: true }, // debug
           // sound: null,
           smallIcon: 'notification_icon',
           actionTypeId: 'event_actions',
@@ -109,9 +101,9 @@ export const useNotificationStore = defineStore('notificationStore', () => {
 
     if (notifications.length) {
       await LocalNotifications.schedule({ notifications })
-      console.log(`[notificationStore] Scheduled ${notifications.length} notification(s):`, notifications)
+      console.log(`[notificationStore] Scheduled ${notifications.length} notification(s)`)
     }
-    else console.log('[notificationStore] No upcoming events to schedule.')
+    else console.log('[notificationStore] No upcoming events to schedule')
   }
 
   // Register actions/buttons for notifictions
@@ -127,7 +119,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
         ]
       }]
     })
-    console.log('[notificationStore] Notification actions registered.')
+    console.log('[notificationStore] Notification actions registered')
   }
 
   // Add listeners for notification actions
@@ -144,7 +136,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           break
 
         case 'details':
-          console.log('[notificationStore] User opened details for', notif.title)
+          // console.log('[notificationStore] User opened details for', notif.title)
           if(notif.extra?.eventId){
             useDataStore().selectedEvent = notif.extra?.eventId
             router.push('/aula')  //'/aula/editar'
@@ -155,7 +147,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           break
 
         case 'maps':
-          console.log('[notificationStore] User needs navigation to', notif.title)
+          // console.log('[notificationStore] User needs navigation to', notif.title)
           if(notif.extra?.maps) await Browser.open({ url: notif.extra?.maps })
           else {
             router.push('/')
@@ -164,7 +156,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
           break
 
         case 'whatsapp':
-          console.log('[notificationStore] User decided to message', notif.title)
+          // console.log('[notificationStore] User decided to message', notif.title)
           if(notif.extra?.whatsapp) await Browser.open({ url: notif.extra?.whatsapp })
           else {
             router.push('/')
@@ -193,7 +185,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     watch(
       [() => dataStore.data.events, () => dataStore.data.config.minutesBefore],
       async () => {
-        console.log('[notificationStore] Re-scheduling pending events on data change.')
+        console.log('[notificationStore] Re-scheduling pending events on data change')
         await scheduleNotifications(dataStore.data.students, dataStore.data.events, dataStore.data.config.minutesBefore)
       },
       { deep: true }

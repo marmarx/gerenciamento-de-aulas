@@ -1,11 +1,24 @@
 <script setup>
+import inputToggle from '@/components/inputToggle.vue'
+import inputText from '@/components/inputText.vue'
+import inputSelect from '@/components/inputSelect.vue'
+import inputHelp from '@/components/inputHelp.vue'
+
+import { parseDate, longWeekdays, formatDuration, currency } from '@/composables/utility'
+import { ref, watch, onBeforeUnmount, onMounted } from 'vue'
+
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
-import { ref, watch, onBeforeUnmount } from 'vue'
-const isNewStudent = ref(false)
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
-import { longWeekdays, formatDuration, currency } from '@/stores/utility';
+const exitView = () => {
+  if (router.options.history.state.back) router.back()
+  else router.push('/alunos')
+}
+
+const isNewStudent = ref(false)
 
 if(!dataStore.selectedStudent) {
   const newStudent = dataStore.newStudent()
@@ -35,13 +48,20 @@ watch(
   { immediate: true }
 )
 
-import { useRouter } from 'vue-router'
-const router = useRouter()
+// update all future events of this particular student when certain fields are changed -> update only the specific field
+const updateKeys = ['cost', 'duration', 'variableCost', 'chargeCancelation', 'freeCancelationBefore', 'cancelationFee', 'minutesBefore']
 
-const isDisabled = () => !student.student_name
-const exitView = () => {
-  if (router.options.history.state.back) router.back()
-  else router.push('/alunos')
+watch(
+  () => updateKeys.map(key => student[key]),
+  (newVals, oldVals) => newVals.forEach((val, i) => { if (val !== oldVals[i]) updateEvents(updateKeys[i]) })
+)
+
+const updateEvents = (key) => {
+  dataStore.data.events.forEach(e => {
+    if (e.id_student === student.id_student && parseDate(e.date, e.time) >= new Date()) {
+      e[key] = student[key] || dataStore.data.config[key]
+    }
+  })
 }
 
 // remove existing student on user request
@@ -55,77 +75,137 @@ const removeStudent = () => {
 }
 
 // remove new student if no name is given when leaving the page
+const isDisabled = () => !student.student_name?.trim()
+const handleBeforeUnload = () => { if(isNewStudent.value && isDisabled) dataStore.removeStudent(student.id_student) }
+
+onMounted(() => window.addEventListener('beforeunload', handleBeforeUnload))
 onBeforeUnmount(() => {
-  if(student.student_name) return
-  dataStore.removeStudent(student.id_student)
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+  handleBeforeUnload()
 })
 </script>
 
 <template>
   <div class="section">
     <h2>{{ isNewStudent ? 'Novo' : 'Editar' }} Aluno</h2>
+
     <div class="halfContainer">
       <div class="half">
-        <label>Nome do aluno
-        <input type="text" placeholder="Nome do aluno" v-model="student.student_name" required></label>
-        <label>Telefone do aluno
-        <input type="tel" placeholder="Telefone" v-model="student.student_phone"></label>
-        <label>Nome do responsável
-        <input type="text" placeholder="Responsável" v-model="student.parent"></label>
-        <label>Telefone do responsável
-        <input type="tel" placeholder="Telefone" v-model="student.parent_phone"></label>
-        <label>Nome do responsável
-        <input type="text" placeholder="Responsável 2" v-model="student.parent_2"></label>
-        <label>Telefone do responsável
-        <input type="tel" placeholder="Telefone 2" v-model="student.parent_2_phone"></label>
-        <label>Endereço
-        <input type="text" placeholder="Endereço" v-model="student.address"></label>
-        <label>Vídeo chamada
-        <input type="text" placeholder="Link para Google Meeting, Zoom, etc" v-model="student.meeting"></label>
-        <label>Escola
-        <input type="text" placeholder="Escola" v-model="student.scholl"></label>
-        <label>Série e ano
-        <input type="text" placeholder="Série" v-model="student.year"></label>
+        <h4 class="noMob">Detalhes do Aluno</h4>
+        <inputText id="name"   type="text"  placeholder="Nome do aluno"       v-model="student.student_name" />
+        <inputText id="tel"    type="tel"   placeholder="Telefone"            v-model="student.student_phone" />
+        <inputText id="dob"    type="date"  placeholder="Data de nascimento"  v-model="student.dob" />
+        <inputText id="scholl" type="text"  placeholder="Escola"              v-model="student.scholl" />
+        <inputText id="year"   type="text"  placeholder="Série"               v-model="student.year" />
+        <hr/>
+
+        <h4>Aulas e horários</h4>
+        <div class="inputFlex schedule" v-for="(schedule, j) in student.weekly_schedule" :key="j">
+          <inputSelect :id="`wday-${j}`" defaultText="Dia da semana" placeholder="Dia" :options="longWeekdays" label="" value="" v-model="schedule.weekDay" />
+          <inputText   :id="`time-${j}`" type="time"  placeholder="Horário"  v-model="schedule.timeDay" />
+          <!-- <inputText   :id="`subj-${j}`" type="text"  placeholder="Matéria"  v-model="schedule.subject" /> -->
+        </div>
+
+        <inputText id="address" type="text"  placeholder="Endereço"       v-model="student.address" />
+        <inputText id="meeting" type="text"  placeholder="Vídeo chamada"  v-model="student.meeting" />
+        <hr/>
+
+        <h4>Responsáveis</h4>
+        <inputText id="parent1" type="text"  placeholder="Nome"       v-model="student.parent" />
+        <inputText id="p1phone" type="tel"   placeholder="Telefone"   v-model="student.parent_phone" />
+        <inputText id="parent2" type="text"  placeholder="Nome"       v-model="student.parent_2" />
+        <inputText id="p2phone" type="tel"   placeholder="Telefone"   v-model="student.parent_phone_2" />
+        <hr/>
+
+        <h4>Contrato</h4>
+        <div class="inputFlex">
+          <inputText id="inicioContrato"  type="date" placeholder="Início"  v-model="student.start_date" />
+          <inputText id="fimContrato"     type="date" placeholder="Fim"     v-model="student.end_date" />
+        </div>
+
+        <hr class="noWeb"/>
       </div>
+
       <div class="half">
-        <label>Dia e horário das aulas
-          <div class="inputFlex schedule" v-for="(schedule, j) in student.weekly_schedule" :key="j">
-            <select name="diaSemana" v-model="schedule.weekDay" required>
-              <option value="" selected>Dia da semana</option>
-              <option v-for="(day, i) in longWeekdays" :key="day" :value="i">{{day}}</option>
-            </select>
-            <input type="text" placeholder="Horário" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'" v-model="schedule.timeDay">
-            <!-- <input type="text" placeholder="Matéria" v-model="schedule.subject"> -->
-          </div>
-        </label>
-        <label>Valor da hora aula <span class="graySpan">({{ currency(student.cost) }})</span>
-        <input type="number" min="0" step="0.01" placeholder="Valor da hora aula" v-model.number="student.cost"></label>
-        <label>Notificação <span v-if="student.minutesBefore" class="graySpan">({{ formatDuration(student.minutesBefore/60) }} antes)</span>
-        <input type="number" min="0" max="120" step="5" placeholder="Notificações (minutos antes)" v-model.number="student.minutesBefore"></label>
-        <label>Início e fim de contrato
-          <div class="inputFlex">
-            <input name="inicioContrato" type="text" placeholder="Início contrato" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="student.start_date">
-            <input name="fimContrato" type="text" placeholder="Fim contrato" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" v-model="student.end_date">
-          </div>
-        </label>
-        <label>Observações
-          <textarea placeholder="Observações" v-model="student.obs"></textarea>
-        </label>
+
+        <h4>Política de precificação</h4>
+        <p>Afeta todas as aulas futuras deste aluno</p>
+        <inputToggle v-model="student.variableCost">
+          <template #title>Valor {{student.variableCost?'variável':'fixo'}}</template>
+          <template #helpText>O valor das aulas deste aluno {{student.variableCost?'':'in'}}depende da respectiva duração</template>
+        </inputToggle>
+
+        <inputHelp id="cost" :placeholder="`Valor (${currency(0).slice(0,2)}${student.variableCost ? '/h' : ''})`" :numberDefs="{min: 0, step: .5}" v-model.number="student.cost">
+          <template #title>Valor padrão da {{ student.variableCost ? 'hora' : 'aula' }}</template>
+          <template #helpText>As aulas deste aluno custam {{ currency(student.cost) }} por {{ student.variableCost ? 'hora' : 'aula' }}</template>
+        </inputHelp>
+
+        <inputHelp id="duration" placeholder="Horas" :numberDefs="{min: 0, step: .1}" v-model.number="student.duration">
+          <template #title>Duração padrão</template>
+          <template #helpText>As aulas deste aluno tem por padrão {{ formatDuration(student.duration) }} de duração</template>
+        </inputHelp>
+
+        <hr/>
+
+        <h4>Política de cancelamento</h4>
+        <p>Afeta todas as aulas futuras deste aluno</p>
+        <inputToggle v-model="student.chargeCancelation">
+          <template #title>Cancelamento {{ student.chargeCancelation?'cobrado':'gratuito' }}</template>
+          <template #helpText>Cancelamentos deste aluno {{ student.chargeCancelation?'':'não ' }}são cobrados {{ student.chargeCancelation?'conforme baixo':'' }}</template>
+        </inputToggle>
+
+        <inputHelp id="freeBefore" if="student.chargeCancelation" placeholder="horas" :numberDefs="{min: 0, step: .25}" v-model.number="student.freeCancelationBefore">
+          <template #title>Período de gratuidade</template>
+          <template #helpText>Não serão cobrados cancelamentos que ocorram {{ student.freeCancelationBefore ? `com no mínimo ${formatDuration(student.freeCancelationBefore)} de antecedência` : 'até o horário da aula' }}</template>
+        </inputHelp>
+
+        <inputHelp id="cancelFee" :if="student.chargeCancelation" placeholder="%" :numberDefs="{min: 0, max: 200, step: 5}" v-model.number="student.cancelationFee">
+          <template #title>Taxa de cancelamento</template>
+          <template #helpText>Cancelamentos {{student.cancelationFee ? `acarretam a cobrança de ${student.cancelationFee}% do valor da aula` : 'são gratuitos'}}</template>
+        </inputHelp>
+
+        <hr/>
+
+        <h4>Notificação</h4>
+        <p>Afeta todas as aulas futuras deste aluno</p>
+        <inputHelp id="minutesBefore" placeholder="min" :numberDefs="{min: 0, max: 120, step: 5}" v-model.number="student.minutesBefore">
+          <template #title>Período de notificações</template>
+          <template #helpText>Notificações serão enviadas {{ formatDuration(student.minutesBefore/60) }} antes de cada aula deste aluno</template>
+        </inputHelp>
+
+        <hr/>
+
+        <h4>Observações</h4>
+        <div class="form-group">
+          <textarea id="obs" placeholder="Observações" v-model="student.obs"></textarea>
+        </div>
+        
       </div>
     </div>
+
     <div class="flexContainer">
       <button @click="exitView()" :id_student="student.id_student" :disabled="isDisabled()">Salvar</button>
       <button  v-if="isNewStudent" @click="exitView()">Cancelar</button>
       <button  v-else @click="removeStudent()">Remover</button>
     </div>
+
   </div>
 </template>
 
-<style>
-/* .noinput{border:1px solid transparent;background:transparent}
-.hidden{display:none} */
-.inputFlex { width: 100%; max-width: 800px; display: flex; flex-wrap: nowrap; gap: 10px}
-.inputFlex *{ width: 100% }
+<style scoped>
+h4 { font-size: 1.2em; margin-top: 2em; text-align: center }
+hr{ margin: 2em 0 }
+.inputFlex { width: 100%; display: flex; flex-wrap: nowrap; gap: 10px}
+.inputFlex .form-group { width: 100% }
+.noWeb { display: none }
+p{text-align: center; margin-top: -.5em}
+
+@media screen and (max-width: 992px) { 
+  /* hr{ display: none } */
+  hr { width: 80%; margin: 2em auto }
+  .noWeb { display: block; margin-bottom: 0; }
+  .noMob{ display: none }
+}
 /* .schedule *:nth-child(1), .schedule *:nth-child(2){width: 30%}
 .schedule *:nth-child(3){width: 40%} */
 </style>

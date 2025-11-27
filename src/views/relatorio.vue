@@ -1,28 +1,35 @@
 <script setup>
+import inputToggle from '@/components/inputToggle.vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const students = dataStore.sortedStudents || []
 
 import { ref, computed } from 'vue'
-import { showToast } from '@/stores/showToast'
-import { dateISO, invertDateISO, currency } from '@/stores/utility'
-const today = new Date();
-const year  = today.getFullYear();
-const month = today.getMonth();
+import { showToast } from '@/composables/showToast'
+import { filterRange, dateISO, shortDateLabel, formatDuration, currency } from '@/composables/utility'
+import { eventValue } from '@/composables/eventValue'
+
+const today = new Date()
+const year  = today.getFullYear()
+const month = today.getMonth()
+const showCanceled = ref(true)
+
 const filterStart = ref(dateISO(new Date(year, month - 1, 1)))
 const filterEnd   = ref(dateISO(new Date(year, month, 0)))
 
-const listCompletedLessons = () => {
-  const events = dataStore.doneEvents.filter(e => e.id_student === dataStore.selectedStudent);
+const listChargableLessons = () => {
+  const ev = showCanceled.value ? dataStore.chargableEvents : dataStore.doneEvents
+  const events = ev.filter(e => e.id_student === dataStore.selectedStudent)
 
   return events.map(e => ({
     type: 'aula',
     date: e.date,
     duration: e.duration || 1,
-    value: e.experimental ? 0 : (-(e.duration || 1) * (e.cost || dataStore.student.cost)),
-    experimental: e.experimental || false
-  }));
-};
+    value: -eventValue(e.id_event),
+    experimental: e.experimental || false,
+    status: e.status
+  }))
+}
 
 const listPayments = () => {
   const studentPayments = dataStore.studentPayments
@@ -30,33 +37,27 @@ const listPayments = () => {
       type: "payment",
       date: payment.date,
       value: payment.value || 0
-  }));
-  return studentPayments;
+  }))
+  return studentPayments
 }
 
 const report = computed(() => {
   if (!dataStore.selectedStudent) return "Nenhum aluno selecionado."
 
-  const startDate = new Date(filterStart.value) 
-  const endDate   = new Date(filterEnd.value)
-
-  const events = listCompletedLessons()
+  const events = listChargableLessons()
   const payments = listPayments()
 
-  // const previousEvents = events.filter(e => new Date(e.date) < startDate)
-  // const previousPayments = payments.filter(p => new Date(p.date) < startDate)
+  // const previousEvents = events.filter(e => parseDate(e.date) < startDate)
+  // const previousPayments = payments.filter(p => parseDate(p.date) < startDate)
 
   // const previousBalance = 
   //   previousEvents.reduce((total, e) => total + (e.experimental ? 0 : e.value), 0) + 
   //   previousPayments.reduce((total, p) => total + p.value, 0)
 
-  const filteredEvents = events
-    .filter(e => new Date(e.date) >= startDate && new Date(e.date) <= endDate)
-    // .sort((a, b) => new Date(a.date) - new Date(b.date))
+  const filterDates = arr => filterRange(arr, filterStart.value, filterEnd.value)
 
-  const filteredPayments = payments
-    .filter(p => new Date(p.date) >= startDate && new Date(p.date) <= endDate)
-    // .sort((a, b) => new Date(a.date) - new Date(b.date))
+  const filteredEvents = filterDates(events)
+  const filteredPayments = filterDates(payments)
 
   let balance = 0 //previousBalance
   let report = ''
@@ -65,9 +66,20 @@ const report = computed(() => {
   report += `<b>Aulas:</b><br>`
   if(filteredEvents.length){
     filteredEvents.forEach(e => {
-      if (!e.experimental) count++
+      let text = ''
+
+      if (e.status === 'canceled') text = '(cancelada)'
+      else {
+        if (e.experimental) text = '(experimental'
+        else {
+          count++
+          text = `(${count}ª aula`
+        }
+        text += `, ${formatDuration(e.duration)})`
+      }
+
       balance += e.experimental ? 0 : e.value
-      report += `${invertDateISO(e.date)} (${e.experimental ? "experimental" : (count + 'ª aula')}) - ${e.duration} hora${e.duration > 1 ? 's' : ''} - ${currency(e.experimental ? 0 : Math.abs(e.value))}<br>`
+      report += `${shortDateLabel(e.date)} ${text} - ${currency(e.experimental ? 0 : Math.abs(e.value))}<br>`
     })
   }
   else report += `Nenhuma aula dada no período<br>`
@@ -76,7 +88,7 @@ const report = computed(() => {
   report += `<br><b>Pagamentos:</b><br>`
     filteredPayments.forEach(p => {
       balance += p.value
-      report += `${invertDateISO(p.date)} - ${currency(p.value)}<br>`
+      report += `${shortDateLabel(p.date)} - ${currency(p.value)}<br>`
     })
   }
 
@@ -86,7 +98,7 @@ const report = computed(() => {
 })
 
 const reportContent = computed(() => {
-  const details = `<b>Aluno(a)</b>: ${dataStore.student.student_name}<br><br><b>Período</b>: de ${invertDateISO(filterStart.value)} à ${invertDateISO(filterEnd.value)}<br><br>`
+  const details = `<b>Aluno(a)</b>: ${dataStore.student.student_name}<br><br><b>Período</b>: de ${(filterStart.value)} à ${shortDateLabel(filterEnd.value)}<br><br>`
 
   return (details + report.value)
     .replace(/<\/?b>/gi, "*")       // Replace <b> tags with asterisks
@@ -113,25 +125,36 @@ const sendParent = (parent, phone) => {
   <div class="section">
     <h2>Relatório</h2>
 
-    <div class="flexContainer">
-      <label class="third">
+    <div class="container">
+      <label>
         Aluno:
         <select name="aluno" v-model="dataStore.selectedStudent" required>
           <option value="" selected disabled>Selecione um aluno</option>
           <option v-for="student in students" :key="student.id_student" :value="student.id_student">{{student.student_name}}</option>
         </select>
       </label>
-      <label class="third">
-        Início:
-        <input class="dateFilter" type="text" placeholder="Data inicial" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'" v-model="filterStart" :max="filterEnd" />
-      </label>
-      <label class="third">
-        Fim:
-        <input class="dateFilter" type="text" placeholder="Data final"   onfocus="this.type='date'" onblur="if(!this.value) this.type='text'" v-model="filterEnd" :min="filterStart" />
-      </label>
+
+      <div class="flexContainer">
+        <label class="half">
+          Início:
+          <input class="dateFilter" type="text" placeholder="Data inicial" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'" v-model="filterStart" :max="filterEnd" />
+        </label>
+        <label class="half">
+          Fim:
+          <input class="dateFilter" type="text" placeholder="Data final"   onfocus="this.type='date'" onblur="if(!this.value) this.type='text'" v-model="filterEnd" :min="filterStart" />
+        </label>
+      </div>
     </div>
 
-    <div v-if="dataStore.selectedStudent && filterStart && filterEnd" v-html="report"></div>
+    <div class="container">
+      <inputToggle v-model="dataStore.data.config.canceledOnReport">
+        <template #title>{{ dataStore.data.config.canceledOnReport ? 'M' : 'Não m' }}ostrar aulas canceladas</template>
+        <template #helpText>Aulas canceladas {{ dataStore.data.config.canceledOnReport ? '' : 'não ' }} serão mostradas no relatório.</template>
+      </inputToggle>
+      <hr/>
+    </div>
+
+    <div v-if="dataStore.selectedStudent && filterStart && filterEnd" v-html="report" style="line-height: 2em;"></div>
     <p v-else>Selecione nos campos acima.</p>
 
     <div class="flexContainer">

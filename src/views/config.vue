@@ -1,20 +1,26 @@
 <script setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
-
 import inputToggle from '@/components/inputToggle.vue'
-import { useDataStore } from "@/stores/dataStore"
-const dataStore = useDataStore()
-
-import { useAgendaStore } from '@/stores/agendaStore'
-const agendaStore = useAgendaStore()
+import inputHelp from '@/components/inputHelp.vue'
 
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useDataStore } from "@/stores/dataStore"
+import { useAgendaStore } from '@/stores/agendaStore'
+
+import { showToast } from '@/composables/showToast'
+import { currency, formatDuration } from '@/composables/utility'
+import { isInstalled, isIOS, isWeb, installApp } from "@/composables/installPWA.js"
+
+const router = useRouter()
+const dataStore = useDataStore()
+const agendaStore = useAgendaStore()
 const fileInput = ref(null)
 
 const copyToClipboard = async () => {
-  try {await navigator.clipboard.writeText('c8a13647-4a71-44b1-967a-259079645ace'); alert("Chave Pix copiada para a área de transferência!")}
-  catch (err) {("Failure: " + err)}
+  try {
+    await navigator.clipboard.writeText('c8a13647-4a71-44b1-967a-259079645ace')
+    showToast("Chave Pix copiada para a área de transferência!")
+  } catch (err) {("Failure: " + err)}
 }
 
 const importAction = (ev) => {
@@ -23,84 +29,153 @@ const importAction = (ev) => {
     router.push('/agenda')
   })
 }
-
-import { currency } from '@/stores/utility'
-import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
 </script>
 
 <template>
   <div class="section">
 
-    <h2>Configurações</h2>
     <div class="flexContainer mw500" style="max-width: 500px">
+      <h2>Configurações</h2>
+      <p>Fique a vontade para ajustar as configurações abaixo conforme as suas necessidades.</p>
+    </div>
+    <hr/>
 
-      <label class="inline-label">
-        <span>
-          <p class="title">Período de envio de notificações</p>
-          <p class="helpText">Se permitido, notificações serão enviadas por padrão com {{dataStore.data.config.minutesBefore}} minuto{{dataStore.data.config.minutesBefore==1?'':'s'}} de antecedência</p>
-        </span>
-        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.minutesBefore">
-      </label>
+    <div class="flexContainer mw500">
+
+      <h3>Agenda</h3>
+      <inputHelp id="daysAgenda" placeholder="Dias" :numberDefs="{min: 0, step: 1}" v-model.number="dataStore.data.config.numberOfDays">
+        <template #title>Dias na agenda</template>
+        <template #helpText>
+          {{ dataStore.data.config.numberOfDays
+            ? `Serão exibidos ${dataStore.data.config.numberOfDays} dia${dataStore.data.config.numberOfDays==1?'':'s'} futuros na agenda`
+            : 'Apenas o dia de hoje será exibido na agenda'}}
+        </template>
+      </inputHelp>
 
       <inputToggle v-model="dataStore.data.config.autoCreateEvents">
         <template #title>Criar agendamentos recorrentes</template>
-        <template #helpText>Aulas semanais {{ dataStore.data.config.autoCreateEvents?'':'não ' }} serão criadas automaticamente considerando o horário de cada aluno - você ainda poderá editar, cancelar e adicionar aulas manualmente</template>
-      </inputToggle>
-
-      <label class="inline-label">
-        <span>
-          <p class="title">Dias na agenda</p>
-          <p class="helpText">Serão exibidos {{dataStore.data.config.numberOfDays}} dia{{dataStore.data.config.numberOfDays==1?'':'s'}} futuros na agenda</p>
-        </span>
-        <input class="tac" type="Number" min="0" step="1" placeholder="Dias" v-model.number="dataStore.data.config.numberOfDays">
-      </label>
-
-      <label class="inline-label">
-        <span>
-          <p class="title">Duração das aulas</p>
-          <p class="helpText">As aulas terão {{dataStore.data.config.defaultClassDuration}} hora{{dataStore.data.config.defaultClassDuration==1?'':'s'}} de duração padrão, caso não especificado individualmente em cada evento - não afeta aulas existentes (passadas e agendadas)</p>
-        </span>
-        <input class="tac" type="Number" min="0" step=".25" placeholder="Horas" v-model.number="dataStore.data.config.defaultClassDuration">
-      </label>
-
-      <label class="inline-label">
-        <span>
-          <p class="title">Valor das aulas</p>
-          <p class="helpText">O valor hora aula de {{ currency(dataStore.data.config.defaultClassCost) }} será utilizado como padrão, caso não especificado individualmente em cada aluno ou cada aula - não afeta alunos ou aulas existentes (passadas e agendadas)</p>
-        </span>
-        <input class="tac" type="Number" min="0" step=".05" placeholder="R$" v-model.number="dataStore.data.config.defaultClassCost">
-      </label>
-
-      <inputToggle v-model="dataStore.data.config.variableCost">
-        <template #title>Valor unitário</template>
-        <template #helpText>O valor das aulas {{dataStore.data.config.variableCost?'':'in'}}depende da respectiva duração, ou seja, elas tem valor {{dataStore.data.config.variableCost?'variável':'fixo'}}.</template>
+        <template #helpText>
+          Aulas semanais {{ dataStore.data.config.autoCreateEvents?'':'não ' }} 
+          serão criadas automaticamente considerando o horário de cada aluno - você ainda poderá editar, cancelar e adicionar aulas manualmente
+        </template>
       </inputToggle>
 
       <inputToggle v-model="dataStore.data.config.autoFinishEvents">
         <template #title>Finalizar aulas automaticamente</template>
-        <template #helpText>Aulas agendadas {{ dataStore.data.config.autoFinishEvents?'':'não ' }}serão automaticamente marcadas como aulas dadas quando sua respectiva data chegar</template>
+        <template #helpText>
+          Aulas agendadas {{ dataStore.data.config.autoFinishEvents?'':'não ' }}
+          serão automaticamente marcadas como aulas dadas quando sua respectiva data chegar
+        </template>
       </inputToggle>
 
-      <label class="inline-label">
-        <span>
-          <p class="title">Período de finalização</p>
-          <p class="helpText">As aulas serão automaticamente marcadas como aulas dadas {{ dataStore.data.config.autoFinishOffset }} minuto{{dataStore.data.config.autoFinishOffset>0?'s':''}} após o horário agendado de cada aula</p>
-        </span>
-        <input class="tac" type="Number" min="0" max="120" step="5" placeholder="Minutos" v-model.number="dataStore.data.config.autoFinishOffset">
-      </label>
+      <inputHelp id="autoFinish" placeholder="Min" :numberDefs="{min: 0, max:120, step: 5}" v-model.number="dataStore.data.config.autoFinishOffset">
+        <template #title>Período de finalização</template>
+        <template #helpText>
+          As aulas serão automaticamente marcadas como aulas dadas 
+          {{ dataStore.data.config.autoFinishOffset ? `${formatDuration(dataStore.data.config.autoFinishOffset/60)} após o` : 'no' }}
+           horário agendado de cada aula
+        </template>
+      </inputHelp>
 
       <inputToggle v-model="dataStore.data.config.autoRemovePastEvents">
         <template #title>Remover aulas automaticamente</template>
-        <template #helpText>Aulas passadas não finalizadas (agendas ou canceladas) {{ dataStore.data.config.autoRemovePastEvents?'':'não ' }}serão removidas da lista de todas as aulas (pode reduzir o uso de memória)</template>
+        <template #helpText>
+          Aulas passadas não finalizadas (agendas ou canceladas) 
+          {{ dataStore.data.config.autoRemovePastEvents?'':'não ' }}
+          serão removidas da lista de todas as aulas (pode reduzir o uso de memória)
+        </template>
       </inputToggle>
 
-      <label class="inline-label">
-        <span>
-          <p class="title">Cor preferida</p>
-          <p class="helpText">Escola a cor utilizada na interface do aplicativo, sinta-se a vontade para customizar</p>
-        </span>
-        <input type="color" v-model="dataStore.data.config.color">
-      </label>
+    </div>
+    <hr/>
+    <div class="flexContainer mw500">
+
+      <h3>Aulas</h3>
+      <inputToggle v-model="dataStore.data.config.variableCost">
+        <template #title>Valor unitário {{dataStore.data.config.variableCost?'variável':'fixo'}}</template>
+        <template #helpText>
+          O valor de cada aula {{dataStore.data.config.variableCost?'':'in'}}
+          depende da respectiva duração, ou seja, elas tem valor {{dataStore.data.config.variableCost?'variável':'fixo'}}
+        </template>
+      </inputToggle>
+
+      <inputHelp id="duration" placeholder="Horas" :numberDefs="{min: .25, step: .25}" v-model.number="dataStore.data.config.duration">
+        <template #title>Duração das aulas</template>
+        <template #helpText>
+          As aulas terão {{ formatDuration(dataStore.data.config.duration) }}
+          de duração padrão, caso não especificado individualmente em cada evento - afeta apenas novos alunos
+        </template>
+      </inputHelp>
+
+      <inputHelp id="cost" :placeholder="`${currency(0).slice(0,2)}${dataStore.data.config.variableCost?'/h':''}`" :numberDefs="{min: 0, step: .5}" v-model.number="dataStore.data.config.cost">
+        <template #title>Valor das aulas</template>
+        <template #helpText>
+          O valor {{dataStore.data.config.variableCost ? 'hora' : 'da'}} aula de {{ currency(dataStore.data.config.cost) }}
+          será utilizado como padrão - afeta apenas novos alunos
+        </template>
+      </inputHelp>
+
+    </div>
+    <hr/>
+    <div class="flexContainer mw500">
+
+      <h3>Política de cancelamento</h3>
+      <inputToggle v-model="dataStore.data.config.chargeCancelations">
+        <template #title>Cancelamentos {{ dataStore.data.config.chargeCancelations?'cobrados':'gratuitos' }}</template>
+        <template #helpText>
+          Aulas canceladas 
+          {{ dataStore.data.config.chargeCancelations ? 'serão cobradas conforme o período de gratuidade e a taxa de cancelamento abaixo' : 'não serão cobradas' }} 
+          por padrão - afeta apenas novos alunos
+          </template>
+      </inputToggle>
+
+      <inputHelp id="freeBefore" :if="dataStore.data.config.chargeCancelations" placeholder="Horas" :numberDefs="{min: 0, step: .25}" v-model.number="dataStore.data.config.freeCancelationBefore">
+        <template #title>Período de gratuidade</template>
+        <template #helpText>
+          Não serão cobrados cancelamentos que ocorram 
+          {{ dataStore.data.config.freeCancelationBefore ? `com no mínimo ${formatDuration(dataStore.data.config.freeCancelationBefore)} de antecedência` : 'até o horário da aula' }} 
+          por padrão - afeta apenas novos alunos
+        </template>
+      </inputHelp>
+
+      <inputHelp id="cancelFee" :if="dataStore.data.config.chargeCancelations" placeholder="%" :numberDefs="{min: 0, max: 200, step: 5}" v-model.number="dataStore.data.config.cancelationFee">
+        <template #title>Taxa de cancelamento</template>
+        <template #helpText>
+          {{dataStore.data.config.cancelationFee
+            ? `Cancelamentos que ocorram após o período de gratuidade, serão cobrados em ${dataStore.data.config.cancelationFee}% do valor da aula`
+            : 'Cancelamentos são gratuitos'}} por padrão - afeta apenas novos alunos
+        </template>
+      </inputHelp>
+
+    </div>
+    <hr/>
+    <div class="flexContainer mw500">
+
+      <h3>Geral</h3>
+
+      <inputHelp id="minutesBefore" placeholder="Min" :numberDefs="{min: 0, max: 120, step: 5}" v-model.number="dataStore.data.config.minutesBefore">
+        <template #title>Período de envio de notificações</template>
+        <template #helpText>
+          Se permitido, notificações serão enviadas por padrão {{dataStore.data.config.minutesBefore
+            ? `com ${formatDuration(dataStore.data.config.minutesBefore/60)} de antecedência`
+            : 'no horário de cada aula'}}
+        </template>
+      </inputHelp>
+
+      <inputToggle v-model="dataStore.data.config.canceledOnReport">
+        <template #title>Relatório: aulas canceladas</template>
+        <template #helpText>Aulas canceladas {{ dataStore.data.config.canceledOnReport ? '' : 'não ' }} serão mostradas no relatório.</template>
+      </inputToggle>
+
+      <inputToggle v-model="dataStore.data.config.advancedOptions">
+        <template #title>Opções avançadas</template>
+        <template #helpText>Permite controlar a política de precificação e a política de cancelamento para cada aula individualmente.</template>
+      </inputToggle>
+
+      <inputHelp id="color" type="color" v-model.number="dataStore.data.config.color">
+        <template #title>Cor preferida</template>
+        <template #helpText>Escola a cor utilizada na interface do aplicativo, sinta-se a vontade para customizar</template>
+      </inputHelp>
 
     </div>
 
@@ -153,14 +228,10 @@ import { isInstalled, isIOS, isWeb, installApp } from "@/stores/installPWA.js"
 
 <style>
 .mw500 {max-width:500px}
-.inline-label{ width: 100%; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-around; gap: 2em; }
-.inline-label input{margin: 0}
-.inline-label > *:first-child{width:80%}
-.inline-label > *:last-child{width:20%}
 
-span p{ font-size: 1.1em; margin: .5em 0; font-weight: normal; user-select: none }
-span p.title { font-weight: bold }
-span p.helpText { font-size: 1em; opacity: .9; }
+span p{ font-size: 1em; margin: .5em 0; font-weight: normal; user-select: none }
+span p.title { font-weight: bold; line-height: 1.1em }
+span p.helpText { font-size: 1em; opacity: .9 }
 
 input[type="color"]{ border:0; padding: 0; width: 2.5em; height: 2.5em; cursor: pointer; }
 p.justify{text-align: justify; line-height: 1.6em; margin: .5em}
@@ -169,4 +240,5 @@ p.justify.mb{margin-bottom: 2em}
 
 <style scoped>
 hr{width:80%; max-width:450px; margin:25px auto}
+.section{gap:.8em}
 </style>

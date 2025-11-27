@@ -7,12 +7,12 @@
 
 .name,.details{padding:22px 18px 18px}
 
-.name{display:inline-flex; justify-content:space-between; font-weight:600; font-size:1.05rem; word-break:break-word}
+.name{display:inline-flex; justify-content:space-between; font-weight:600; font-size:1.05rem; min-height:1.05em; word-break:break-word}
 .ampel{width: 8px; height: 8px; border-radius: 100%; background: currentColor}
 .status{color: var(--green); font-weight:bold}
 .paused{color: var(--red)}
 
-.details{font-size:.98rem; color:var(--accent); display:flex; align-items:center; gap:8px; padding-top:0; white-space:pre}
+.details{font-size:.98rem; min-height:1.16em; color:var(--accent); display:flex; align-items:center; gap:8px; padding-top:0; white-space:pre}
 .details:nth-child(3){padding-bottom:22px}
 
 .btns{ display:inline-flex; margin-top:5px; border-top:1px solid var(--card-br) }
@@ -25,7 +25,8 @@
 }
 .btn:hover{background-color:var(--black-washed)}
 .btn:first-child{border-radius: 0 0 0 14px}
-.btn:last-child{border-right:0;border-radius: 0 0 14px 0}
+.btn:last-child{border-right:0; border-radius: 0 0 14px 0}
+.btn:only-child{border-radius: 0 0 14px 14px}
 .btn:active{transform:translateY(1px);}
 .noround{border-radius:0!important}
 

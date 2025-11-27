@@ -14,10 +14,14 @@ tr{cursor:pointer}
 
 .exTitle, .exText {margin: 5px 0}
 .exTitle { font-weight: bold }
-.exText { font-size: .9em ; margin-top: auto}
+.exText { font-size: .9em; margin-top: auto}
+.exStatus { font-size: .9em; font-weight: normal; opacity: .7 }
 
 .icon-wrapper{width: 50px; display:flex}
 .icon { position: relative; --color: var(--black); margin: auto; font-size: 2em}
 .icon-done, .icon-canceled {width:30px; height:30px; mask-size: contain; mask-repeat: no-repeat; mask-position: center}
 .icon-done {background: var(--green); -webkit-mask-image:url('@/svg/complete.svg'); mask-image:url('@/svg/complete.svg')}
 .icon-canceled {background: var(--red); -webkit-mask-image:url('@/svg/cancel.svg'); mask-image:url('@/svg/cancel.svg')}
+
+.up { color: var(--green) }
+.down { color: var(--red) }

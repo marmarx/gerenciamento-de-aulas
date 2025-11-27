@@ -1,14 +1,20 @@
 <script setup>
 import inputToggle from '@/components/inputToggle.vue'
-import { useDataStore } from "@/stores/dataStore"
-const dataStore = useDataStore()
+import inputText from '@/components/inputText.vue'
+import inputSelect from '@/components/inputSelect.vue'
+import inputHelp from '@/components/inputHelp.vue'
 
-import { dateISO, timeISO, formatTime, formatDuration, isValidDate, currency } from '@/stores/utility';
-import { onBeforeUnmount, ref, computed, watch } from 'vue'
+import { parseDate, formatDuration, formatDur, currency } from '@/composables/utility';
+import { onMounted, onBeforeUnmount, ref, computed } from 'vue'
+import { useDataStore } from "@/stores/dataStore"
 import { useRouter } from 'vue-router'
+import { isMob } from '@/composables/gestureControl'
+
+const dataStore = useDataStore()
 const router = useRouter()
 
 const autoFinishOffset = computed(() => !isNaN(dataStore.data.config.autoFinishOffset) ? Number(dataStore.data.config.autoFinishOffset) : 30)
+const advancedOptions = computed(() => dataStore.data.config.advancedOptions)
 let isNewEvent = ref(false)
 
 if(!dataStore.selectedEvent) {
@@ -21,31 +27,21 @@ if(!dataStore.selectedEvent) {
 const students = dataStore.activeStudents
 const event = dataStore.data.events.find(e => e.id_event === dataStore.selectedEvent)
 
-let updating = false
-const isDisabled = () => !event.id_student || !event.date || !event.time
-
-const initialUpdate = () => { // added due to the recent changes in the data structure: added event.minutesBefore, event.dateEnd, and event.timeEnd
-  const student = students.find(s => s.id_student === event.id_student)
-  event.minutesBefore =
-    (event.minutesBefore || event.minutesBefore === 0) ? event.minutesBefore :
-    (student?.minutesBefore || student?.minutesBefore === 0) ? student.minutesBefore :
-    dataStore.data.config.minutesBefore
-
-  if(!event.duration && event.duration != 0) return
-  updating = true
-    const start = new Date(`${event.date}T${event.time}`)
-    const end = new Date(start.getTime() + event.duration * 60 * 60 * 1000)
-    event.dateEnd = event.dateEnd || dateISO(end)
-    event.timeEnd = event.timeEnd || timeISO(end)
-  setTimeout(() => updating = false, 50)
-}
-if(!isNewEvent.value) initialUpdate()
+import { useEventDefaults } from '@/composables/eventDefaults'
+const { finishEvent, initialUpdate } = useEventDefaults(event)
 
 const backupEvent = {
   date: event.date,
   time: event.time,
   dateEnd: event.dateEnd,
   timeEnd: event.timeEnd
+}
+
+if(!isNewEvent.value) initialUpdate()
+
+const finishEventNow = () => {
+  finishEvent()
+  exitView()
 }
 
 // restore to the last instance or the original created values
@@ -58,26 +54,35 @@ const restoreEvent = () => {
   saveEvent()
 }
 
-const exitView = () => {
-  if (router.options.history.state.back) router.back()
-  else router.push('/agenda')
-}
-
-const saveEvent = () => {
+const saveEvent = async () => {
   event.student_name = students.find(s => s.id_student === event.id_student)?.student_name || ''
-  event.duration = event.duration || dataStore.data.config.defaultClassDuration
+  event.duration = event.duration || dataStore.data.config.duration
 
   if(isNewEvent.value) {
     event.status = 'scheduled'
     event.originalDate = event.originalDate || event.date
     event.originalTime = event.originalTime || event.time
-    event.cost = students.find(s => s.id_student === event.id_student).cost || dataStore.data.config.defaultClassCost
+
+    const student = dataStore.data.students.find(s => s.id_student === event.id_student)
+    const config = dataStore.data.config
+
+    const fallBackNum = key => fallbackNumber(event, student, config, key)
+    const fallBackBol = key =>   fallbackBool(event, student, config, key)
+
+    event.cost = fallBackNum('cost')
+    event.duration = fallBackNum('duration')
+    event.freeCancelationBefore = fallBackNum('freeCancelationBefore')
+    event.cancelationFee = fallBackNum('cancelationFee')
+    event.minutesBefore = fallBackNum('minutesBefore')
+
+    event.variableCost = fallBackBol('variableCost')
+    event.chargeCancelation = fallBackBol('chargeCancelation')
   }
   else event.rescheduled = event.date !== event.originalDate || event.time !== event.originalTime
 
   if(dataStore.data.config.autoFinishEvents.value) {
-    const now = new Date();
-    const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`);
+    const now = new Date()
+    const eventDateTime = parseDate(event.date, event.time)   //formatTime(event.time)
     const finishThreshold = new Date(eventDateTime.getTime() + autoFinishOffset.value * 60 * 1000)
     if(finishThreshold <= now) event.status = 'done'
   }
@@ -85,7 +90,13 @@ const saveEvent = () => {
 }
 
 const cancelEvent = () => {
-  event.status = event.status === 'canceled' ? 'scheduled' : 'canceled'
+  if(event.status === 'canceled') { // restore event
+    event.status = 'scheduled'
+    event.canceledAt = null
+  } else {  // cancel event
+    event.status = 'canceled'
+    event.canceledAt = new Date().getTime()
+  }
   exitView()
 }
 
@@ -94,170 +105,121 @@ const removeEvent = () => {
   exitView()
 }
 
-const finishEventNow = () => {
-  updating = true
-  const now = new Date()
-  event.date = dateISO(now) // YYYY-MM-DD format
-  event.time = timeISO(now) // HH:mm
-
-  const end = new Date(now.getTime() + event.duration * 60 * 60 * 1000)
-  event.dateEnd = dateISO(end)
-  event.timeEnd = timeISO(end)
-
-  event.status = 'done'
-  setTimeout(() => updating = false, 50)
-  exitView()
+const exitView = () => {
+  if (router.options.history.state.back) router.back()
+  else router.push('/agenda')
 }
-
-// update minutesBefore, cost, duration upon changing student
-watch(() => event.id_student, (newId, oldId) => {
-  const oldStudent = dataStore.data.students.find(s => s.id_student === oldId)
-  const newStudent = dataStore.data.students.find(s => s.id_student === newId)
-
-  if (!newStudent) return
-
-  // Use the old student’s values to detect if user changed them manually
-  const oldCost          = oldStudent?.cost
-  const oldDuration      = oldStudent?.duration
-  const oldMinutesBefore = oldStudent?.minutesBefore
-
-  if (event.cost === oldCost || event.cost == null)
-    event.cost = newStudent.cost ?? dataStore.data.config.defaultClassCost
-
-  if (event.duration === oldDuration || event.duration == null)
-    event.duration = newStudent.duration ?? dataStore.data.config.defaultClassDuration
-
-  if (event.minutesBefore === oldMinutesBefore || event.minutesBefore == null)
-    event.minutesBefore = newStudent.minutesBefore ?? dataStore.data.config.minutesBefore
-})
-
-// ?? -> null, undefined
-// || or :? -> false, 0, '', null, undefined, NaN
-
-// change dateEnd and timeEnd upon changing start date, preserves duration
-watch(() => event.date, (newVal, oldVal) => {
-  if (updating) return
-  if (!newVal || !oldVal || !event.dateEnd) return
-  if (!isValidDate(newVal) || !isValidDate(oldVal)) return
-
-  updating = true
-  const oldStart = new Date(`${oldVal}T${event.time}`)
-
-  let oldEnd
-  if (event.timeEnd) oldEnd = new Date(`${event.dateEnd}T${event.timeEnd}`)
-  else if (event.duration) oldEnd = new Date(oldStart.getTime() + event.duration * 60 * 60 * 1000)
-  else oldEnd = new Date(`${event.dateEnd}T${event.time}`)
-
-  const diff = oldEnd.getTime() - oldStart.getTime()
-  const newStart = new Date(`${newVal}T${event.time}`)
-  const newEnd = new Date(newStart.getTime() + diff)
-
-  event.dateEnd = dateISO(newEnd)
-  event.timeEnd = timeISO(newEnd)
-
-  setTimeout(() => updating = false, 50) // to avoid immediate retriggering
-})
-
-// change dateEnd and timeEnd upon changing start time, preserves duration
-watch(() => event.time, (newVal, _) => {
-  if (updating) return
-  if (!newVal) return
-  updating = true
-
-  const start = new Date(`${event.date}T${newVal}`)
-  if (!isValidDate(start)) return
-  const end = new Date(start.getTime() + event.duration * 60 * 60 * 1000)
-
-  event.dateEnd = dateISO(end)
-  event.timeEnd = timeISO(end)
-
-  setTimeout(() => updating = false, 50) // to avoid immediate retriggering
-})
-
-// change dateEnd and timeEnd upon changing duration, preserves date and time
-watch(() => event.duration, (newVal, _) => {
-  if (updating) return
-  if (!newVal) return
-  updating = true
-
-  const start = new Date(`${event.date}T${event.time}`)
-  if (!isValidDate(start)) return
-  const end = new Date(start.getTime() + newVal * 60 * 60 * 1000)
-
-  event.dateEnd = dateISO(end)
-  event.timeEnd = timeISO(end)
-
-  setTimeout(() => updating = false, 50) // to avoid immediate retriggering
-})
-
-// change duration upon changing dateEnd or timeEnd
-watch([() => event.dateEnd, () => event.timeEnd], ([newDateEnd, newTimeEnd], [_, __]) => {
-  if (updating) return
-  updating = true
-  
-  const start = new Date(`${event.date}T${event.time}`)
-  const end = new Date(`${newDateEnd}T${newTimeEnd}`)
-  if (!isValidDate(start) || !isValidDate(end)) return
-
-  const diffMinutes = (end.getTime() - start.getTime()) / (60 * 1000)
-  event.duration = diffMinutes / 60
-
-  setTimeout(() => updating = false, 50) // to avoid immediate retriggering
-})
 
 const timeMin = computed(() => event.dateEnd === event.date ? event.time : '')
 
 // remove event if no student, no date or no time is given when leaving the page
-onBeforeUnmount(() => { if(isNewEvent.value && isDisabled()) dataStore.removeEvent(event.id_event) })
+const isDisabled = () => !event.id_student || !event.date?.trim() || !event.time?.trim()
+const handleBeforeUnload = () => {
+  if(isNewEvent.value) {
+    if(isDisabled()) dataStore.removeEvent(event.id_event)
+    else saveEvent()
+  }
+}
+
+onMounted(() => window.addEventListener('beforeunload', handleBeforeUnload))
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+  handleBeforeUnload()
+})
 </script>
 
 <template>
   <div class="section">
     <h2>{{ isNewEvent ? 'Nova' : 'Editar' }} Aula</h2>
-    <div class="container">
-      <label>Nome do aluno
-      <select name="aluno" v-model="event.id_student" required> <!-- disabled -->
-        <option value="" selected>Nome do aluno</option>
-        <option v-for="student in students" :key="student" :value="student.id_student">{{student.student_name}}</option>
-      </select>
-      </label>
-    
-      <div class="flexContainer">
-        <label class="half">Data de início
-          <input name="data" type="date" v-model="event.date" required>
-        </label>
-        <label class="half">Data de fim
-          <input name="data" type="date" v-model="event.dateEnd" :min="event.date" required>
-        </label>
+
+    <div :class="{'halfContainer': advancedOptions}">
+      <div :class="{'half': advancedOptions, 'container': !advancedOptions}">
+
+        <h4 class="noMob">Detalhes da Aula</h4>
+        <inputSelect id="aluno" defaultText="Selecione um aluno" placeholder="Aluno" :options="students" label="student_name" value="id_student" v-model="event.id_student" />
+
+        <div class="flexContainer">
+          <inputText class="half" id="startDate" type="date" placeholder="Data início" v-model="event.date" />
+          <inputText class="half" id="endDate"   type="date" placeholder="Data fim"    v-model="event.dateEnd" :numberDefs="{min: event.date}" />
+          <inputText class="half" id="startTime" type="time" placeholder="Hora início" v-model="event.time" />
+          <inputText class="half" id="endTime"   type="time" placeholder="Hora fim"    v-model="event.timeEnd" :numberDefs="{min: timeMin}" />
+        </div>
+
+        <div class="flexContainer">
+          <inputText :class="{'half': !advancedOptions, 'w100': advancedOptions}" id="duration" type="number" v-model="event.duration" :numberDefs="{min: 0, step: 0.1}"
+            :placeholder="event.duration ? `Duração (${formatDur(event.duration)})` : 'Duração (horas)'" />
+
+          <inputText v-if="!advancedOptions" class="half" id="cost" type="number" v-model="event.cost" :numberDefs="{step: 0.5, min: 0}"
+            :placeholder="`Valor (${event.cost ? currency(event.cost) : currency(0).slice(0,2)}${event.variableCost ? '/h' : ''})`" />
+        </div>
+
+        <inputText id="notify" type="number" v-model="event.minutesBefore" :numberDefs="{min: 0, step: 5, max: 120}"
+          :placeholder="`Notificação (${event.minutesBefore ? `${formatDur(event.minutesBefore/60)}` : 'minutos'})`" />
+
+        <inputToggle v-model="event.experimental">
+          <template #title>Aula experimental</template>
+          <template #helpText>Aulas experimentais não tem custo e não são consideradas nos cálculos</template>
+        </inputToggle>
+
+        <template v-if="!isMob || !advancedOptions">
+          <hr>
+          <h4>Observações</h4>
+          <div class="form-group">
+            <textarea id="obs" placeholder="Observações" v-model="event.obs"></textarea>
+          </div>
+        </template>
+        
       </div>
 
-      <div class="flexContainer">
-        <label class="half">Horário de início
-          <input name="horario" type="text" placeholder="Hora de início (hh:mm)" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'" v-model="event.time" required>
-        </label>
-        <label class="half">Horário de fim
-          <input name="horario" type="text" placeholder="Hora de fim (hh:mm)" :min="timeMin" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'" v-model="event.timeEnd" required>
-        </label>
+      <div v-if="advancedOptions" class="half">
+
+        <h4>Política de precificação</h4>
+        <p>Afeta apenas esta aula</p>
+        <inputToggle v-model="event.variableCost">
+          <template #title>Valor {{event.variableCost?'variável':'fixo'}}</template>
+          <template #helpText>O valor desta aula {{event.variableCost?'':'in'}}depende da respectiva duração</template>
+        </inputToggle>
+
+        <inputHelp id="cost" :placeholder="`Valor (${currency(0).slice(0,2)}${event.variableCost ? '/h' : ''})`" :numberDefs="{min: 0, step: .5}" v-model.number="event.cost">
+          <template #title>Valor da {{ event.variableCost ? 'hora' : 'aula' }}</template>
+          <template #helpText>Esta aula custa {{ currency(event.cost) }} {{ event.variableCost ? 'a cada hora' : '(valor fixo)' }}</template>
+        </inputHelp>
+        
+        <!-- 
+        <inputHelp id="duration" placeholder="Horas" :numberDefs="{min: 0, step: .1}" v-model.number="event.duration">
+          <template #title>Duração</template>
+          <template #helpText>Esta aula tem {{ formatDuration(event.duration) }} de duração</template>
+        </inputHelp>
+        -->
+
+        <hr/>
+
+        <h4>Política de cancelamento</h4>
+        <p>Afeta apenas esta aula</p>
+        <inputToggle v-model="event.chargeCancelation">
+          <template #title>Cancelamento {{ event.chargeCancelation?'cobrado':'gratuito' }}</template>
+          <template #helpText>Cancelamento desta aula {{ event.chargeCancelation?'':'não ' }}será cobrado {{ event.chargeCancelation?'conforme baixo':'' }}</template>
+        </inputToggle>
+
+        <inputHelp id="freeBefore" :if="event.chargeCancelation" placeholder="horas" :numberDefs="{min: 0, step: .25}" v-model.number="event.freeCancelationBefore">
+          <template #title>Período de gratuidade</template>
+          <template #helpText>O cancelamento desta aula não será cobrado caso ocorra {{ event.freeCancelationBefore ? `com no mínimo ${formatDuration(event.freeCancelationBefore)} de antecedência` : 'até seu horário' }}</template>
+        </inputHelp>
+
+        <inputHelp id="cancelFee" :if="event.chargeCancelation" placeholder="%" :numberDefs="{min: 0, max: 200, step: 5}" v-model.number="event.cancelationFee">
+          <template #title>Taxa de cancelamento</template>
+          <template #helpText>O cancelamento desta aula {{event.cancelationFee ? `acarreta cobrança de ${event.cancelationFee}% do seu valor` : 'é gratuito'}}</template>
+        </inputHelp>
+
+        <template v-if="isMob">
+          <hr>
+          <h4>Observaçõesaa</h4>
+          <div class="form-group">
+            <textarea id="obs" placeholder="Observações" v-model="event.obs"></textarea>
+          </div>
+        </template>
+        
       </div>
-
-      <label>Duração <span v-if="event.duration" class="graySpan">({{ formatDuration(event.duration) }})</span>
-        <input name="duração" type="number" placeholder="Duração (horas)" step="0.1" v-model="event.duration">
-      </label>
-
-      <label>Valor da hora aula <span v-if="event.cost" class="graySpan">({{ currency(event.cost) }})</span>
-        <input name="valor" type="number" placeholder="Valor da hora aula" step="0.5" v-model="event.cost">
-      </label>
-
-      <label>Notificação <span v-if="event.minutesBefore" class="graySpan">({{formatDuration(event.minutesBefore/60)}} antes)</span>
-        <input name="notificação" type="Number" min="0" max="120" step="5" placeholder="Notificação (minutos antes do evento)" v-model="event.minutesBefore">
-      </label>
-      
-      <label>Observações<textarea name="obs" placeholder="Observações" v-model="event.obs"></textarea></label>
-
-      <inputToggle v-model="event.experimental">
-        <template #title>Aula experimental</template>
-        <template #helpText>Aulas experimentais não tem custo e não são consideradas nos cálculos</template>
-      </inputToggle>
 
     </div>
 
@@ -279,3 +241,23 @@ onBeforeUnmount(() => { if(isNewEvent.value && isDisabled()) dataStore.removeEve
     
   </div>
 </template>
+
+<style scoped>
+h4 { font-size: 1.2em; margin-top: 2em; text-align: center }
+hr{ margin: 2em 0 }
+p{text-align: center; margin-top: -.5em}
+.noWeb { display: none }
+
+.flexContainer { display: flex; flex-wrap: wrap; row-gap: 0; column-gap: .5em }
+
+@media screen and (max-width: 992px) { 
+  hr { width: 80%; margin: 2em auto }
+  .noWeb { display: block; margin-bottom: 0; }
+  .noMob{ display: none }
+
+  #startDate { order: 1 }
+  #startTime { order: 2 }
+  #endDate   { order: 3 }
+  #endTime   { order: 4 }
+}
+</style>

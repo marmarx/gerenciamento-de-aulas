@@ -6,12 +6,16 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const student = dataStore.sortedStudents.find(s => s.id_student === props.id)
 
-import { horaBR, currency, shortWeekdays } from '@/stores/utility'
+import { horaBR, currency, shortWeekdays } from '@/composables/utility'
+import { eventValue } from '@/composables/eventValue'
+
 const studentSchedules = computed(() => student.weekly_schedule.filter(e => e.weekDay || e.timeDay).map(e => `${shortWeekdays[e.weekDay]} ${horaBR(e.timeDay)}`).join('  •  '))
-const completedEvents = computed(() => dataStore.doneEvents.filter(e => e.id_student === student.id_student))
-const completedEventsValue = computed(() => completedEvents.value.filter(e => e.experimental === false).reduce((sum, e) => sum + e.cost * e.duration, 0))
+
+const chargableEvents = computed(() => dataStore.chargableEvents.filter(e => e.id_student === student.id_student))
+const chargableEventsValue = computed(() => chargableEvents.value.reduce((sum, e) => sum + eventValue(e.id_event), 0))
+
 const completedPayments = computed(() => dataStore.sortedPayments.filter(p => p.id_student === student.id_student).reduce((sum, p) => sum + p.value, 0))
-const balance = computed(() => completedPayments.value - completedEventsValue.value)
+const balance = computed(() => completedPayments.value - chargableEventsValue.value)
 </script>
 
 <template>

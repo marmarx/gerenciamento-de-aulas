@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { watch, computed, watchEffect } from 'vue'
-import { dateISO, formatTime } from '@/stores/utility'
+import { parseDate, dateISO } from '@/composables/utility'
 import { useDataStore } from "@/stores/dataStore"
 
 export const useAgendaStore = defineStore('agenda', () => {
@@ -29,7 +29,7 @@ export const useAgendaStore = defineStore('agenda', () => {
           const student = activeStudents.value.find(s => s.student_id === event.student_id)
           if (student.paused || student.weekly_schedule.length === 0) return
 
-          const eventDateTime = new Date(`${event.date}T${formatTime(event.time)}`)
+          const eventDateTime = parseDate(event.date, event.time)   //formatTime(event.time)
           const finishThreshold = new Date(eventDateTime.getTime() + Number(autoFinishOffset.value) * 60 * 1000)
           if (finishThreshold <= now) event.status = 'done' // overdue → mark done immediately
           else {
@@ -79,7 +79,7 @@ export const useAgendaStore = defineStore('agenda', () => {
 
             if (!exists) {  // check if it already exists
               const newEvent = dataStore.newEvent() // create new event
-              newEvent.added_on = new Date()
+              newEvent.added_on = new Date().getTime()
               newEvent.id_student = student.id_student
               newEvent.student_name = student.student_name
               newEvent.date = d.date
@@ -90,6 +90,15 @@ export const useAgendaStore = defineStore('agenda', () => {
               newEvent.cost = student.cost
               newEvent.added_manually = false
               newEvent.status = 'scheduled'
+              
+              newEvent.minutesBefore = student.minutesBefore || dataStore.data.config.minutesBefore || 15
+              newEvent.duration = student.duration || dataStore.data.config.duration || 1
+              newEvent.cost = student.cost || dataStore.data.config.cost || 50
+              newEvent.variableCost = student.variableCost || dataStore.data.config.variableCost || true
+              newEvent.chargeCancelation = student.chargeCancelation || dataStore.data.config.chargeCancelation || false
+              newEvent.freeCancelationBefore = student.freeCancelationBefore || dataStore.data.config.freeCancelationBefore || 1
+              newEvent.cancelationFee = student.cancelationFee || dataStore.data.config.cancelationFee || 50
+
               dataStore.data.events.push(newEvent)
             }
           }
@@ -100,7 +109,7 @@ export const useAgendaStore = defineStore('agenda', () => {
     // Cleanup: remove invalid future events only
     dataStore.data.events = dataStore.data.events.filter(e => {
       if (e.added_manually) return true // keep all events added manually
-      if (new Date(e.date) < new Date()) return true // keep all past events
+      if (parseDate(e.date) < new Date()) return true // keep all past events
       return validEvents.some(v =>
         v.id_student === e.id_student &&
         v.date === (e.originalDate || e.date) &&
@@ -113,7 +122,7 @@ export const useAgendaStore = defineStore('agenda', () => {
     const now = new Date()
     dataStore.data.events = dataStore.data.events
       .map(e => {
-        const eventDateTime = new Date(`${e.date}T${formatTime(e.time)}`)
+        const eventDateTime = parseDate(e.date, e.time)   //formatTime(event.time)
         const finishThreshold = new Date(eventDateTime.getTime() + Number(autoFinishOffset.value) * 60 * 1000)
         if (finishThreshold <= now) {
           if (autoFinishEvents.value && e.status === 'scheduled') e.status = 'done'   // mark past scheduled events as done, avoids canceled events

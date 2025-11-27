@@ -1,19 +1,24 @@
 import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
-import { uuidv4, dateISO, timeISO } from './utility';
-import { paletteFromBase } from './colorStore';
-import { importStorage, exportStorage, exportXLSX } from './importExport';
+import { uuidv4, dateISO, timeISO } from '@/composables/utility';
+import { importStorage, exportStorage, exportXLSX } from '@/composables/importExport';
 // import dummyData from '@/unpublished/dummyData'
 
 const storageTitle = 'gestaoDeAulas'
+
+const defaults = {
+  cost: 50, duration: 1, variableCost: true,  // classes default settings
+  chargeCancelation: false, freeCancelationBefore: 1, cancelationFee: 50,  // cancelation policy
+  minutesBefore: 15, // notifications settings
+}
+
 const newData = () => (
   {
-    students:[], events:[], payments:[], config:
-    {
+    students:[], events:[], payments:[],
+    config: {
       numberOfDays: 14, autoCreateEvents: true, autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, // agenda settings
-      minutesBefore: 15, // notifications settings
-      defaultClassDuration: 1, defaultClassCost: 50, variableCost: true, // classes default settings
-      color: '#44289e'  // user interface settings
+      color: '#44289e', canceledOnReport: true, advancedOptions: false, // user interface settings
+      ...defaults
     }
   }
 )
@@ -57,20 +62,29 @@ export const useDataStore = defineStore(storageTitle, () => {
   const newStudent = () => {
     const student = ref({
       id_student: `student_${uuidv4()}`,
-      added_on: new Date(),
+      added_on: new Date().getTime(),
       paused: false,
-      student_name: '',                     //required
+      student_name: '',               //required
       student_phone: '',
+      dob: '',
       parent: '', parent_phone: '',
       parent_2: '', parent_2_phone: '',
       address: '',
       meeting: '',
       scholl: '', year: '',
       weekly_schedule: [{ weekDay: null, timeDay: '', subject: '' }], // { weekDay: 0-6, timeDay: 'hh:mm', subject: '' }
-      cost: data.value.config.defaultClassCost || 50,
-      minutesBefore: data.value.config.minutesBefore || 15,
       start_date: dateISO(new Date()), end_date: '',
-      obs: ''
+      obs: '',
+
+      cost: data.value.config.cost || 50,
+      duration: data.value.config.duration || 1,
+      variableCost: data.value.config.variableCost || true,
+
+      chargeCancelation: data.value.config.chargeCancelation || false,
+      freeCancelationBefore: data.value.config.freeCancelationBefore || 1,
+      cancelationFee: data.value.config.cancelationFee || 50,
+
+      minutesBefore: data.value.config.minutesBefore || 15,
     })
     return student.value
   }
@@ -78,34 +92,34 @@ export const useDataStore = defineStore(storageTitle, () => {
   const newEvent = () => {
     const event = ref({
       id_event: `event_${uuidv4()}`,
-      id_student: '',               //required
+      id_student: '',                 //required
       student_name: '',
-      added_on: new Date(),
-      date: dateISO(new Date()),       //required
-      time: timeISO(new Date()),       //required
-      dateEnd: dateISO(new Date()),
-      timeEnd: timeISO(new Date(new Date().getTime() + (data.value.config.defaultClassDuration || 1) * 60* 60 * 1000)),
+      subject: '',
+      added_on: new Date().getTime(),
       originalDate: '',
       originalTime: '',
-      cost: data.value.config.defaultClassCost || 50, //number
-      duration: data.value.config.defaultClassDuration || 1,  //hours
-      minutesBefore: data.value.config.minutesBefore || 15, //number
-      experimental: false, //boolean
+      date: '',       // dateISO(new Date()) - required
+      time: '',       // timeISO(new Date()) - required
+      dateEnd: '',    // dateISO(new Date())
+      timeEnd: '',    // timeISO(new Date().getTime() + (data.value.config.duration || 1) * 60* 60 * 1000)
+      experimental: false,
       added_manually: true,
       rescheduled: false,
-      status: '', //scheduled, done, canceled
-      obs: ''
+      status: '',     //scheduled, done, canceled
+      canceledAt: null,
+      obs: '',
+      ...defaults
     })
     return event.value
   }
-
+  
   const newPayment = () => {
     const payment = ref({
       id_pay: `payment_${uuidv4()}`,
       id_student: '',                 //required
       student_name: '',
-      added_on: new Date(),
-      date: dateISO(new Date()),         //required
+      added_on: new Date().getTime(),
+      date: dateISO(new Date()),      //required
       value: 0,                       //required
       obs: ''
     })
@@ -125,8 +139,16 @@ export const useDataStore = defineStore(storageTitle, () => {
   const activeStudents = computed(() => sortedStudents.value.filter(s => !s.paused))
   const pausedStudents = computed(() => sortedStudents.value.filter(s =>  s.paused))
 
-  const doneEvents   = computed(() => sortedEvents.value.filter(e =>  e.status === 'done'))
-  const undoneEvents = computed(() => sortedEvents.value.filter(e =>  e.status !== 'done'))
+  const scheduledEvents = computed(() => sortedEvents.value.filter(e => e.status === 'scheduled'))
+  const canceledEvents  = computed(() => sortedEvents.value.filter(e => e.status === 'canceled'))
+  const doneEvents      = computed(() => sortedEvents.value.filter(e => e.status === 'done'))
+  const undoneEvents    = computed(() => sortedEvents.value.filter(e => e.status !== 'done'))       //scheduled + canceled -> agenda
+  
+  // events may individually be charged, each may have it's own chargeCancelation policy
+  const chargableEvents = computed(() => {
+    const predicate = (e) => e.chargeCancelation ? e.status !== 'scheduled' : e.status === 'done'
+    return sortedEvents.value.filter(predicate)
+  })
 
   const selectedStudent = ref('')
   const selectedEvent   = ref('')
@@ -136,14 +158,6 @@ export const useDataStore = defineStore(storageTitle, () => {
   const studentEvents   = computed(() =>   sortedEvents.value.filter(e => e.id_student === selectedStudent.value))
   const studentPayments = computed(() => sortedPayments.value.filter(p => p.id_student === selectedStudent.value))
 
-  const color_label = ['nav-back','nav-hover','nav-line','header-left','header-right','head-text']
-  const color_set = (label,color) => document.documentElement.style.setProperty(`--${label}`, color)
-
-  watch(() => data.value.config.color, (color) => {
-    const colors = paletteFromBase(color)
-    colors.forEach((color,i) => color_set(color_label[i],color))
-  }, { deep: true, immediate: true })
-
   return { 
     saveStorage, clearStorage,
     importData, exportData, exportTables,
@@ -152,8 +166,8 @@ export const useDataStore = defineStore(storageTitle, () => {
     selectedStudent, selectedEvent, selectedPayment,
     sortedStudents, sortedEvents, sortedPayments,
     activeStudents, pausedStudents,
-    doneEvents, undoneEvents,
+    scheduledEvents, doneEvents, canceledEvents, undoneEvents, chargableEvents,
     student, studentEvents, studentPayments,
     data
   }
-});
+})

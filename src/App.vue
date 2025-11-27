@@ -4,7 +4,7 @@ import Header from '@/components/header.vue'
 import fab from '@/components/fab.vue'
 import toast from '@/components/toast.vue'
 
-import { updatedVisibility, isWeb } from '@/stores/installPWA'
+import { updatedVisibility, isWeb } from '@/composables/installPWA'
 import installPrompt from '@/components/installPrompt.vue'
 
 import { useAgendaStore } from '@/stores/agendaStore'
@@ -19,10 +19,13 @@ notificationStore.setupNotificationWatcher()
 import { useRouter } from 'vue-router';
 const router = useRouter()
 
-import { setBackGesture, setSwipeGesture, transitionName } from '@/stores/gestureControl'
+import { setBackGesture, setSwipeGesture, transitionName } from '@/composables/gestureControl'
+import { useTheme } from '@/composables/color'
 
 import { onMounted, onUnmounted } from 'vue'
+
 onMounted(async () => {
+  useTheme()
   setBackGesture()
   setSwipeGesture()
   updatedVisibility()
@@ -30,7 +33,33 @@ onMounted(async () => {
   router.push('/agenda')
 })
 
-onUnmounted(() => document.removeEventListener("visibilitychange", updatedVisibility))
+onUnmounted(() => document.removeEventListener("visibilitychange", updatedVisibility))  
+
+
+// update existing data sets - maybe removed in future updates
+import { useEventDefaults } from '@/composables/eventDefaults'
+import { useDataStore } from "@/stores/dataStore"
+const dataStore = useDataStore()
+
+const studentsUpdate = (student) => {
+  student.cost           = student.cost ?? dataStore.data.config.cost
+  student.duration       = student.duration ?? dataStore.data.config.duration
+  student.variableCost   = student.variableCost ?? dataStore.data.config.variableCost
+
+  student.chargeCancelation      = student.chargeCancelation ?? dataStore.data.config.chargeCancelation
+  student.freeCancelationBefore  = student.freeCancelationBefore ?? dataStore.data.config.freeCancelationBefore
+  student.cancelationFee         = student.cancelationFee ?? dataStore.data.config.cancelationFee
+
+  student.minutesBefore  = student.minutesBefore ?? dataStore.data.config.minutesBefore
+}
+
+onMounted(async () => {
+  dataStore.data.students.forEach(s => studentsUpdate(s))
+  dataStore.data.events.forEach(ev => {
+    const { initialUpdate } = useEventDefaults(ev)
+    initialUpdate()
+  })
+})
 </script>
 
 <template>

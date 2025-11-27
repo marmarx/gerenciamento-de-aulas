@@ -1,5 +1,6 @@
 <script setup>
-import { weekLabel, dateLabel, timeISO, horaBR, formatDuration, currency, toSentenceCase } from '@/stores/utility'
+import { parseDate, weekLabel, dateLabel, timeISO, horaBR, formatDuration, currency, toSentenceCase } from '@/composables/utility'
+import { eventValue } from '@/composables/eventValue'
 import { computed } from 'vue'
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
@@ -9,30 +10,32 @@ const student = dataStore.student
 const history = computed(() => {
   if (!dataStore.selectedStudent) return []
 
-  const events = dataStore.doneEvents
+  const events = dataStore.chargableEvents //dataStore.data.events chargableEvents
     .filter(e => e.id_student === dataStore.selectedStudent)
     .map(e => ({
       type: 'Aula',
       id: e.id_event,
       date: e.date,
       time: e.time,
-      value: e.experimental ? 0 : -((e.duration || 1) * (e.cost || student.cost)),
+      value: -eventValue(e.id_event),
       dateStamp: `${weekLabel(e.date)}, ${dateLabel(e.date)}  •  ${horaBR(e.time)}`,
-      details: `${e.experimental ? 'Experimental' : currency(e.cost || student.cost)}  •  ${formatDuration(e.duration)}`
-    }));
+      details: `${e.experimental ? 'Experimental' : currency(e.cost || student.cost)}  •  ${formatDuration(e.duration)}`,
+      status: e.status
+    }))
 
   const payments = dataStore.studentPayments
     .map(p => ({
       type: "Pagamento",
       id: p.id_pay,
       date: p.date,
-      time: timeISO(new Date(p.added_on)),
+      time: timeISO(p.added_on),
       value: p.value || 0,
-      dateStamp: `${weekLabel(p.date)}, ${dateLabel(p.date)}  •  ${horaBR(timeISO(new Date(p.added_on)))}`,
-      details: null
-    }));
+      dateStamp: `${weekLabel(p.date)}, ${dateLabel(p.date)}  •  ${horaBR(timeISO(p.added_on))}`,
+      details: null,
+      status: null
+    }))
 
-  return [...payments, ...events].sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`))
+  return [...payments, ...events].sort((a, b) => parseDate(a.date, a.time) - parseDate(b.date, b.time))
 })
 
 const monthlyBalance = computed(() => {
@@ -43,7 +46,7 @@ const monthlyBalance = computed(() => {
   for (const item of items) {
     runningBalance += item.value
 
-    const d = new Date(`${item.date}T${item.time}`)
+    const d = parseDate(item.date, item.time)
     const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
 
     result[monthKey] = runningBalance
@@ -57,7 +60,7 @@ const groupedByMonth = computed(() => {
   const items = [...history.value].reverse()
 
   for (const item of items) {
-    const d = new Date(`${item.date}T${item.time}`)
+    const d = parseDate(item.date, item.time)
     const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
     if (!groups[monthKey]) groups[monthKey] = {
       month: monthKey,
@@ -106,12 +109,12 @@ const editEntry = (type, id) => {
           <div v-for="item in group.items" :key="item.id" class="exItem" @click="editEntry(item.type, item.id)">
             <div class="exRow">
               <div class="exCol">
-                <div class="exTitle">{{ item.type }}</div>
+                <div class="exTitle">{{ item.type }} <span class="exStatus" v-if="item.status === 'canceled'">(cancelada)</span></div>
                 <div class="exText">{{ item.dateStamp }}</div>
-                <div v-if="item.details" class="exText">{{ item.details }}</div> 
+                <div v-if="item.details" class="exText">{{ item.details }}</div>
               </div>
               <div class="exCol">
-                <div class="exValue" style="margin:auto" :style="{ color: item.value < 0 ? 'var(--red)' : 'var(--green)' }">{{ currency(item.value) }}</div>
+                <div class="exValue" style="margin:auto" :class="{ up: item.value > 0, down: item.value < 0 }">{{ item.value === 0 ? currency(0) : currency(item.value) }}</div>
               </div>
             </div>
           </div>

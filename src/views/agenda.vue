@@ -6,29 +6,50 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const numberOfDays = computed(() => dataStore.data.config.numberOfDays || 0)
 const nextDaysTitle = computed(() => numberOfDays.value === 1 ? 'Amanhã' : `Próximos ${numberOfDays.value} dias`)
-const lastDate = computed(() => new Date(new Date().setDate(new Date().getDate() + numberOfDays.value)))
 
-import { dateISO } from '@/stores/utility';
-const eventsToday = computed(() => dataStore.undoneEvents.filter(e => e.date === dateISO(new Date())))
-const eventsNextDays = computed(() => dataStore.undoneEvents.filter(e => e.date > dateISO(new Date()) && e.date <= dateISO(lastDate.value)))
+import { filterRange, dateISO, addDays } from '@/composables/utility';
+const tomorrow = addDays(0, 1)
+const lastDate = computed(() => addDays(0, numberOfDays.value))
+const filterDates = arr => filterRange(arr, tomorrow, lastDate.value)
+
+const eventsToday = computed(() => dataStore.undoneEvents.filter(e => e.date === dateISO(new Date())))  // events happening today
+const eventsNextDays = computed(() => filterDates(dataStore.undoneEvents || []))                        // events happening in-between tomorrow and numberOfDays shown in agenda
 </script>
 
 <template>
   <div class="section">
-    <div class="agenda">
-      <h2>Hoje</h2>
-      <div v-if="eventsToday.length" class="container grid">
-        <cardEvent v-for="event in eventsToday" :key="event.id_event" :id="event.id_event" :add="true" />
+
+    <template v-if="!dataStore.data.students.length">
+      <div class="agenda container">
+        <h2>Agenda</h2>
+        <p class="tac">Nenhum aluno ainda, inicie <router-link to="/aluno/editar" title="Novo aluno" @click="dataStore.selectedStudent = null">adicionando um</router-link> para agendar aulas.</p>
       </div>
-      <p class="tac" v-else>Nenhuma aula para hoje :)</p>
-    </div>
-      
-    <div class="agenda" v-if="numberOfDays>0 && eventsNextDays.length">
-      <h2>{{nextDaysTitle}}</h2>
-      <div class="container grid">
-        <cardEvent v-for="event in eventsNextDays" :key="event.id_event" :id="event.id_event" :add="false" />
+    </template>
+
+    <template v-else-if="!dataStore.data.events.length">
+      <div class="agenda container">
+        <h2>Agenda</h2>
+        <p class="tac">Nenhuma aula agendada, <router-link to="/aula" title="Novo aluno" @click="dataStore.selectedEvent = null">adicione uma</router-link> manualmente ou indique horário semanal dos alunos para criar os agendamentos automaticamente.</p>
       </div>
-    </div>
+    </template>
+
+    <template v-else>
+      <div class="agenda">
+        <h2>Hoje</h2>
+        <div v-if="eventsToday.length" class="container grid">
+          <cardEvent v-for="event in eventsToday" :key="event.id_event" :id="event.id_event" :add="true" />
+        </div>
+        <p class="tac" v-else>Nenhuma aula para hoje :)</p>
+      </div>
+        
+      <div class="agenda" v-if="numberOfDays>0 && eventsNextDays.length">
+        <h2>{{nextDaysTitle}}</h2>
+        <div class="container grid">
+          <cardEvent v-for="event in eventsNextDays" :key="event.id_event" :id="event.id_event" :add="false" />
+        </div>
+      </div>
+    </template>
+
   </div>
 </template>
 

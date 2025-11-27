@@ -6,8 +6,8 @@ const dataStore = useDataStore()
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-import { isMob } from '@/stores/gestureControl'
-import { invertDateISOnoYear, currency, weekLabel, dateLabel, toSentenceCase } from '@/stores/utility';
+import { isMob } from '@/composables/gestureControl'
+import { parseDate, shortDateLabel, currency, weekLabel, dateLabel, toSentenceCase } from '@/composables/utility';
 
 dataStore.selectedStudent = ''
 const students = dataStore.sortedStudents
@@ -17,7 +17,7 @@ const paymentsGroupedByMonth = computed(() => {
   const groups = {}
 
   for (const item of payments.value.reverse()) {
-    const d = new Date(`${item.date}T00:00`)
+    const d = parseDate(item.date)
     const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
     if (!groups[monthKey]) groups[monthKey] = []
     groups[monthKey].push(item)
@@ -33,7 +33,7 @@ const sortedPayments = computed(() => {
   const sorted = [...payments.value].sort((a, b) => {
     if (sortKey.value === 'student_name') return a.student_name.toLowerCase().localeCompare(b.student_name.toLowerCase())
     if (sortKey.value === 'value') return a.value - b.value
-    else return new Date(a.date) - new Date(b.date)
+    else return parseDate(a.date) - parseDate(b.date)
   })
   return sortReverse.value ? sorted.reverse() : sorted
 })
@@ -95,7 +95,7 @@ const editPayment = (id) => {
         </tr></thead>
         <tbody><tr v-for="payment in sortedPayments" :key="payment.id_pay" @click="editPayment(payment.id_pay)">
           <td>{{ payment.student_name }}</td>
-          <td>{{ invertDateISOnoYear(payment.date) }}</td>
+          <td>{{ shortDateLabel(payment.date) }}</td>
           <td>{{ currency(payment.value) }}</td>
         </tr></tbody>
       </table>

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from "vue"
-import { deferredPrompt, isInstalled, installButtonVisible, isIOS, installApp, hideInstallButton } from "@/stores/installPWA.js"
+import { deferredPrompt, isInstalled, installButtonVisible, isIOS, installApp, hideInstallButton } from "@/composables/installPWA.js"
 
 onMounted(() => { 
   window.addEventListener("beforeinstallprompt", async (e) => {

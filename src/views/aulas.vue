@@ -1,15 +1,16 @@
 <script setup>
 import { ref, computed } from 'vue'
-
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-import { isMob } from '@/stores/gestureControl'
-import { invertDateISOnoYear, shortWeekday, currency, formatTime, formatDuration, weekLabel, dateLabel, horaBR, toSentenceCase } from '@/stores/utility';
-const status = { 'scheduled':'Agendada', 'done':'Finalizada', 'canceled':'Cancelada' }
-
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
+
+import { isMob } from '@/composables/gestureControl'
+import { parseDate, shortDateLabel, shortWeekday, currency, formatDuration, weekLabel, dateLabel, horaBR, toSentenceCase } from '@/composables/utility';
+import { eventValue } from '@/composables/eventValue'
+
+const status = { 'scheduled':'Agendada', 'done':'Finalizada', 'canceled':'Cancelada' }
 
 dataStore.selectedStudent = ''
 const students = dataStore.sortedStudents
@@ -19,7 +20,7 @@ const eventsGroupedByMonth = computed(() => {
   const groups = {}
 
   for (const item of events.value.reverse()) {
-    const d = new Date(`${item.date}T00:00`)
+    const d = parseDate(item.date)
     const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
     if (!groups[monthKey]) groups[monthKey] = []
     groups[monthKey].push(item)
@@ -34,10 +35,10 @@ const sortReverse = ref(true)
 const sortedEvents = computed(() => {
   const sorted = [...events.value].sort((a, b) => {
     if (sortKey.value === 'student_name' || sortKey.value === 'status') return a[sortKey.value].toLowerCase().localeCompare(b[sortKey.value].toLowerCase())
-    if (sortKey.value === 'duration' || sortKey.value === 'cost') return a[sortKey.value] - b[sortKey.value]
-    if (sortKey.value === 'day') return new Date(a.date).getDay() - new Date(b.date).getDay()
-    if (sortKey.value === 'time') return new Date(`2025-01-01T${formatTime(a.time)}`) - new Date(`2025-01-01T${formatTime(b.time)}`)
-    else return new Date(`${a.date}T${formatTime(a.time)}`) - new Date(`${b.date}T${formatTime(b.time)}`)
+    if (sortKey.value === 'duration' || sortKey.value === 'cost' || sortKey.value === 'value') return a[sortKey.value] - b[sortKey.value]
+    if (sortKey.value === 'day') return parseDate(a.date).getDay() - parseDate(b.date).getDay()
+    if (sortKey.value === 'time') return parseDate('2025-01-01', a.time) - parseDate('2025-01-01', b.time)     //formatTime(a.time)
+    else return parseDate(a.date, a.time) - parseDate(b.date, b.time)
   })
   return sortReverse.value ? sorted.reverse() : sorted
 })
@@ -70,7 +71,7 @@ const editEvent = (id) => {
       <div v-for="(items, month) in eventsGroupedByMonth" :key="month">
         <div class="exHead">
           <p class="exMonth">{{ toSentenceCase(month) }}</p>
-          <p class="exText">{{ currency(items.reduce((total, e) => total + (e.experimental ? 0 : (e.status !== 'canceled' ? e.cost * e.duration : 0)), 0)) }}</p>
+          <p class="exText">{{ currency(items.reduce((total, e) => total + eventValue(e.id_event), 0)) }}</p>
         </div>
         <div v-for="event in items" :key="event.id" class="exItem" @click="editEvent(event.id_event)">
           <div class="exRow">
@@ -80,7 +81,7 @@ const editEvent = (id) => {
               <div class="exText">{{ event.experimental ? 'Experimental' : currency(event.cost) }}  •  {{ formatDuration(event.duration) }}</div> 
             </div>
             <div class="icon-wrapper">
-              <div v-if="event.status === 'scheduled'" class="icon icon-event" :style="{'--today-day': `'${new Date(event.date).getDate()+1}'`}"></div>
+              <div v-if="event.status === 'scheduled'" class="icon icon-event" :style="{'--today-day': `'${parseDate(event.date).getDate()+1}'`}"></div>
               <div v-else-if="event.status === 'canceled'" class="icon icon-canceled"></div>
               <div v-else-if="event.status === 'done'" class="icon icon-done"></div>
             </div>
@@ -98,18 +99,20 @@ const editEvent = (id) => {
           <th             @click="sortBy('date')">        Data    <span v-if="sortKey === 'date'">        {{ sortReverse ? '▲' : '▼' }}</span></th>
           <th class="web" @click="sortBy('day')">         Dia     <span v-if="sortKey === 'day'">         {{ sortReverse ? '▲' : '▼' }}</span></th>
           <th class="web" @click="sortBy('time')">        Hora    <span v-if="sortKey === 'time'">        {{ sortReverse ? '▲' : '▼' }}</span></th>
-          <th class="web" @click="sortBy('duration')">    Duração <span v-if="sortKey === 'duration'">    {{ sortReverse ? '▲' : '▼' }}</span></th>
           <th class="web" @click="sortBy('cost')">        R$/h    <span v-if="sortKey === 'cost'">        {{ sortReverse ? '▲' : '▼' }}</span></th>
+          <th class="web" @click="sortBy('duration')">    Duração <span v-if="sortKey === 'duration'">    {{ sortReverse ? '▲' : '▼' }}</span></th>
           <th             @click="sortBy('status')">      Status  <span v-if="sortKey === 'status'">      {{ sortReverse ? '▲' : '▼' }}</span></th>
+          <th             @click="sortBy('value')">       R$      <span v-if="sortKey === 'value'">       {{ sortReverse ? '▲' : '▼' }}</span></th>
         </tr></thead>
         <tbody><tr v-for="event in sortedEvents" :key="event.id_event" @click="editEvent(event.id_event)">
           <td>{{ event.student_name }}</td>
-          <td>{{ invertDateISOnoYear(event.date) }}</td>
+          <td>{{ shortDateLabel(event.date) }}</td>
           <td class="web">{{ shortWeekday(event.date) }}</td>
           <td class="web">{{ event.time }}</td>
-          <td class="web">{{ `${event.duration} hora${event.duration>1?'s':''}` }}</td>
-          <td class="web">{{ event.experimental ? currency(0) : currency(event.cost) }}</td>
+          <td class="web">{{ event.experimental ? 'Experimental' : `${currency(event.cost)}/h` }}</td>
+          <td class="web">{{ formatDuration(event.duration) }}</td>
           <td>{{ status[event.status] }}</td>
+          <td>{{ currency(eventValue(event.id_event)) }}</td>
         </tr></tbody>
       </table>
       <br/>

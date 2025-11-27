@@ -7,14 +7,14 @@ const dataStore = useDataStore()
 const event = computed(() => dataStore.sortedEvents.find(e => e.id_event === props.id))
 const student = computed(() => dataStore.sortedStudents.find(s => s.id_student === event.value.id_student))
 
-import { mapsLink, whatsappLink, weekLabel, dateLabel, horaBR } from '@/stores/utility';
+import { mapsLink, whatsappLink, weekLabel, dateLabel, horaBR } from '@/composables/utility';
 
 const markAsDone = () => {
-  event.value.duration = event.value.duration || dataStore.data.config.defaultClassDuration
+  event.value.duration = event.value.duration || dataStore.data.config.duration
   event.value.status = 'done'
 }
 
-const cancelEvent = () => { event.value.status = 'canceled' }
+const cancelEvent = () => { event.value.status = 'canceled'; event.value.canceledAt = new Date().getTime() }
 const restoreEvent = () => { event.value.status = 'scheduled' }
 </script>
 
