@@ -35,11 +35,12 @@ const timerWidth = (toast) => `${ Math.round( Math.max(0, toast.remaining / toas
 :root { --toastColor: #f5b031 }
 
 .toast-stack {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999;
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: -1;
   display: flex; flex-direction: column-reverse; gap: 10px;
   width: 80%; max-width: 400px; max-height: 60vh; overflow: hidden;
   padding: 1em
 }
+.toast-stack:has(.toast-container) { z-index: 9999 }
 
 .toast-container {
   position: relative; box-sizing: border-box;
@@ -82,3 +83,4 @@ const timerWidth = (toast) => `${ Math.round( Math.max(0, toast.remaining / toas
 
 @media screen and (max-width: 992px) { .toast-stack { width: 90% } }
 </style>
+
