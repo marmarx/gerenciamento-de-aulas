@@ -1,0 +1,79 @@
+@import "colors.css";
+@import "@/modules/inputs/inputForm.css";
+
+* { color: var(--black); transition: all 0.3s ease; }
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: var(--body-back); min-height: 100vh}
+table { border-collapse: collapse; width: 100%; background: var(--white) }
+p { line-height: 1.6em }
+
+.dateFilter { width: 100%; text-align: center; }
+h2 { margin: 12px 0 18px; width: 100%; text-align: center }
+h4 { margin: 1.6em 0.8em .6em}
+
+.flexContainer { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+.container{ width:80% }
+.container, .halfContainer {max-width: 900px; margin: auto}
+.smallContainer {max-width: 500px}
+.halfContainer { width:100%; display: flex; flex-wrap: wrap; justify-content: space-between;}
+.halfContainer > .half{padding: 0 25px}
+
+.half, .alwaysHalf { width: calc(49.9999% - 5px); box-sizing: border-box; }
+.alwaysHalf label{text-align: center}
+.third{ width: calc(33.3333% - 10px); box-sizing: border-box }
+.w100{ width: 100% }
+
+.tac{text-align: center; margin-top: 0}
+.graySpan{color:#9d9d9d}
+.smallTxt{font-size:.8em}
+#student-form{width:100%}
+
+table{border-collapse: collapse}
+thead{color: var(--white);background: var(--table-head)}
+/* thead{color: var(--black)} */
+#statement td,#statement th{text-align: center; border: 0}
+th{user-select: none}
+th, td{ border: 1px solid var(--table-border); padding: 8px; text-align: center }
+tr:nth-child(even){background-color: var(--table-odd)}
+tbody tr:hover {background-color: var(--table-hover)}
+.table-balance{border-top: 2px solid var(--table-balance)!important}
+
+button {
+  display: inline-block;
+  font-size: 1em; font-weight:bold; color: var(--white); text-align: center; text-decoration: none;
+  padding: 14px 28px; border: none; border-radius: 6px; margin: 4px 8px;
+  background-color:var(--black-main); cursor: pointer;
+}
+.button { width:25px; height:25px; padding:1em; margin:0; cursor: pointer; background-color:var(--black-main); display: flex; border-radius: 10px}
+.button:hover,button:hover {background-color: var(--black-washed)}
+button:disabled{ opacity: 0.6; cursor: not-allowed }
+button:disabled:hover{ background-color: var() }
+a.disabled { pointer-events: none; cursor: default }
+
+#config-button{
+  width: 32px; height: 32px; position: absolute; right: 18px; top: 18px;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-label { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px }
+.checkbox-label span{white-space: nowrap;margin-left:5px}
+
+.dateFlex { width: 90%; max-width: 800px; display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px }
+
+#thisWeekClasse { width: 100%; max-width: 800px; display: flex; flex-direction: row; gap: 10px }
+.weekclass { width: 33.3333%; box-sizing: border-box; padding: 10px; border-radius: 5px }
+
+/* .web{display: block} */
+.mob{display: none}
+
+@media screen and (max-width: 992px) {
+  .container, .halfContainer, .flexContainer{width: 100%; gap: 0}
+  .flexContainer > label { width: 100% }
+  .half, .third{width: 100%}
+  .halfContainer > .half{padding: 0}
+  .web{display: none}
+  .mob{display: block}
+  button, a:has(button){width: 100%; margin:.5em 0}
+  .button{width: 20px; height: 20px}
+  #student-history{margin-top: 25px}
+}
