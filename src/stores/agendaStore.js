@@ -53,14 +53,13 @@ export const useAgendaStore = defineStore('agenda', () => {
     })
   }
 
-
   // remove events for paused students
+  const pausedIds = computed(() => students.value.filter(s => s.paused).map(s => s.id_student))
   const removeScheduledEventsForPausedStudents = () => {
-    const pausedIds = students.value.filter(s => s.paused).map(s => s.id_student)
-    if (pausedIds.length === 0) return
-
-    dataStore.data.events = dataStore.data.events.filter(e => !(pausedIds.includes(e.id_student) && e.status === 'scheduled'))
+    if (pausedIds.value.length === 0) return
+    dataStore.data.events = dataStore.data.events.filter(e => !(pausedIds.value.includes(e.id_student) && e.status === 'scheduled'))
   }
+  watch(pausedIds, removeScheduledEventsForPausedStudents, {immediate: true}
 
 
   // remove events that became overdue and haven't been marked as 'done' manually
@@ -100,6 +99,7 @@ export const useAgendaStore = defineStore('agenda', () => {
     const studentsWithSchedule = students.value.filter(s => s.weekly_schedule.length > 0)
 
     studentsWithSchedule.forEach(student => {
+      if (student.paused) return
       student.weekly_schedule.forEach(schedule => {
         if (schedule.weekDay === null || !schedule.timeDay) return  // skip empty schedule entries
 
@@ -193,3 +193,4 @@ export const useAgendaStore = defineStore('agenda', () => {
 
   return { generateEvents }
 })
+
