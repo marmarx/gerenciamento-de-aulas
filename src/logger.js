@@ -1,38 +1,42 @@
 // usage: import '@/logger.js'
 const DEBUG = true  // import.meta.env.DEV || false
+const STYLING_ARG_REGEX = /\[([^\]]*)\] ?/; // regex matchs '[any string]' or '[any string] '
 const originalLog = console.log
 
 // reset console log to support tag coloring
 console.log = (...args) => {
   if (!DEBUG) return
 
-  const match = args
-    .map(arg => typeof arg === 'string'
-      ? arg.match(/\[([^\]]*)\] ?/) // matchs '[any string]' or '[any string] '
-      : null).find(m => m)
+  // const assignedColors = {}  // use this instead when specific colors for specific tags is desired
 
-  if (!match) return originalLog(...args)
+  for (let index = 0; index < args.length; index++) {
+    const arg = args[index]
+    const match = typeof arg === 'string' ? arg.match(STYLING_ARG_REGEX) : null
 
-  // const assignedColors = {}  // use this when specific colors for specific tags is desired
+    if (match) {
+      const fullMatch = arg.trim() === match[0].trim()  // is arg '[tag]' or '[tag] string'?
+      
+      if (fullMatch) args.splice(index, 1)                    // removes the arg match
+      else args[index] = arg.replace(STYLING_ARG_REGEX, "")   // removes only tag from the arg match
 
-  const tag = match[1]
-  const color = setColorTag(tag)  // assignedColors[tag]
+      const tag   = match[1]
+      const color = setColorTag(tag)  // assignedColors[tag]
 
-  const head = `%c[${tag}]`
-  const style = `color: ${color}; font-weight:bold`
+      const head  = `%c[${tag}]`
+      const style = `color: ${color}; font-weight:bold`
+      args.unshift(head, style)
 
-  args = args.map(arg => typeof arg === 'string'
-    ? arg.replace(/\[[^\]]*\] ?/g, "")
-    : arg
-  )
+      break // only the first tag match is import
+    }
+  }
 
-  return originalLog(head, style, ...args)
+  return originalLog(...args)
 }
 
 // assigns a color to each tag that shows up in the console.log
 const createColorTag = () => {
   let colorIndex = 0
-  const tagColors = new Map()   // tag -> assigned color
+  const tagColors = new Map()   // map for assigned color
   
   const COLOR_PALETTE = [
     '#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
@@ -44,7 +48,7 @@ const createColorTag = () => {
   const findColorTag = (tag) => {
     if (!tagColors.has(tag)) {
       const color = COLOR_PALETTE[colorIndex % COLOR_PALETTE.length]
-      tagColors.set(tag, color)
+      tagColors.set(tag, color) // tag -> assign color
       colorIndex++
     }
     return tagColors.get(tag)
