@@ -1,37 +1,4 @@
 // usage: import '@/logger.js'
-const DEBUG = true  // import.meta.env.DEV || false
-const STYLING_ARG_REGEX = /\[([^\]]*)\] ?/; // regex matchs '[any string]' or '[any string] '
-const originalLog = console.log
-
-// reset console log to support tag coloring
-console.log = (...args) => {
-  if (!DEBUG) return
-
-  // const assignedColors = {}  // use this instead when specific colors for specific tags is desired
-
-  for (let index = 0; index < args.length; index++) {
-    const arg = args[index]
-    const match = typeof arg === 'string' ? arg.match(STYLING_ARG_REGEX) : null
-
-    if (match) {
-      const fullMatch = arg.trim() === match[0].trim()  // is arg '[tag]' or '[tag] string'?
-      
-      if (fullMatch) args.splice(index, 1)                    // removes the arg match
-      else args[index] = arg.replace(STYLING_ARG_REGEX, "")   // removes only tag from the arg match
-
-      const tag   = match[1]
-      const color = setColorTag(tag)  // assignedColors[tag]
-
-      const head  = `%c[${tag}]`
-      const style = `color: ${color}; font-weight:bold`
-      args.unshift(head, style)
-
-      break // only the first tag match is import
-    }
-  }
-
-  return originalLog(...args)
-}
 
 // assigns a color to each tag that shows up in the console.log
 const createColorTag = () => {
@@ -57,18 +24,46 @@ const createColorTag = () => {
   return findColorTag
 }
 
-const setColorTag = createColorTag()
+// reset console log to support tag coloring
+console.log = (() => {  // define anonymous function
+  const DEBUG = true    // import.meta.env.DEV || false
+  const STYLING_ARG_REGEX = /\[([^\]]*)\] ?/; // regex matchs '[any string]' or '[any string] '
+  // const assignedColors = {}  // use this instead when specific colors for specific tags is desired
+
+  console.clear()
+  const originalLog = console.log
+  const setColorTag = createColorTag()
+
+  return (...args) => {   // returns a second anonymous function
+    if (!DEBUG) return
+
+    for (let index = 0; index < args.length; index++) {
+      const arg = args[index]
+      const match = typeof arg === 'string' ? arg.match(STYLING_ARG_REGEX) : null
+
+      if (match) {
+        const fullMatch = arg.trim() === match[0].trim()  // is arg '[tag]'/'[tag] ' or '[tag] string'?
+        
+        if (fullMatch) args.splice(index, 1)                    // removes the arg match
+        else args[index] = arg.replace(STYLING_ARG_REGEX, "")   // removes only tag from the arg match
+
+        const tag   = match[1]
+        const color = setColorTag(tag)  // const color = assignedColors[tag]
+
+        const head  = `%c[${tag}]`
+        const style = `color: ${color}; font-weight:bold`
+        args.unshift(head, style)
+
+        break // only the first tag match is import
+      }
+    }
+
+    return originalLog(...args)
+  }
+})()    // run anonymous function right after defining it (runs only once)
 
 /*
-// -- Defining setColorTag() anonymously --
+// -- Defining anonymously vs named --
 // -> named is better when it comes to legibility, reusability and tracing
 // -> makes no difference in terms of performance and tree shaking
-// -> for the sake of learning only
-
-const setColorTag = (() => {  // anonymous function
-  let colorIndex = 0
-  ...
-  return tag => {...}         // return anonympus function
-})()                          // run anonymous function
-
 */
