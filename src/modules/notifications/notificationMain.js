@@ -1,0 +1,105 @@
+import { ref } from 'vue'
+import { LocalNotifications } from '@capacitor/local-notifications'
+import { hashUUID } from '@/modules/notifications/notificationHelper'
+
+// ## PERMISSION REQUEST ##
+const permissionGranted = ref(false)
+
+// Silent check for notifiction permission
+const checkPermission = async () => {
+  const check = await LocalNotifications.checkPermissions() // {display: "granted"}
+  const result = check.display === 'granted'  // true or false
+  permissionGranted.value = result
+  return result
+}
+
+// Request user notification permission
+const requestPermission = async () => {
+  const request = await LocalNotifications.requestPermissions()  // {display: "granted"}
+  const result = request.display === 'granted'  // true or false
+  permissionGranted.value = result
+  return result
+}
+
+// Request notification permission -> returns true if granted
+const notificationPermission = async () => {
+  const check = await checkPermission()
+  console.log('[notificationStore] Permission check:', check)
+  if (check) return check
+
+  const request = await requestPermission()
+  console.log('[notificationStore] Permission request:', request)
+  return request
+}
+
+
+// ## SCHEDULE NOTIFICATIONS ##
+// Schedule multiple notifications
+const scheduleNotifications = async (notifications) => {
+  const check = await checkPermission()  // silent check - no need to bother the user every time the function is called
+  if (!check) return
+
+  try {
+    if (!notifications.length) { console.log('[notificationStore] No notifications to schedule'); return }
+
+    await LocalNotifications.schedule({ notifications })
+    console.log(`[notificationStore] Scheduled ${notifications.length} notification(s)`)
+  }
+  catch (err) { console.error('[notificationStore] Failed to schedule notifications:', err) }
+}
+
+// Lists all pending notifications, returns { notifications: [] }
+const listPendingNotifications  = async () => await LocalNotifications.getPending()
+
+
+// ## CANCEL NOTIFICATIONS ##
+// Cancal single notification by related id
+const cancelNotificationById = async (notifId) => {
+  const id = hashUUID(notifId)
+
+  await LocalNotifications.cancel({ notifications: [{ id }] })
+  console.log(`[notificationStore] Canceled notification ${id} related to ${notifId}`)
+}
+
+// Cancal all pending notifications
+const cancelPendingNotifications = async () => {
+  const pending = await listPendingNotifications()
+
+  try {
+    if (!pending?.notifications?.length) { console.log('[notificationStore] No pending notifications to cancel'); return }
+
+    await LocalNotifications.cancel({ notifications: pending.notifications })
+    console.log(`[notificationStore] Canceled ${pending.notifications.length} pending notifications`)
+  }
+  catch (err) { console.error('[notificationStore] Failed to cancel notifications:', err) }
+}
+
+
+// ## REMOVE NOTIFICATIONS ##
+// Remove all delivered notifications
+const removeDeliveredNotifications = async () => await LocalNotifications.removeAllDeliveredNotifications()
+
+// Remove all notifications
+const removeAllNotifications = async () => {
+  await cancelPendingNotifications()
+  await removeDeliveredNotifications()
+}
+
+// Test notification system in the currenct system
+const testNotification = async () => {
+  await LocalNotifications.schedule({
+    notifications: [{
+      id: 999999,
+      title: "Test notification",
+      body: "Should fire in 10 seconds",
+      schedule: { at: new Date(Date.now() + 10000) }
+    }]
+  })
+}
+
+
+export {
+  permissionGranted, checkPermission, notificationPermission, scheduleNotifications,
+  cancelNotificationById, removeDeliveredNotifications, removeAllNotifications,
+  testNotification
+}
