@@ -12,6 +12,7 @@ const defaults = {
   cost: 50, duration: 1, variableCost: true,  // classes default settings
   chargeCancelation: false, freeCancelationBefore: 1, cancelationFee: 50,  // cancelation policy
   minutesBefore: 15, // notifications settings
+  systemTheme: true, darkTheme: false, color: '#44289e'// user interface settings
 }
 
 const newData = () => (
@@ -19,7 +20,7 @@ const newData = () => (
     students:[], events:[], payments:[],
     config: {
       numberOfDays: 14, autoCreateEvents: true, autoFinishEvents: false, autoFinishOffset: 30, autoRemovePastEvents: false, removalGraceHours: 48, // agenda settings
-      color: '#44289e', canceledOnReport: true, advancedOptions: false, notifyBirthday: true, notBirthDayBefore: true, lastRefreshDate: null, // user interface settings
+      canceledOnReport: true, advancedOptions: false, notifyBirthday: true, notBirthDayBefore: true, lastRefreshDate: null, // user interface settings
       ...defaults
     }
   }

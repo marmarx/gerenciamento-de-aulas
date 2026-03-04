@@ -1,6 +1,7 @@
 import { watch } from 'vue'
 import { useDataStore } from '@/stores/dataStore'
 
+/*
 const hue = h => h > 360 ? h - 360 : (h < 0 ? 360 + h : h)
 const sl = sl => sl > 1 ? 1 : (sl < 0 ? 0 : sl)
 
@@ -68,7 +69,7 @@ const paletteFromBase = (baseHex) => {
 
 export const useTheme = () => {
   const dataStore = useDataStore()
-
+  
   const colorLabels = ['nav-back','nav-hover','nav-line','header-left','header-right','head-text']
   const setCSSVar = (label, color) => document.documentElement.style.setProperty(`--${label}`, color)
 
@@ -78,4 +79,14 @@ export const useTheme = () => {
   }
 
   watch(() => dataStore.sortedConfig.color, applyTheme, { immediate: true, deep: true })
+}
+*/
+
+export const useColor = () => {
+  const dataStore = useDataStore()
+
+  const applyColor = (color) =>
+    document.documentElement.style.setProperty('--user-color', color)
+
+  watch(() => dataStore.sortedConfig.color, applyColor, { immediate: true, deep: true })
 }

@@ -46,7 +46,57 @@ onMounted(() => checkPermission())
     <hr/>
 
     <div class="flexContainer mw500">
+      <h3>Geral</h3>
 
+      <inputToggle v-model="dataStore.data.config.systemTheme">
+        <template #title>Cores definidas pelo sistema</template>
+        <template #helpText>As cores do aplicativo {{dataStore.data.config.systemTheme ? '' : 'não '}}seguem as configurações do sistema operacional.</template>
+      </inputToggle>
+
+      <inputToggle v-if="!dataStore.data.config.systemTheme" v-model="dataStore.data.config.darkTheme">
+        <template #title>Modo escuro</template>
+        <template #helpText>Usar o modo {{dataStore.data.config.darkTheme ? 'escuro' : 'claro'}} para o aplicativo.</template>
+      </inputToggle>
+
+      <inputHelp id="color" type="color" v-model.number="dataStore.data.config.color">
+        <template #title>Cor preferida</template>
+        <template #helpText>Escola a cor utilizada na interface do aplicativo, sinta-se a vontade para customizar</template>
+      </inputHelp>
+    </div>
+    <hr/>
+
+    <div class="flexContainer mw500">
+      <h3>Notificações</h3>
+      <p v-if="isMob && isWeb" class="tac">Para receber notificações em um celular ou tablet, é necessário instalar o app nativo para <a target="_blank" href="https://drive.google.com/file/d/1ExAxy8egcl-Quu_qVxhrDHIRu77Hd8jG/view?usp=sharing">Android</a> ou <a target="_blank" href="https://drive.google.com/file/d/1IL5eVcVKXdgWr7_GKEhVoMd0VcCQ_hIv/view?usp=sharing">iPhone</a>.</p>
+
+      <inputToggle v-model="permissionGranted" style="pointer-events: none">
+        <template #title>Permitir notificações</template>
+        <template #helpText>{{ permissionGranted ? 'O envio de notificações está permitido. Para desativar' : 'Para permitir' }}, por favor, abra as configurações do seu dispositivo.</template>
+      </inputToggle>
+
+      <inputHelp v-if="permissionGranted" id="minutesBefore" placeholder="Min" :numberDefs="{min: 0, max: 120, step: 5}" v-model.number="dataStore.data.config.minutesBefore">
+        <template #title>Período de envio de notificações</template>
+        <template #helpText>
+          Se permitido, notificações serão enviadas por padrão {{dataStore.sortedConfig.minutesBefore
+            ? `com ${formatDuration(dataStore.sortedConfig.minutesBefore/60)} de antecedência`
+            : 'no horário de cada aula'}}
+        </template>
+      </inputHelp>
+
+      <inputToggle v-if="permissionGranted" v-model="dataStore.data.config.notifyBirthday">
+        <template #title>Notificar aniversários</template>
+        <template #helpText>Notificações {{ dataStore.sortedConfig.notifyBirthday ? '' : 'não ' }}dos aniversários de cada aluno serão enviadas.</template>
+      </inputToggle>
+
+      <inputToggle v-if="permissionGranted && dataStore.sortedConfig.notifyBirthday" v-model="dataStore.data.config.notBirthDayBefore">
+        <template #title>Aniversários no dia anterior</template>
+        <template #helpText>Notificações de aniversários serão enviadas às 9 horas da manhã do dia {{ dataStore.sortedConfig.notBirthDayBefore ? 'anterior ao' : 'do' }} aniversário.</template>
+      </inputToggle>
+
+    </div>
+    <hr/>
+
+    <div class="flexContainer mw500">
       <h3>Agenda</h3>
       <inputHelp id="daysAgenda" placeholder="Dias" :numberDefs="{min: 0, step: 1}" v-model.number="dataStore.data.config.numberOfDays">
         <template #title>Dias na agenda</template>
@@ -91,11 +141,10 @@ onMounted(() => checkPermission())
             : 'mantidas indefinidamente na agenda - você ainda poderá remove-las manualmente' }} 
         </template>
       </inputToggle>
-
     </div>
     <hr/>
-    <div class="flexContainer mw500">
 
+    <div class="flexContainer mw500">
       <h3 class="mb0">Aulas</h3>
       <p class="tac w100">As configurações a seguir tem efeitos apenas na criação de novos alunos.</p>
       <inputToggle v-model="dataStore.data.config.variableCost">
@@ -120,10 +169,14 @@ onMounted(() => checkPermission())
         </template>
       </inputHelp>
 
+      <inputToggle v-model="dataStore.data.config.advancedOptions">
+        <template #title>Mostrar opções avançadas</template>
+        <template #helpText>Permite controlar a política de precificação e a política de cancelamento individualmente para cada aula.</template>
+      </inputToggle>
     </div>
     <hr/>
-    <div class="flexContainer mw500">
 
+    <div class="flexContainer mw500">
       <h3 class="mb0">Política de cancelamento</h3>
       <p class="tac w100">As configurações a seguir tem efeitos apenas na criação de novos alunos.</p>
       <inputToggle v-model="dataStore.data.config.chargeCancelations">
@@ -148,61 +201,18 @@ onMounted(() => checkPermission())
             : 'Cancelamentos são gratuitos'}} por padrão
         </template>
       </inputHelp>
-
     </div>
     <hr/>
+
     <div class="flexContainer mw500">
-
-      <h3>Notificações</h3>
-      <p v-if="isMob && isWeb" class="tac">Para receber notificações em um celular ou tablet, é necessário instalar o app nativo para <a target="_blank" href="https://drive.google.com/file/d/1ExAxy8egcl-Quu_qVxhrDHIRu77Hd8jG/view?usp=sharing">Android</a> ou <a target="_blank" href="https://drive.google.com/file/d/1IL5eVcVKXdgWr7_GKEhVoMd0VcCQ_hIv/view?usp=sharing">iPhone</a>.</p>
-
-      <inputToggle v-model="permissionGranted" style="pointer-events: none">
-        <template #title>Permitir notificações</template>
-        <template #helpText>{{ permissionGranted ? 'O envio de notificações está permitido. Para desativar' : 'Para permitir' }}, por favor, abra as configurações do seu dispositivo.</template>
-      </inputToggle>
-
-      <inputHelp v-if="permissionGranted" id="minutesBefore" placeholder="Min" :numberDefs="{min: 0, max: 120, step: 5}" v-model.number="dataStore.data.config.minutesBefore">
-        <template #title>Período de envio de notificações</template>
-        <template #helpText>
-          Se permitido, notificações serão enviadas por padrão {{dataStore.sortedConfig.minutesBefore
-            ? `com ${formatDuration(dataStore.sortedConfig.minutesBefore/60)} de antecedência`
-            : 'no horário de cada aula'}}
-        </template>
-      </inputHelp>
-
-      <inputToggle v-if="permissionGranted" v-model="dataStore.data.config.notifyBirthday">
-        <template #title>Notificar aniversários</template>
-        <template #helpText>Notificações {{ dataStore.sortedConfig.notifyBirthday ? '' : 'não ' }}dos aniversários de cada aluno serão enviadas.</template>
-      </inputToggle>
-
-      <inputToggle v-if="permissionGranted && dataStore.sortedConfig.notifyBirthday" v-model="dataStore.data.config.notBirthDayBefore">
-        <template #title>Aniversários no dia anterior</template>
-        <template #helpText>Notificações de aniversários serão enviadas às 9 horas da manhã do dia {{ dataStore.sortedConfig.notBirthDayBefore ? 'anterior ao' : 'do' }} aniversário.</template>
-      </inputToggle>
-
-    </div>
-    <hr/>
-    <div class="flexContainer mw500">
-
-      <h3>Geral</h3>
-
-      <inputHelp id="color" type="color" v-model.number="dataStore.data.config.color">
-        <template #title>Cor preferida</template>
-        <template #helpText>Escola a cor utilizada na interface do aplicativo, sinta-se a vontade para customizar</template>
-      </inputHelp>
-
-      <inputToggle v-model="dataStore.data.config.advancedOptions">
-        <template #title>Aulas: opções avançadas</template>
-        <template #helpText>Permite controlar a política de precificação e a política de cancelamento para cada aula individualmente.</template>
-      </inputToggle>
+      <h3 class="mb0">Relatório</h3>
 
       <inputToggle v-model="dataStore.data.config.canceledOnReport">
-        <template #title>Relatório: aulas canceladas</template>
-        <template #helpText>Aulas canceladas {{ dataStore.sortedConfig.canceledOnReport ? '' : 'não ' }} serão mostradas no relatório.</template>
+        <template #title>Exibir aulas canceladas</template>
+        <template #helpText>Aulas canceladas {{ dataStore.sortedConfig.canceledOnReport ? '' : 'não ' }} serão exibidas nos relatórios.</template>
       </inputToggle>
 
     </div>
-
     <hr/>
 
     <div class="flexContainer mw500">
@@ -210,7 +220,6 @@ onMounted(() => checkPermission())
       <p class="justify">Utilize a opção a seguir para exportar todos os dados para uma planilha que pode ser aberta utilizando Google Sheets, Microsoft Excel ou outro aplicativo de sua preferência.</p>
       <button @click="dataStore.exportTables()">Exportar tabelas</button>
     </div>
-
     <hr/>
 
     <div class="flexContainer mw500">
@@ -224,7 +233,6 @@ onMounted(() => checkPermission())
       <button @click="fileInput.click()">Importar dados</button>
       <button @click="dataStore.clearStorage()">Apagar dados</button>
     </div>
-
     <hr/>
 
     <div class="flexContainer mw500">
@@ -241,9 +249,9 @@ onMounted(() => checkPermission())
         <p class="justify">Se desejar suportar o desenvolvimento, fique a vontade para fazer doações por Pix.</p>
         <button @click="copyToClipboard()">Copiar Chave Pix</button>
       </div>
-
       <hr/>
-      <p class="justify">v 1.6.2 - 2025.12.09</p>
+
+      <p class="justify">v 1.6.3 - 2026.03.04</p>
     </div>
     
   </div>

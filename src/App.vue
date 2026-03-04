@@ -3,16 +3,17 @@ import Header from '@/components/header.vue'
 import floatingMenu from '@/modules/floatingMenu/floatingMenu.vue'
 import toast from '@/modules/toast/toast.vue'
 import installPrompt from '@/modules/PWA/installPrompt.vue'
+import theme from '@/components/theme.vue'
 import { RouterView } from 'vue-router'
 
-import { useTheme } from '@/composables/color'
+import { useColor } from '@/composables/color'
 import { usePWA, isWeb } from '@/modules/PWA/installPWA'
 import { useGestures, transitionName } from '@/modules/gesture/gestureControl'
 import { useRouter } from 'vue-router'
 import { useAgendaStore } from '@/stores/agendaStore'
 import { useNotificationStore } from '@/modules/notifications/notificationStore'
 
-useTheme()
+useColor()
 usePWA()
 useGestures()
 useRouter().push('/agenda')
@@ -32,6 +33,7 @@ useNotificationStore()
   </div>
  
   <floatingMenu />
+  <theme />
 
   <template v-if="isWeb">
     <installPrompt />

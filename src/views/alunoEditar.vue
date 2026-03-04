@@ -55,11 +55,11 @@ watch(
 )
 
 const updateEvents = (key) => {
-  dataStore.sortedEvents.forEach(e => {
-    if (e.id_student === student.id_student && parseDate(e.date, e.time) >= new Date()) {
-      e[key] = student[key] || dataStore.sortedConfig[key]
-    }
-  })
+  dataStore.data.events = [...dataStore.data.events].map(e =>
+    e.id_student === student.id_student && parseDate(e.date, e.time) >= new Date()
+      ? { ...e, [key]: student[key] || dataStore.sortedConfig[key] }
+      : e
+  )
 }
 
 // remove existing student on user request
@@ -159,7 +159,7 @@ onBeforeUnmount(async () => {
           <template #helpText>Cancelamentos deste aluno {{ student.chargeCancelation?'':'não ' }}são cobrados {{ student.chargeCancelation?'conforme baixo':'' }}</template>
         </inputToggle>
 
-        <inputHelp id="freeBefore" if="student.chargeCancelation" placeholder="horas" :numberDefs="{min: 0, step: .25}" v-model.number="student.freeCancelationBefore">
+        <inputHelp id="freeBefore" :if="student.chargeCancelation" placeholder="horas" :numberDefs="{min: 0, step: .25}" v-model.number="student.freeCancelationBefore">
           <template #title>Período de gratuidade</template>
           <template #helpText>Não serão cobrados cancelamentos que ocorram {{ student.freeCancelationBefore ? `com no mínimo ${formatDuration(student.freeCancelationBefore)} de antecedência` : 'até o horário da aula' }}</template>
         </inputHelp>
