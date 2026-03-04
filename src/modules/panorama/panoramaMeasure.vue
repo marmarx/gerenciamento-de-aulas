@@ -76,7 +76,7 @@ const growth = computed(() => `(${revenueGrowth.value > 0 ? '+' : ''}${revenueGr
 
 <style scoped>
 .grid {
-  display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   width: 100%; padding: 1rem 1.2rem; box-sizing: border-box
 }
 .indicard {

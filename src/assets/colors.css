@@ -1,11 +1,25 @@
 :root {
   --today-day: '1'; 
-  --head-text: #fff; --head-black: #1f2937; --head-white: #fff;
   --user-color: #9d289f;
+  --head-text: #fff;
+  /* --head-black: #1f2937; --head-white: #fff; */
+
+  --head-text: hsl(from var(--user-color) 0 0 clamp(0, calc((70 - l) * 10000), 100)); /* l > 70 ? 0 : 100 */
+  --head-text: oklch(from var(--user-color) clamp(0, calc((0.7 - l) * 1000), 1) 0 0); /* l > .7 ? 0 : 1 */
+  /* --head-text: color-contrast(var(--nav-back) vs black, white); */ /* not largely supported right now */
 
   --nav-back:     hsl(from var(--user-color) h s l);
-  --nav-hover:    hsl(from var(--user-color) h            max(0, s)            clamp(0, calc(l - 10), 100));
-  --nav-line:     hsl(from var(--user-color) calc(h + 30) max(0, calc(s - 10)) clamp(0, calc(l + 20), 100));
+  --nav-hover:    hsl(from var(--user-color) h            max(0, s)      clamp(0, l - 10, 100));
+  --nav-line:     hsl(from var(--user-color) calc(h + 30) max(0, s - 10) clamp(0, l + 20, 100));
   --header-left:  hsl(from var(--user-color) calc(h + 30) s l);
   --header-right: hsl(from var(--user-color) calc(h - 30) s l);
+  /* h: 0 to 360, s: 0 to 100, l: 0 to 100 */
+
+  --nav-back:     oklch(from var(--user-color) l c h);
+  --nav-hover:    oklch(from var(--user-color) clamp(0, l - 0.10, 1) max(0, c - 0.04) h);
+  --nav-line:     oklch(from var(--user-color) clamp(0, l + 0.17, 1) min(c + 0.02, 0.4) calc(h + 22));
+  --header-left:  oklch(from var(--user-color) clamp(0, l + 0.02, 1) min(c + 0.03, 0.4) calc(h + 26));
+  --header-right: oklch(from var(--user-color) clamp(0, l + 0.02, 1) min(c + 0.03, 0.4) calc(h - 26));
+  /* l: 0 to 1, c: 0 to 0.4, h: 0 to 360 - OKLCH chroma (c) is similar to HSL saturation (s) */
 }
+

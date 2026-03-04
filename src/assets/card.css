@@ -24,7 +24,7 @@
 
 .magic::before {
   opacity: .8;
-  background: conic-gradient(from 0deg, var(--nav-back), var(--header-left), var(--header-right), var(--nav-line));
+  background: conic-gradient(from 0deg, var(--nav-back), var(--header-left), var(--header-right), var(--nav-line), var(--nav-back));
   animation: spinGradient 2.5s linear infinite;
 }
 

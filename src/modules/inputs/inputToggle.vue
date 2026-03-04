@@ -40,7 +40,8 @@ defineEmits(["update:modelValue"])
   aspect-ratio: 1 / 1;
   left: var(--toggle-padding); bottom: var(--toggle-padding);
   position: absolute;
-  background-color: var(--head-text); border-radius: 50%;
+  color: var(--head-text); background-color: currentColor; mix-blend-mode: hard-light;
+  border-radius: 50%; 
   -webkit-transition: .4s; transition: .4s;
 }
 
