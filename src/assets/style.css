@@ -1,7 +1,13 @@
 @import "colors.css";
 @import "@/modules/inputs/inputForm.css";
 
-* { color: var(--black); transition: all 0.3s ease; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+* {
+  color: var(--black); transition: all 0.3s ease;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;
+  outline-color: transparent; /* same effect as outline: none, but still allows high contrast mode (accessibility) */
+  &:focus-visible { outline-color: var(--nav-line) }
+}
 
 body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: var(--body-back); min-height: 100svh}
 table { border-collapse: collapse; width: 100%; background: var(--white) }
@@ -49,13 +55,6 @@ button {
 button:disabled{ opacity: 0.6; cursor: not-allowed }
 button:disabled:hover{ background-color: var() }
 a.disabled { pointer-events: none; cursor: default }
-
-button, div[onclick], input, textarea, select, option, checkbox{
-  user-select: none;
-  outline-color: transparent; /* same effect as outline: none, but still allows high contrast mode (accessibility) */
-  &:focus-visible { outline-color: var(--nav-line) }
-}
-textarea { field-sizing: content }
 
 #config-button{
   width: 32px; height: 32px; position: absolute; right: 18px; top: 18px;
