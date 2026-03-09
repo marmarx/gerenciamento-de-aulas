@@ -1,7 +1,7 @@
 import { parseDate, dateISO, formatDuration, fallbackNumber, whatsappLink, mapsLink } from '@/composables/utility'
 
-// notifications will be set only for events/birthdays within the next 7 days
-const sevenDays = 7
+// notifications will be set only for events/birthdays within the next n days
+const timelineTreshold = 30  // in days
 
 // all fields relevant to the fuctions belowe
 const EVENT_FIELDS    = ['id_student', 'student_name', 'id_event', 'date', 'time', 'duration', 'minutesBefore']
@@ -23,7 +23,7 @@ const hashUUID = (uuid) => {
 const checkTimespan = (notifyAt) => {
   const now = new Date().getTime()
   const diff = notifyAt.getTime() - now
-  const timespan = sevenDays * 24 * 60 * 60 * 1000  // days to milliseconds
+  const timespan = timelineTreshold * 24 * 60 * 60 * 1000  // days to milliseconds
 
   return diff > 0 && diff <= timespan // returns true if within valid timespan
 }

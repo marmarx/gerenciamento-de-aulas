@@ -157,6 +157,7 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     console.log('[notificationStore] Starting up notifications module')
     await registerNotificationActions()
     await addActionListeners()
+    await setAllNotifications()  // 🔥 FORCE scheduling notifications on every boot
     await morningRefresh()
   }
 
