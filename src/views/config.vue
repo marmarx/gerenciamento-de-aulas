@@ -67,7 +67,12 @@ onMounted(() => checkPermission())
 
     <div class="flexContainer mw500">
       <h3>Notificações</h3>
-      <p v-if="isMob && isWeb" class="tac">Para receber notificações em um celular ou tablet, é necessário instalar o app nativo para <a target="_blank" href="https://drive.google.com/file/d/1ExAxy8egcl-Quu_qVxhrDHIRu77Hd8jG/view?usp=sharing">Android</a> ou <a target="_blank" href="https://drive.google.com/file/d/1IL5eVcVKXdgWr7_GKEhVoMd0VcCQ_hIv/view?usp=sharing">iPhone</a>.</p>
+      <p v-if="isMob && isWeb" class="tac">
+        Para receber notificações em um celular ou tablet, é necessário instalar o app nativo para
+        <a target="_blank" href="https://drive.google.com/file/d/1ExAxy8egcl-Quu_qVxhrDHIRu77Hd8jG/view?usp=sharing">Android</a>
+        <!-- ou <a target="_blank" href="https://drive.google.com/file/d/1IL5eVcVKXdgWr7_GKEhVoMd0VcCQ_hIv/view?usp=sharing">iPhone</a> -->
+        .
+      </p>
 
       <inputToggle v-model="permissionGranted" style="pointer-events: none">
         <template #title>Permitir notificações</template>
@@ -251,7 +256,7 @@ onMounted(() => checkPermission())
       </div>
       <hr/>
 
-      <p class="justify">v 1.6.4 - 2026.03.09</p>
+      <p class="justify">v 1.6.4 - 2026.03.11</p>
     </div>
     
   </div>

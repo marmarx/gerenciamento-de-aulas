@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDataStore } from "@/stores/dataStore"
-import { useClockStore } from '@/stores/counterStore'
+import { useClockStore } from '@/stores/clockStore'
 import { parseDate, mapsLink, whatsappLink, weekLabel, dateLabel, horaBR, formatDur } from '@/composables/utility'
 import alink from '@/components/alink.vue'
 
