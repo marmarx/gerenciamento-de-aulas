@@ -62,31 +62,32 @@ const showMap     = computed(() => student.value.address && !student.value.meeti
 </script>
 
 <template v-if="!student?.paused">
-  <div class="card-holder" :class="{magic: isNow}">
-    <div title="Editar aula" class="card" :class="{partiallyVisible: showRestore}" @click="routeTo('/aula')">
-      <div class="name">
-        {{student.student_name}}
-        <div v-if="countDown" class="countDown">{{ countDown }}</div>
-      </div>
-      <div class="details">{{weekLabel(event.date)}}  •  {{dateLabel(event.date)}}  •  {{horaBR(event.time)}}</div>
-      <div class="btns">
+  <div title="Editar aula" class="card" :class="{magic: isNow, partiallyVisible: showRestore}" @click="routeTo('/aula')">
 
-        <template v-if="isToday" >
-          <div v-if="showRestore"     title="Restaurar aula" class="btn undo"     @click.stop="restoreEvent()"></div>
-          <div v-else-if="showCancel" title="Cancelar aula"  class="btn cancel"   @click.stop="cancelEvent()"> </div>
-          <div v-else                 title="Finalizar aula" class="btn complete" @click.stop="markAsDone()">  </div>
-        </template>
-        
-        <alink v-if="showMap"               title="Navegar até aluno"       class="btn navigation" :href="mapsLink(student.address)"/>
-        <alink v-if="student.meeting"       title="Abrir vídeo chamada"     class="btn video"      :href="student.meeting"/>
-        <alink v-if="student.student_phone" title="Whatsapp do aluno"       class="btn whatsapp"   :href="whatsappLink(student.student_phone)"/>
-        <alink v-if="student.parent_phone"  title="Whatsapp do responsável" class="btn parent"     :href="whatsappLink(student.parent_phone)"/>
-
-      </div>
+    <div class="title">
+      <div class="name">{{student.student_name}}</div>
+      <div v-if="countDown" class="countDown">{{ countDown }}</div>
     </div>
+    
+    <div class="details">{{weekLabel(event.date)}}  •  {{dateLabel(event.date)}}  •  {{horaBR(event.time)}}</div>
+    <div class="btns">
+
+      <template v-if="isToday" >
+        <div v-if="showRestore"     title="Restaurar aula" class="btn undo"     @click.stop="restoreEvent()"></div>
+        <div v-else-if="showCancel" title="Cancelar aula"  class="btn cancel"   @click.stop="cancelEvent()"> </div>
+        <div v-else                 title="Finalizar aula" class="btn complete" @click.stop="markAsDone()">  </div>
+      </template>
+      
+      <alink v-if="showMap"               title="Navegar até aluno"       class="btn navigation" :href="mapsLink(student.address)"/>
+      <alink v-if="student.meeting"       title="Abrir vídeo chamada"     class="btn video"      :href="student.meeting"/>
+      <alink v-if="student.student_phone" title="Whatsapp do aluno"       class="btn whatsapp"   :href="whatsappLink(student.student_phone)"/>
+      <alink v-if="student.parent_phone"  title="Whatsapp do responsável" class="btn parent"     :href="whatsappLink(student.parent_phone)"/>
+
+    </div>
+
   </div>
 </template>
 
-<style>
+<style scoped>
 @import "@/assets/card.css";
 </style>

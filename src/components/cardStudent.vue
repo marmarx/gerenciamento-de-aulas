@@ -31,9 +31,9 @@ const routeTo = (path) => {
 </script>
 
 <template>
-  <div class="card regular-border" title="Ver perfil do aluno" @click="routeTo('/aluno')">
-    <div class="name">
-      {{student.student_name}}
+  <div class="card" title="Ver perfil do aluno" @click="routeTo('/aluno')">
+    <div class="title">
+      <div class="name">{{student.student_name}}</div>
       <div class="ampel status" :class="{paused: student.paused}"></div>
     </div>
     <div class="details">{{studentSchedules}}</div>
@@ -46,6 +46,7 @@ const routeTo = (path) => {
   </div>
 </template>
 
-<style>
+<style scoped>
 @import "@/assets/card.css";
+.card { grid-row: span 4 }
 </style>

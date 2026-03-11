@@ -256,7 +256,7 @@ onMounted(() => checkPermission())
       </div>
       <hr/>
 
-      <p class="justify">v 1.6.4 - 2026.03.11</p>
+      <p class="justify">v 1.6.5 - 2026.03.11</p>
     </div>
     
   </div>
