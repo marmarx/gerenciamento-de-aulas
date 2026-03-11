@@ -121,9 +121,16 @@ npx capacitor-assets generate
 
 # ANDROID PERMISSIONS #
 
-Add the following permissions within <manifest>...</manifest> to your androidManifest.xlm file in ./android/app/src/main/AndroidManifest.xml
+Add the following permissions to your androidManifest.xlm file in ./android/app/src/main/AndroidManifest.xml
 
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+```xml
+<manifest>
+  <!-- Permissions -->
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
+  ...
+<manifest/>
+```
