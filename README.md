@@ -1,4 +1,6 @@
-## INSTALATION ##
+# INSTALATION #
+
+## Install Vue ##
 
 1. Install Vue
 npm install vue
@@ -19,8 +21,7 @@ copy files from drive
 npm install
 
 
-
-## ADDING CAPACITOR ##
+## Install Capacitor ##
 
 1. Install Capacitor
 npm install @capacitor/core @capacitor/cli
@@ -39,8 +40,8 @@ npm install @capacitor/ios
 npx cap add ios
 
 
-
-## MAKE SURE ALL OF THE FOLLOWING IS INSTALLED ##
+## Other instalations ##
+Make sure all of the below is installed:
 
 1. Capacitor Local Notifications plugin 
 npm install @capacitor/local-notifications
@@ -59,12 +60,14 @@ npm install xlsx
 
 
 
-## RUNNING PROJECT ##
+# RUNNING THE PROJECT #
 npm run dev
 
 
 
-## BUILD ANDROID APP ##
+# ANDROID APP #
+
+## Building the app ##
 
 1. Install Android Studio
 https://developer.android.com/studio/install
@@ -78,8 +81,7 @@ Build > Clean project
 Run > Run app
 
 
-
-## EXPORT ANDROID APK FILE ##
+## Export Android APK file ##
 
 1. Build app
 npm run clean-build
@@ -90,8 +92,7 @@ Build > Clean project
 Export .apk file: Build > Generate APK
 
 
-
-## DEBUG ##
+## Debugging the Android app ##
 
 1. On Android Studio
 Open LogCat
@@ -104,9 +105,9 @@ Click 'inspect'
 
 
 
-## CAPACITOR EXTRAS ##
+# CAPACITOR EXTRAS #
 
-# Create icon and images assets with Capacitor
+## Create icon and images assets with Capacitor ##
 npm install @capacitor/assets --save-dev
 create a /resources/ folder in the project root
 add the following files to it:
@@ -118,8 +119,10 @@ npx capacitor-assets generate
 
 
 
-## ANDROID PERMISSIONS ##
-android/app/src/main/AndroidManifest.xml within <manifest>...</manifest>
+# ANDROID PERMISSIONS #
+
+Add the following permissions within <manifest>...</manifest> to your androidManifest.xlm file in ./android/app/src/main/AndroidManifest.xml
+
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
