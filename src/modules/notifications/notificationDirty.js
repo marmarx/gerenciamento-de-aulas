@@ -25,7 +25,7 @@ const queueDirtyProcessing = () => {
 
 // update notifications for items marked
 const processDirtyItems = async () => {
-  await removeDeliveredNotifications()
+  // await removeDeliveredNotifications() // removed on 2026.03.12
   if (!dirtyItems.size) return
 
   const items = Array.from(dirtyItems.values()) //events and students ids -> events and birthdays

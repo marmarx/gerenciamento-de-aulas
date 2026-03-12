@@ -42,5 +42,5 @@ const newStudent = () => dataStore.selectedStudent = null
 .alunos:nth-last-child(1){margin-top:2em}
 .alunos h2{margin-bottom:1.5em}
 .listFilter { width:80%; max-width: 500px }
-.grid{ display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 25px ; margin-top: 1em}
+.grid{ position: relative; z-index: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 25px ; margin-top: 1em}
 </style>

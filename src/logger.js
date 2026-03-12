@@ -1,4 +1,4 @@
-// usage: import '@/logger.js'
+// usage: import './logger.js'
 
 // assigns a color to each tag that shows up in the console.log
 const createColorTag = () => {

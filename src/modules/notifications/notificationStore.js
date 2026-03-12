@@ -1,15 +1,13 @@
 import { defineStore } from 'pinia'
 import { watch, onMounted } from 'vue'
 import { App } from '@capacitor/app'
+import { Capacitor } from '@capacitor/core'
 import { useDataStore } from '@/stores/dataStore'
 
 import { EVENT_FIELDS, STUDENT_FIELDS, BIRTHDAY_FIELDS, CONFIG_FIELDS, eventNotification, birthdayNotification, isNewDay } from '@/modules/notifications/notificationHelper'
 import { registerNotificationActions, unregisterNotificationActions, addActionListeners, removeActionListeners } from '@/modules/notifications/notificationActions'
-import { permissionGranted, checkPermission, notificationPermission, scheduleNotifications, cancelNotificationById, removeAllNotifications } from '@/modules/notifications/notificationMain'
+import { permissionGranted, checkPermission, notificationPermission, listPendingNotifications, scheduleNotifications, cancelNotificationById, removeAllNotifications } from '@/modules/notifications/notificationMain'
 import { markEventDirty, markBirthdayDirty } from '@/modules/notifications/notificationDirty'
-
-// -- CONSOLE SETUP --
-// const log = (...args) => console.log('%c[notificationStore]', 'color: red', ...args)
 
 export const useNotificationStore = defineStore('notificationStore', () => {
   const dataStore = useDataStore()
@@ -19,29 +17,39 @@ export const useNotificationStore = defineStore('notificationStore', () => {
     const check = await checkPermission()  // silent check
     if (!check) return
 
-    const students = dataStore.sortedStudents
-    const events = dataStore.sortedEvents
-    const config = dataStore.sortedConfig
-
-    await removeAllNotifications()
-
     const evNotifications = []
+    const birthdays = []
+    
+    // await removeAllNotifications() // removed on 2026.03.12 - instead of removing and rescheduling every notification, let's schedule only the missing notifications
+    const pending = await listPendingNotifications()
+
+    const existingIds = new Set()
+    if(Capacitor.getPlatform() !== 'web') pending.notifications.forEach(n => existingIds.add(n.id))
+
+    const students = dataStore.sortedStudents
+    const events   = dataStore.sortedEvents
+    const config   = dataStore.sortedConfig
+
+    const studentMap = new Map(students.map(s => [s.id_student, s]))
+
     events.forEach(event => {
-      const student = students.find(s => s.id_student === event.id_student)
+      const student = studentMap.get(event.id_student)
       const notification = eventNotification(event, student, config)
-      if(notification) evNotifications.push(notification)
+      if(notification && !existingIds.has(notification.id)) evNotifications.push(notification)
     })
 
-    const birthdays = []
     if (config.notifyBirthday) {
       students.forEach(student => {
         const notification = birthdayNotification(student, config)
-        if (notification) birthdays.push(notification)
+        if(notification && !existingIds.has(notification.id)) birthdays.push(notification)
       })
     }
+
+    const notifications = [...evNotifications, ...birthdays]
+    if(!notifications.length) return
     
     console.log(`[notificationStore] Scheduling notifications for ${evNotifications.length} event(s) and ${birthdays.length} birthdays(s)`)
-    await scheduleNotifications([...evNotifications, ...birthdays])
+    await scheduleNotifications(notifications)
   }
 
   // re-run setAllNotifications() in case today is a new day -> create notifications without watching for a events change

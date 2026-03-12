@@ -99,7 +99,8 @@ const testNotification = async () => {
 
 
 export {
-  permissionGranted, checkPermission, notificationPermission, scheduleNotifications,
+  permissionGranted, checkPermission, notificationPermission,
+  listPendingNotifications, scheduleNotifications,
   cancelNotificationById, removeDeliveredNotifications, removeAllNotifications,
   testNotification
 }

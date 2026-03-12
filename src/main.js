@@ -1,5 +1,5 @@
 import './assets/style.css'
-import '@/logger.js'
+import './logger.js'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

@@ -65,7 +65,7 @@ const newEvent   = () => dataStore.selectedEvent = null
 .agenda{width:100%}
 .agenda:nth-last-child(1){margin-top:2em}
 .agenda h2{margin-bottom:1.5em}
-.grid{ display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 25px ; margin-top: 1em}
+.grid{ position: relative; z-index: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 25px ; margin-top: 1em}
 
 @media screen and (max-width: 992px) {
   .agenda:nth-last-child(1){margin-top:0}
