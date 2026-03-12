@@ -1,6 +1,6 @@
 {
   "name": "lesson-management",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "private": true,
   "scripts": {
     "build": "vite build",
