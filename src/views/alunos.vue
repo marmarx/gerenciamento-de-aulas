@@ -14,12 +14,12 @@ const newStudent = () => dataStore.selectedStudent = null
 
 <template>
   <div class="section">
-    <div class="alunos">
+    <div class="card-holder">
       <h2 v-if="!pausedStudents.length">Alunos</h2>
       <h2 v-else>Alunos Ativos</h2>
 
       <div class="container dateFlex">
-        <input style="margin:auto" v-if="activeStudents.length" type="text" name="listFilter" class="listFilter" placeholder="Filtrar por nome" v-model="filterByName" />
+        <input v-if="activeStudents.length" type="text" name="listFilter" class="listFilter" placeholder="Filtrar por nome" v-model="filterByName" />
       </div>
 
       <div v-if="activeStudents.length" class="container grid">
@@ -28,7 +28,7 @@ const newStudent = () => dataStore.selectedStudent = null
       <p v-else class="tac">Nenhum aluno ainda, <router-link to="/aluno/editar" title="Novo aluno" @click="newStudent">adicione um</router-link>.</p>
     </div>
 
-    <div v-if="pausedStudents.length" class="alunos">
+    <div v-if="pausedStudents.length" class="card-holder">
       <h2>Alunos Pausados</h2>
       <div class="container grid">
         <card-student v-for="student in pausedStudents" :key="student.id_student" :id="student.id_student" />
@@ -38,9 +38,5 @@ const newStudent = () => dataStore.selectedStudent = null
 </template>
 
 <style>
-.alunos{width:100%}
-.alunos:nth-last-child(1){margin-top:2em}
-.alunos h2{margin-bottom:1.5em}
-.listFilter { width:80%; max-width: 500px }
-.grid{ position: relative; z-index: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 25px ; margin-top: 1em}
+@import "@/assets/cardHolder.css";
 </style>

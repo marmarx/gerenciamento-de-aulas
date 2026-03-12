@@ -1,0 +1,128 @@
+.card-holder { width: 100% }
+.card-holder:nth-last-child(1) { margin-top: 2em }
+.card-holder h2 { margin-bottom: 1.5em }
+
+.listFilter { width:80%; max-width: 500px; margin: 0 auto 1.5em }
+
+.grid {
+  position: relative; z-index: 0; isolation: isolate;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 25px ;
+  margin-top: 1em
+}
+
+@media screen and (max-width: 992px) {
+  .card-holder:nth-last-child(1) { margin-top: 0 }
+  .card-holder h2 { margin-bottom: .5em }
+}
+
+/* any element that has .card as a direct child */
+*:has(> .card){ position: relative; isolation: isolate }
+
+.card {
+  --border-width: 3px;
+  --border-radius: 12px;
+
+  position: relative;
+  display: grid; grid-template-rows: subgrid;
+  grid-row: span var(--sibling-count); gap: 0; align-items: center;
+  border-radius: var(--border-radius);
+  background: var(--card-bg); background-clip: padding-box; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  cursor: pointer;
+  transition: background-color 0s;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    background: var(--card-br);
+    animation: 3s spin linear infinite;
+    animation-play-state: paused;
+  }
+
+  &::before {
+    inset: calc(-1 * var(--border-width)); z-index: -1;
+    border-radius: calc(var(--border-radius) + var(--border-width));
+  }
+
+  &::after {
+    inset: calc(-2 * var(--border-width)); z-index: -2;
+    border-radius: calc(var(--border-radius) + 2 * var(--border-width));
+    filter: blur(1.5rem); opacity: .5;
+  }
+}
+
+.magic::before, .magic::after {
+  --magic: var(--nav-back), var(--header-left), var(--header-right), var(--nav-line), var(--nav-back);
+  background: conic-gradient(from var(--angle), var(--magic)); box-shadow: none;
+  animation-play-state: running;
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spin {
+  from { --angle: 0deg }
+  to { --angle: 360deg }
+}
+
+.partiallyVisible { opacity:.5 }
+
+.card-title, .details { padding: 18px 18px }
+.card-title {
+  display: inline-flex; justify-content: space-between;
+  min-height: 1.05em; height: max-content;
+  font-size: 1.05rem; font-weight: 600; word-break: break-word
+}
+
+.details { font-size: .98rem; min-height: 1.16em; color: var(--accent); display: flex; align-items: center; gap: 8px; padding-top: 0; white-space: pre }
+/* .details:nth-child(3) { padding-bottom: 22px } */
+
+.countDown {
+  width: fit-content;
+  font-size: .9em; text-align: right;
+  white-space: nowrap; word-break: keep-all;
+  opacity: .7; margin: 0; padding-left: 5px }
+
+.ampel {
+  width: 8px; height: 8px; min-width: 8px; min-height: 8px;
+  border-radius: 100%; margin: auto 0; 
+  background: currentColor; white-space: nowrap;
+}
+.status { color: var(--green); font-weight: bold }
+.paused { color: var(--red) }
+
+@media screen and (max-width: 992px) {
+  .card-title, .details { padding: 22px 18px 18px }
+  .details { padding-top: 0 }
+}
+
+.btns { display: inline-flex; border-top: 1px solid var(--card-br) }
+.btn {
+  width: 100%; height: 22px;
+  padding: 10px 0; border: 0; border-right: 1px solid var(--btn-br);
+  font-weight: 600; color: var(--white); text-align:center; text-decoration: none;
+  appearance: none; cursor:pointer;
+  background-color: var(--black-main); background-repeat: no-repeat; background-position: center; background-size: contain; background-origin: content-box;
+}
+.btn:hover { background-color:var(--black-washed) }
+.btn:active { transform:translateY(1px) }
+
+.btn:first-child { border-radius: 0 0 0 var(--border-radius) }
+.btn:last-child { border-right: 0; border-radius: 0 0 var(--border-radius) 0 }
+.btn:only-child { border-radius: 0 0 var(--border-radius) var(--border-radius) }
+.noround { border-radius: 0!important }
+
+.btn.edit       { background-image: url('@/svg/edit.svg') }
+.btn.complete   { background-image: url('@/svg/complete.svg') }
+.btn.cancel     { background-image: url('@/svg/cancel.svg') }
+.btn.undo       { background-image: url('@/svg/undo.svg') }
+.btn.navigation { background-image: url('@/svg/navigation.svg') }
+.btn.video      { background-image: url('@/svg/video.svg') }
+.btn.whatsapp   { background-image: url('@/svg/whatsapp.svg') }
+.btn.parent     { background-image: url('@/svg/parent.svg') }
+.btn.info       { background-image: url('@/svg/info.svg') }
+.btn.extrato    { background-image: url('@/svg/extrato.svg') }
+.btn.report     { background-image: url('@/svg/report.svg') }
+/* .btn.message    {background-image:url('@/svg/message.svg')} */

@@ -31,22 +31,25 @@ const routeTo = (path) => {
 </script>
 
 <template>
-  <div class="card" title="Ver perfil do aluno" @click="routeTo('/aluno')">
-    <div class="title">
+  <div title="Ver perfil do aluno" class="card" @click="routeTo('/aluno')">
+
+    <div class="card-title">
       <div class="name">{{student.student_name}}</div>
       <div class="ampel status" :class="{paused: student.paused}"></div>
     </div>
+
     <div class="details">{{studentSchedules}}</div>
     <div class="details">Saldo:<span class="status" :class="{paused: balance < 0}">{{ currency(balance) }}</span></div>
+    
     <div class="btns">
       <div title="Editar aluno"  class="btn edit"    @click.stop="routeTo('/aluno/editar')"></div>
       <div title="Ver extrato"   class="btn extrato" @click.stop="routeTo('/extrato')">      </div>
       <div title="Ver relatório" class="btn report"  @click.stop="routeTo('/relatorio')">    </div>
     </div>
+    
   </div>
 </template>
 
 <style scoped>
-@import "@/assets/card.css";
-.card { grid-row: span 4 }
+.card{--sibling-count: 4}
 </style>
