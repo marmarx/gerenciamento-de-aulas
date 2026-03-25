@@ -165,8 +165,16 @@ export function useEventDefaults(event) {
 
   // Change dateStart -> updates dateEnd and timeEnd, preserves duration and timeStart
   watch(() => event.date, (newVal, oldVal) => {
-    if (updating || !newVal || !oldVal || !event.dateEnd) return
-    if (!isValidDate(newVal) || !isValidDate(oldVal)) return
+    if (updating || !newVal || !isValidDate(newVal)) return
+
+    if(!event.dateEnd && !event.time) {
+      updating = true
+      event.dateEnd = newVal
+      updating = false
+      return
+    }
+
+    if (!oldVal || !isValidDate(oldVal)) return
 
     updating = true
       const oldStart = parseDate(oldVal, event.time)

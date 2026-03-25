@@ -3,7 +3,10 @@ const inputsWithPlaceholder = ['date', 'time', 'datetime-local', 'month', 'week'
 
 const props = defineProps({modelValue: [String, Number, Date], id: String, placeholder: String, type: {type: String, default: "text"}, numberDefs: Object})
 
-const handleFocus = ev => ev.target.type = props.type
+const handleFocus = (ev) => {
+  ev.target.type = props.type
+  requestAnimationFrame(() => ev.target.showPicker?.())   // opens dialog picker with a single click
+}
 const handleBlur  = ev => { if (!ev.target.value) ev.target.type = 'text' }
 
 defineEmits(["update:modelValue"])
