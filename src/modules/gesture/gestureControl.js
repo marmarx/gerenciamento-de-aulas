@@ -9,7 +9,7 @@ const transitionName = ref('slide-left')
 const windowWidth = ref(window.innerWidth)
 const isMob = computed(() => windowWidth.value < 993)
 
-let handleTouchStart, handleTouchEnd, resizeHandler, backHandler = null
+let handleTouchStart, handleTouchEnd, resizeHandler = null
 let backGestureSet, swipeGestureSet, resizeGestureSet = false
 const isAndroid = Capacitor.getPlatform() === 'android'   // true or false
 
@@ -116,12 +116,12 @@ const setResizeGesture = () => {
 
 // cleanup -> remove gestures event listeners
 const cleanupAll = () => {
-  if (backHandler && isAndroid) App.removeAllListeners('backButton')
+  if (isAndroid) App.removeAllListeners('backButton')
   if (handleTouchStart) window.removeEventListener('touchstart', handleTouchStart)
   if (handleTouchEnd)   window.removeEventListener('touchend', handleTouchEnd)
   if (resizeHandler)    window.removeEventListener('resize', resizeHandler)
 
-  handleTouchStart, handleTouchEnd, resizeHandler, backHandler = null
+  handleTouchStart, handleTouchEnd, resizeHandler = null
   backGestureSet, swipeGestureSet, resizeGestureSet = false
 }
 

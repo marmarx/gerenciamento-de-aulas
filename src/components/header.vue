@@ -23,7 +23,7 @@ const toSentenceCase = str => str.charAt(0).toUpperCase() + str.toLowerCase().sl
 
 <style>
 :root{--header-back: linear-gradient(90deg, var(--header-left) 0%, var(--header-right) 100%)}
-header { color: var(--head-text); padding: 10px 0 0; background: var(--header-back);}
+header { color: var(--head-text); padding: 10px 0 0; background: var(--header-back); padding-top: calc(env(safe-area-inset-top) + 10px)}
 h1 { padding: 25px 10px; margin: 0; color: currentColor; text-align: center; }
 
 .nav {position: sticky; top:0; margin-top: -1px; width:100%; display: flex; background: var(--header-back); z-index: 3}

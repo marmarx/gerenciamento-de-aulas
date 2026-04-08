@@ -1,5 +1,5 @@
 <script setup>
-import toast from '@/modules/toast/toast.vue'
+import toast from '@/toast/toast.vue'
 
 import { toastShow } from '@/modules/toast/toastShow'
 toastShow('Successfully saved!', 'All changes saved to storage')

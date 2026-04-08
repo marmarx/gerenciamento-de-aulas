@@ -65,11 +65,17 @@ const eventNotification = (event, student, config) => {
   const body_head = event.timeEnd ? `${event.time} - ${event.timeEnd}` : event.time
 
   const id = hashUUID(event.id_event) // must be numeric and unique
-  const title = name
-  const body = `${body_head}: Sua próxima aula com ${name} é em ${formatDuration(minutesBefore/60)}`
 
-  const summaryText = address ? address : ''                  // Android -> adds summaryText to body
-  const largeBody = address ? `${body} - ${address}` : body   // iOS -> replaces body with largeBody
+  // const title = name
+  // const body = `${body_head}: Sua próxima aula com ${name} é em ${formatDuration(minutesBefore/60)}`
+
+  // const summaryText = address ? address : ''                  // Android -> adds summaryText to body
+  // const largeBody = address ? `${body} - ${address}` : body   // iOS -> replaces body with largeBody
+
+  const title = `${body_head}: ${name}`
+  const summaryText = `Em ${formatDuration(minutesBefore/60)}`
+  const body = address ? address : `${body_head}: Sua próxima aula com ${name} é em ${formatDuration(minutesBefore/60)}`
+  const largeBody = phone ? `${body} - ${phone}` : body
   
   const schedule = { at: notifyAt, allowWhileIdle: true }
   const extra = { whatsapp: whatsappLink(phone), maps: mapsLink(address), eventId: event.id_event, studentId: student.id_student }
