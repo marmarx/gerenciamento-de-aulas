@@ -1,0 +1,42 @@
+<script setup>
+import cardStudent from '@/components/cardStudent.vue'
+import { ref, computed } from 'vue'
+const filterByName = ref('')
+
+import { useDataStore } from "@/stores/dataStore"
+const dataStore = useDataStore()
+
+const activeStudents = computed(() => dataStore.activeStudents.filter(s => s.student_name.toLowerCase().includes(filterByName.value.toLowerCase())))
+const pausedStudents = computed(() => dataStore.pausedStudents.filter(s => s.student_name.toLowerCase().includes(filterByName.value.toLowerCase())))
+
+const newStudent = () => dataStore.selectedStudent = null
+</script>
+
+<template>
+  <div class="section">
+    <div class="card-holder">
+      <h2 v-if="!pausedStudents.length">Alunos</h2>
+      <h2 v-else>Alunos Ativos</h2>
+
+      <div class="container dateFlex">
+        <input v-if="activeStudents.length" type="text" name="listFilter" class="listFilter" placeholder="Filtrar por nome" v-model="filterByName" />
+      </div>
+
+      <div v-if="activeStudents.length" class="container grid">
+        <card-student v-for="student in activeStudents" :key="student.id_student" :id="student.id_student" />
+      </div>
+      <p v-else class="tac">Nenhum aluno ainda, <router-link to="/aluno/editar" title="Novo aluno" @click="newStudent">adicione um</router-link>.</p>
+    </div>
+
+    <div v-if="pausedStudents.length" class="card-holder">
+      <h2>Alunos Pausados</h2>
+      <div class="container grid">
+        <card-student v-for="student in pausedStudents" :key="student.id_student" :id="student.id_student" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+@import "@/assets/cardHolder.css";
+</style>

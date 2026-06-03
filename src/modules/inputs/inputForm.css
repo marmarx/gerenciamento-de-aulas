@@ -1,0 +1,25 @@
+/* @import 'inputHideIcons.css'; */
+
+.form-group { position: relative; margin: 0 } /* margin: 1em 0 */
+
+.inline-label{ width: 100%; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-around; gap: 2em ; box-sizing: border-box}
+.inline-label input{margin: 0}
+.inline-label > *:first-child{width:80%}
+.inline-label > *:last-child{width:20%}
+
+label { display: block; margin: 1em 0 0; font-weight: bold; transition: all 0.25s ease;}
+input, select, textarea { 
+  width: 100%; box-sizing: border-box;
+  padding: 1.1em .8em; border: 0; border-radius: 5px; margin: .5em 0 0; outline: none; /* border: 1px solid var(--black-washed); */
+  font-family: "Open Sans", sans-serif; font-size: 1em;
+  background: var(--body-back)
+}
+input, select{height: 60px}
+input[type="file"]{ padding:0; width: unset }
+textarea{resize: vertical; min-height: 200px}
+select:invalid, option:disabled{color:var(--black-main)}
+select{-webkit-appearance: none; appearance: none; -moz-appearance: none}
+
+@media screen and (max-width: 992px) {
+  .inline-label { padding: 0 .8em }
+}

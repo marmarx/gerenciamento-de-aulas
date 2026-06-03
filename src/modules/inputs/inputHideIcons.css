@@ -1,0 +1,23 @@
+/* Date / Time pickers (Chrome, Edge) */
+input::-webkit-calendar-picker-indicator { display: none !important; opacity: 0 !important }
+
+/* Remove arrow inside time input (Chrome) */
+input::-webkit-inner-spin-button { display: none }
+
+/* Search: hide the clear (X) icon */
+input[type=search]::-webkit-search-cancel-button { -webkit-appearance: none }
+
+/* Remove iOS "inner shadow" & decorations */
+input { -webkit-appearance: none; appearance: none }
+
+/* Number: hide spinner buttons */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0 }
+input[type=number] { -moz-appearance: textfield } /* Firefox */
+
+/*
+/* -- adjustments in case of number input with built-in arrows --
+input[type="number"]{ padding-left: 1.5em }
+input[type="number"]:hover, input[type="number"]:focus{ padding-left: .8em }
+@media screen and (max-width: 992px) { input[type="number"]{ padding-left: .8em } }
+*/
