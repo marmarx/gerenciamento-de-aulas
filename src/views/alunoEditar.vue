@@ -80,10 +80,7 @@ const isDisabled = () => !student.student_name?.trim()
 const handleBeforeUnload = () => {
   if(isNewStudent.value) {
     if (isDisabled()) dataStore.removeStudent(student.id_student)
-    else {
-      // create events for new student
-      useAgendaStore().generateEventsForStudent(student.id_student)
-    }
+    else useAgendaStore().generateEventsForStudent(student.id_student) // create events for new student
   }
 }
 
