@@ -10,7 +10,6 @@ lerna-debug.log*
 node_modules
 dist
 unpublished
-android
 ios
 dist-ssr
 coverage
