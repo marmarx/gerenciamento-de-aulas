@@ -1,6 +1,7 @@
 <!-- Floating Action Buttons -->
 
 <script setup>
+import { temporal } from "@/composables/helpers/helpers.temporal"
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
@@ -24,8 +25,8 @@ const togglefm = () => {
   document.querySelector('.fm-container').classList.toggle('negative-z-index');
 
   // set today day for icon
-  const today = new Date()
-  document.documentElement.style.setProperty('--today-day', `"${today.getDate()}"`)
+  const today = temporal.day()
+  document.documentElement.style.setProperty('--today-day', `"${today}"`)
   // reset()
 }
 

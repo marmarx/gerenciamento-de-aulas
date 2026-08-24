@@ -7,8 +7,13 @@ import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 
 import { isMob } from '@/modules/gesture/gestureControl'
-import { parseDate, shortDateLabel, shortWeekday, currency, formatDuration, weekLabel, dateLabel, horaBR, toSentenceCase } from '@/composables/utility';
 import { eventValue } from '@/composables/eventValue'
+
+import { temporal } from '@/composables/helpers/helpers.temporal'
+import { currency, toSentenceCase } from '@/composables/helpers/helpers.text'
+import { parseDate, shortDateLabel, dateLabel } from '@/composables/helpers/helpers.date'
+import { shortWeekday, weekLabel } from '@/composables/helpers/helpers.week'
+import { formatDuration, horaBR } from '@/composables/helpers/helpers.time'
 
 const status = { 'scheduled':'Agendada', 'done':'Finalizada', 'canceled':'Cancelada' }
 
@@ -36,7 +41,7 @@ const sortedEvents = computed(() => {
   const sorted = [...events.value].sort((a, b) => {
     if (sortKey.value === 'student_name' || sortKey.value === 'status') return a[sortKey.value].toLowerCase().localeCompare(b[sortKey.value].toLowerCase())
     if (sortKey.value === 'duration' || sortKey.value === 'cost' || sortKey.value === 'value') return a[sortKey.value] - b[sortKey.value]
-    if (sortKey.value === 'day') return parseDate(a.date).getDay() - parseDate(b.date).getDay()
+    if (sortKey.value === 'day') return parseDate(a.date) - parseDate(b.date)
     if (sortKey.value === 'time') return parseDate('2025-01-01', a.time) - parseDate('2025-01-01', b.time)     //formatTime(a.time)
     else return parseDate(a.date, a.time) - parseDate(b.date, b.time)
   })
@@ -81,7 +86,7 @@ const editEvent = (id) => {
               <div class="exText">{{ event.experimental ? 'Experimental' : currency(event.cost) }}  •  {{ formatDuration(event.duration) }}</div> 
             </div>
             <div class="icon-wrapper">
-              <div v-if="event.status === 'scheduled'" class="icon icon-event" :style="{'--today-day': `'${parseDate(event.date).getDate()+1}'`}"></div>
+              <div v-if="event.status === 'scheduled'" class="icon icon-event" :style="{'--today-day': `'${temporal.day(parseDate(event.date))+1}'`}"></div>
               <div v-else-if="event.status === 'canceled'" class="icon icon-canceled"></div>
               <div v-else-if="event.status === 'done'" class="icon icon-done"></div>
             </div>

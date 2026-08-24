@@ -1,12 +1,12 @@
 import { ref, watch, computed } from 'vue'
-import { isValidDate, parseDate, filterRange, dateISO } from '@/composables/utility'
+import { parseDate, dateISO, isValidDate, filterRange } from '@/composables/helpers/helpers.date'
+import { temporal } from '@/composables/helpers/helpers.temporal'
 
 import { useDataStore } from '@/stores/dataStore'
 const dataStore = useDataStore()
 
-const today = new Date()
-const year  = today.getFullYear()
-const month = today.getMonth()
+const year  = temporal.year()
+const month = temporal.month()
 
 // previous month by default
 const previousMonth = true

@@ -3,7 +3,13 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDataStore } from "@/stores/dataStore"
 import { useClockStore } from '@/stores/clockStore'
-import { parseDate, mapsLink, whatsappLink, weekLabel, dateLabel, horaBR, formatDur } from '@/composables/utility'
+
+import { temporal } from '@/composables/helpers/helpers.temporal'
+import { mapsLink, whatsappLink } from '@/composables/helpers/helpers.text'
+import { parseDate, dateLabel } from '@/composables/helpers/helpers.date'
+import { weekLabel } from '@/composables/helpers/helpers.week'
+import { horaBR, formatDur } from '@/composables/helpers/helpers.time'
+
 import alink from '@/components/alink.vue'
 
 const props = defineProps({ id: { type: String, required: true }, isToday: { type: Boolean, default: false } }) //event id
@@ -16,9 +22,9 @@ const now = computed(() => props.isToday ? clock.now : null)
 const event   = computed(() => dataStore.sortedEvents.find(e => e.id_event === props.id))
 const student = computed(() => dataStore.sortedStudents.find(s => s.id_student === event.value.id_student))
 
-const startDate = computed(() => parseDate(event.value.date, event.value.time).getTime())
+const startDate = computed(() => parseDate(event.value.date, event.value.time))
 const endDate   = computed(() => startDate.value + event.value.duration * 60 * 60 * 1000)
-// const endDate = computed(() => parseDate(event.value.dateEnd, event.value.timeEnd).getTime())
+// const endDate = computed(() => parseDate(event.value.dateEnd, event.value.timeEnd))
 
 // timmer countdown
 const isNow = computed(() => {
@@ -47,7 +53,7 @@ const markAsDone = () => {
   event.value.status = 'done'
 }
 
-const cancelEvent  = () => { event.value.status = 'canceled'; event.value.canceledAt = new Date().getTime() }
+const cancelEvent  = () => { event.value.status = 'canceled'; event.value.canceledAt = temporal.now() }
 const restoreEvent = () => { event.value.status = 'scheduled' }
 
 const routeTo = (path) => {

@@ -45,6 +45,7 @@ const scheduleNotifications = async (notifications) => {
       return
     }
 
+    console.log(notifications)
     await LocalNotifications.schedule({ notifications })
     // console.log(`[notificationStore] Scheduled ${notifications.length} notification(s)`)
   }

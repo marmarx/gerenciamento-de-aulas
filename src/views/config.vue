@@ -2,21 +2,23 @@
 import inputToggle from '@/modules/inputs/inputToggle.vue'
 import inputHelp from '@/modules/inputs/inputHelp.vue'
 
+import { currency } from '@/composables/helpers/helpers.text'
+import { formatDuration } from '@/composables/helpers/helpers.time'
+
+import { toastShow } from '@/modules/toast/toastShow'
+import { isInstalled, isIOS, isWeb, installApp } from "@/modules/PWA/installPWA.js"
+import { permissionGranted, checkPermission } from '@/modules/notifications/notificationMain'
+import { isMob } from '@/modules/gesture/gestureControl'
+
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDataStore } from "@/stores/dataStore"
 import { useAgendaStore } from '@/stores/agendaStore'
 
-import { toastShow } from '@/modules/toast/toastShow'
-import { currency, formatDuration } from '@/composables/utility'
-import { isInstalled, isIOS, isWeb, installApp } from "@/modules/PWA/installPWA.js"
-import { permissionGranted, checkPermission } from '@/modules/notifications/notificationMain'
-import { isMob } from '@/modules/gesture/gestureControl'
-
+const fileInput = ref(null)
 const router = useRouter()
 const dataStore = useDataStore()
 const agendaStore = useAgendaStore()
-const fileInput = ref(null)
 
 const copyToClipboard = async () => {
   try {

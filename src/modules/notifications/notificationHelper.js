@@ -1,4 +1,9 @@
-import { parseDate, dateISO, formatDuration, fallbackNumber, whatsappLink, mapsLink } from '@/composables/utility'
+import { fallbackNumber } from '@/composables/helpers/helpers.utility'
+import { mapsLink, whatsappLink } from '@/composables/helpers/helpers.text'
+import { parseDate, dateISO } from '@/composables/helpers/helpers.date'
+import { formatDuration } from '@/composables/helpers/helpers.time'
+import { temporal } from '@/composables/helpers/helpers.temporal'
+
 
 // notifications will be set only for events/birthdays within the next n days
 const timelineTreshold = 30  // in days
@@ -21,8 +26,8 @@ const hashUUID = (uuid) => {
 
 // Valid notification time span
 const checkTimespan = (notifyAt) => {
-  const now = new Date().getTime()
-  const diff = notifyAt.getTime() - now
+  const now = temporal.now()
+  const diff = notifyAt - now
   const timespan = timelineTreshold * 24 * 60 * 60 * 1000  // days to milliseconds
 
   return diff > 0 && diff <= timespan // returns true if within valid timespan
@@ -43,11 +48,11 @@ const notifyEventAt = (event, minutesBefore) => {
   if (!event.date || !event.time) return
 
   const eventDate = parseDate(event.date, event.time)
-  const notifyAt = new Date(eventDate.getTime() - minutesBefore * 60 * 1000) // minutes to milliseconds
+  const notifyAt = eventDate - minutesBefore * 60 * 1000 // minutes to milliseconds
 
   const valid = checkTimespan(notifyAt)
   if (!valid) return
-  return notifyAt
+  return new Date(notifyAt)
 }
 
 // Create event notification object
@@ -93,10 +98,11 @@ const getNextBirthday = (dob) => {
   const [_, month, day] = dob.split('-').map(Number)
   if (!Number.isInteger(month) || !Number.isInteger(day)) return null
   
-  const now = new Date()
-  let birthday = new Date(now.getFullYear(), month - 1, day)
-
-  if (birthday < now) birthday = new Date(now.getFullYear() + 1, month - 1, day)  // if birthday already passed this year → use next year
+  const currentYear = temporal.year()
+  let birthday = parseDate(`${currentYear}-${month}-${day}`)
+  
+  const now = temporal.now()
+  if (birthday < now) birthday = parseDate(`${currentYear + 1}-${month}-${day}`)  // if birthday already passed this year → use next year
 
   return birthday
 }
@@ -112,7 +118,7 @@ const notifyBirthdayAt = (dob, dayBefore) => {
 
   const valid = checkTimespan(notifyAt)
   if (!valid) return
-  return notifyAt
+  return new Date(notifyAt)
 }
 
 // Create birthday notification object

@@ -3,13 +3,17 @@ const isNative = Capacitor.isNativePlatform()
 
 import * as XLSX from 'xlsx'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
-import { Share } from '@capacitor/share'
 import { FilePicker } from '@capawesome/capacitor-file-picker'
-import { currency, dateISO, longWeekdays } from '@/composables/utility'
+import { Share } from '@capacitor/share'
+
+import { longWeekdays } from '@/composables/helpers/helpers.week'
+import { dateISO } from './helpers/helpers.date'
+import { currency } from './helpers/helpers.text'
 import { eventValue, eventCancelPolicy } from '@/composables/eventValue'
 
 // helper function
-const fileDate = () => new Date().toLocaleDateString('en-CA').replaceAll('-', '.')
+const fileDate = () => dateISO()
+
 const blobToBase64 = (blob) => new Promise((resolve) => {
   const reader = new FileReader()
   reader.onload = () => resolve(reader.result.split(',')[1])

@@ -1,6 +1,8 @@
 import { computed } from 'vue'
 import { eventValue } from '@/composables/eventValue'
-import { parseDate, filterRange, dateISO } from '@/composables/utility'
+
+import { temporal } from '@/composables/helpers/helpers.temporal'
+import { parseDate, filterRange, dateISO } from '@/composables/helpers/helpers.date'
 import { startDate, endDate, eventsInRange, chargableInRange, paymentsInRange } from '@/modules/panorama/dateFilter'
 
 import { useDataStore } from '@/stores/dataStore'
@@ -61,8 +63,9 @@ const studentStats = computed(() => {
 
 // total revenue for current and previous month
 const datePryer = (str) => {
-  const year  = parseDate(str).getFullYear()
-  const month = parseDate(str).getMonth()
+  const ms = parseDate(str)
+  const year  = temporal.year(ms)
+  const month = temporal.month(ms)
   return [ year, month ]
 }
 
@@ -87,8 +90,8 @@ const currentRevenue  = computed(() => revenueFor(0))
 const previousRevenue = computed(() => revenueFor(-1))
 
 const revenueGrowth = computed(() => {
-  const startMonth = parseDate(startDate.value).getMonth()
-  const endMonth   = parseDate(endDate.value).getMonth()
+  const startMonth = temporal.month(parseDate(startDate.value))
+  const endMonth   = temporal.month(parseDate(endDate.value))
 
   if(startMonth !== endMonth) return null
 

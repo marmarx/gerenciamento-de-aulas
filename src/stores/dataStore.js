@@ -1,7 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
-import { uuidv4, dateISO } from '@/composables/utility';
-import { importStorage, exportStorage, exportXLSX } from '@/composables/importExport';
+
+import { uuidv4 } from '@/composables/helpers/helpers.utility'
+import { dateISO } from '@/composables/helpers/helpers.date'
+import { temporal } from '@/composables/helpers/helpers.temporal'
+
+import { importStorage, exportStorage, exportXLSX } from '@/composables/importExport'
 import { toastShow } from '@/modules/toast/toastShow'
 // import dummyData from '@/unpublished/dummyData'
 
@@ -76,9 +80,9 @@ export const useDataStore = defineStore(storageTitle, () => {
   const newStudent = () => {
     const student = {
       id_student: `student_${uuidv4()}`,
-      added_on: new Date().getTime(),
+      added_on: temporal.now(),
       paused: false,
-      student_name: '',               //required
+      student_name: '',               // required
       student_phone: '',
       dob: '',
       parent: '', parent_phone: '',
@@ -87,7 +91,7 @@ export const useDataStore = defineStore(storageTitle, () => {
       meeting: '',
       scholl: '', year: '',
       weekly_schedule: [{ weekDay: null, timeDay: '', subject: '' }], // { weekDay: 0-6, timeDay: 'hh:mm', subject: '' }
-      start_date: dateISO(new Date()), end_date: '',
+      start_date: dateISO(), end_date: '',
       obs: '',
 
       cost: data.value.config.cost ?? 50,
@@ -109,13 +113,13 @@ export const useDataStore = defineStore(storageTitle, () => {
       id_student: '',                 //required
       student_name: '',
       subject: '',
-      added_on: new Date().getTime(),
+      added_on: temporal.now(),
       originalDate: '',
       originalTime: '',
-      date: '',       // dateISO(new Date()) - required
-      time: '',       // timeISO(new Date()) - required
-      dateEnd: '',    // dateISO(new Date())
-      timeEnd: '',    // timeISO(new Date().getTime() + (data.value.config.duration || 1) * 60* 60 * 1000)
+      date: '',       // dateISO() - required
+      time: '',       // timeISO() - required
+      dateEnd: '',    // dateISO()
+      timeEnd: '',    // timeISO(temporal.now() + (data.value.config.duration || 1) * 60* 60 * 1000)
       experimental: false,
       added_manually: true,
       rescheduled: false,
@@ -132,8 +136,8 @@ export const useDataStore = defineStore(storageTitle, () => {
       id_pay: `payment_${uuidv4()}`,
       id_student: '',                 //required
       student_name: '',
-      added_on: new Date().getTime(),
-      date: dateISO(new Date()),      //required
+      added_on: temporal.now(),
+      date: dateISO(),                //required
       value: 0,                       //required
       obs: ''
     }

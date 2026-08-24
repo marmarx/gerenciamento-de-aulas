@@ -1,7 +1,12 @@
 <script setup>
-import { parseDate, weekLabel, dateLabel, timeISO, horaBR, formatDuration, currency, toSentenceCase } from '@/composables/utility'
-import { eventValue } from '@/composables/eventValue'
+import { currency, toSentenceCase } from '@/composables/helpers/helpers.text'
+import { parseDate, dateLabel } from '@/composables/helpers/helpers.date'
+import { weekLabel } from '@/composables/helpers/helpers.week'
+import { timeISO, horaBR, formatDuration } from '@/composables/helpers/helpers.time'
+
 import { computed } from 'vue'
+import { eventValue } from '@/composables/eventValue'
+
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
 const students = dataStore.sortedStudents

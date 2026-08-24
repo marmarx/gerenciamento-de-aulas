@@ -1,5 +1,10 @@
 import { watch, computed } from 'vue'
-import { parseDate, dateISO, timeISO, isValidDate, fallbackNumber, fallbackBool } from '@/composables/utility'
+
+import { fallbackNumber, fallbackBool } from '@/composables/helpers/helpers.utility'
+import { temporal } from './helpers/helpers.temporal'
+import { parseDate, dateISO, isValidDate } from './helpers/helpers.date'
+import { timeISO } from './helpers/helpers.time'
+
 import { useDataStore } from '@/stores/dataStore'
 
 export function useEventDefaults(event) {
@@ -27,11 +32,11 @@ export function useEventDefaults(event) {
   // FINISH EVENT
   const finishEvent = () => {
     updating = true
-      const now = new Date()
+      const now = temporal.now()
       event.date = dateISO(now)
       event.time = timeISO(now)
 
-      const end = new Date(now.getTime() + event.duration * 60 * 60 * 1000)
+      const end = now + event.duration * 60 * 60 * 1000
       event.dateEnd = dateISO(end)
       event.timeEnd = timeISO(end)
 
@@ -59,10 +64,10 @@ export function useEventDefaults(event) {
 
       const start = parseDate(event.date, event.time)
       const end = parseDate(event.dateEnd || event.date, event.timeEnd || event.time)
-      const duration = (end.getTime() - start.getTime()) / (60 * 60 * 1000)
+      const duration = (end - start) / (60 * 60 * 1000)
 
       if (end <= start || event.duration !== duration ) {
-        const newEnd = new Date(start.getTime() + event.duration * 60 * 60 * 1000)
+        const newEnd = start + event.duration * 60 * 60 * 1000
         event.dateEnd = dateISO(newEnd)
         event.timeEnd = timeISO(newEnd)
       }
@@ -76,18 +81,18 @@ export function useEventDefaults(event) {
     const startA = parseDate(event.date, event.time)
     const endA   = parseDate(event.dateEnd, event.timeEnd)
 
-    if (startA.getTime() === endA.getTime()) endA = new Date(startA.getTime() + 60 * 1000) //edge case: event has 0 duration -> treat as 1 minute event
+    if (startA === endA) endA = startA + 60 * 1000 //edge case: event has 0 duration -> treat as 1 minute event
 
     return dataStore.sortedEvents.find(ev => {
       if (ev.id_event === event.id_event) return false            // ignore itself
-      if (ev.status === 'canceled' || ev.deleted) return false     // ignore canceled or deleted events
+      if (ev.status === 'canceled' || ev.deleted) return false    // ignore canceled or deleted events
       if (ev.date !== event.date) return false                    // must match same day to be considered overlapping
       if (!ev.date || !ev.time) return false                      // avoids crashes
 
       const startB = parseDate(ev.date, ev.time)
       let endB     = parseDate(ev.dateEnd || ev.date, ev.timeEnd || ev.time)
 
-      if(endB <= startB) endB = new Date(startB.getTime() + ev.duration * 60 * 60 * 1000)
+      if(endB <= startB) endB = startB + ev.duration * 60 * 60 * 1000
 
       return startA < endB && endA > startB
     }) || null
@@ -138,8 +143,8 @@ export function useEventDefaults(event) {
     // auto-finish logic
     if (config.autoFinishEvents) {
       const eventDateTime = parseDate(event.date, event.time)
-      const finishThreshold = new Date(eventDateTime.getTime() + Number(config.autoFinishOffset || 30) * 60 * 1000)
-      if (finishThreshold <= new Date()) event.status = 'done'
+      const finishThreshold = eventDateTime + Number(config.autoFinishOffset || 30) * 60 * 1000
+      if (finishThreshold <= temporal.now()) event.status = 'done'
     }
   }
 
@@ -180,11 +185,11 @@ export function useEventDefaults(event) {
       const oldStart = parseDate(oldVal, event.time)
       const oldEnd = event.timeEnd
         ? parseDate(event.dateEnd, event.timeEnd)
-        : new Date(oldStart.getTime() + event.duration * 60 * 60 * 1000)
+        : (oldStart + event.duration * 60 * 60 * 1000)
 
-      const diff = oldEnd.getTime() - oldStart.getTime()
+      const diff = oldEnd - oldStart
       const newStart = parseDate(newVal, event.time)
-      const newEnd = new Date(newStart.getTime() + diff)
+      const newEnd = newStart + diff
 
       event.dateEnd = dateISO(newEnd)
       event.timeEnd = timeISO(newEnd)
@@ -199,7 +204,7 @@ export function useEventDefaults(event) {
       const start = parseDate(event.date, newTime)
       if (!isValidDate(start)) return
 
-      const end = new Date(start.getTime() + event.duration * 60 * 60 * 1000)
+      const end = start + event.duration * 60 * 60 * 1000
       event.dateEnd = dateISO(end)
       event.timeEnd = timeISO(end)
     setTimeout(() => updating = false, 50)
@@ -208,12 +213,13 @@ export function useEventDefaults(event) {
   // Change duration -> updates dateEnd and timeEnd, preserves dateStart and timeStart
   watch(() => event.duration, newVal => {
     if (updating || !newVal) return
-
     updating = true
       const start = parseDate(event.date, event.time)
+      console.log(start)
       if (!isValidDate(start)) return
 
-      const end = new Date(start.getTime() + newVal * 60 * 60 * 1000)
+      const end = start + newVal * 60 * 60 * 1000
+      console.log(end)
       event.dateEnd = dateISO(end)
       event.timeEnd = timeISO(end)
     setTimeout(() => updating = false, 50)

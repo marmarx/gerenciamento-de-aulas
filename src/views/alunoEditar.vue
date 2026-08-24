@@ -1,12 +1,17 @@
 <script setup>
+import { ref, watch, onBeforeUnmount, onMounted } from 'vue'
+import { toastShow } from '@/modules/toast/toastShow'
+
 import inputToggle from '@/modules/inputs/inputToggle.vue'
 import inputText from '@/modules/inputs/inputText.vue'
 import inputSelect from '@/modules/inputs/inputSelect.vue'
 import inputHelp from '@/modules/inputs/inputHelp.vue'
 
-import { parseDate, longWeekdays, formatDuration, currency } from '@/composables/utility'
-import { ref, watch, onBeforeUnmount, onMounted } from 'vue'
-import { toastShow } from '@/modules/toast/toastShow'
+import { temporal } from '@/composables/helpers/helpers.temporal'
+import { currency } from '@/composables/helpers/helpers.text'
+import { parseDate } from '@/composables/helpers/helpers.date'
+import { longWeekdays } from '@/composables/helpers/helpers.week'
+import { formatDuration } from '@/composables/helpers/helpers.time'
 
 import { useDataStore } from "@/stores/dataStore"
 const dataStore = useDataStore()
@@ -58,7 +63,7 @@ watch(
 
 const updateEvents = (key) => {
   dataStore.data.events = [...dataStore.data.events].map(e =>
-    e.id_student === student.id_student && parseDate(e.date, e.time) >= new Date()
+    e.id_student === student.id_student && parseDate(e.date, e.time) >= temporal.now()
       ? { ...e, [key]: student[key] || dataStore.sortedConfig[key] }
       : e
   )

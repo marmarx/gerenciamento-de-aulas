@@ -7,7 +7,9 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 import { isMob } from '@/modules/gesture/gestureControl'
-import { parseDate, shortDateLabel, currency, weekLabel, dateLabel, toSentenceCase } from '@/composables/utility';
+import { weekLabel } from '@/composables/helpers/helpers.week'
+import { currency, toSentenceCase } from '@/composables/helpers/helpers.text'
+import { parseDate, shortDateLabel, dateLabel } from '@/composables/helpers/helpers.date'
 
 dataStore.selectedStudent = ''
 const students = dataStore.sortedStudents

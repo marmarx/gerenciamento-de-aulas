@@ -1,6 +1,8 @@
 // import { eventValue } from '@/composables/eventValue'
 import { useDataStore } from "@/stores/dataStore"
-import { parseDate, formatDuration, fallbackNumber, fallbackBool } from '@/composables/utility'
+import { fallbackNumber, fallbackBool } from '@/composables/helpers/helpers.utility'
+import { formatDuration } from "./helpers/helpers.time"
+import { parseDate } from "./helpers/helpers.date"
 
 // a || b -> 0, '', null and undefined are falsy and defaults to b
 // a ?? b -> only null and undefined are falsy -> 0 and '' are truthy
@@ -23,7 +25,7 @@ const eventValue = (id) => {
     if (!e.cancelationFee) return 0       // cancelation fee is 0% -> no charge
     if (!e.canceledAt) return 0           // buggy entry, safe guard
 
-    const eventStart = parseDate(e.date, e.time).getTime()
+    const eventStart = parseDate(e.date, e.time)
     const grace = fallBack('freeCancelationBefore')
     
     const canceledEarly  = eventStart - e.canceledAt > (grace * 60 * 60 * 1000) // hours -> miliseconds

@@ -9,7 +9,10 @@ import { useRouter } from 'vue-router'
 if (!dataStore.selectedStudent) useRouter().push('/alunos')
 const student = dataStore.student
 
-import { shortDateLabel, shortWeekdays, horaBR, formatDuration, currency, whatsappLink, mapsLink } from '@/composables/utility';
+import { currency, whatsappLink, mapsLink } from '@/composables/helpers/helpers.text'
+import { shortDateLabel } from '@/composables/helpers/helpers.date'
+import { shortWeekdays } from '@/composables/helpers/helpers.week'
+import { horaBR, formatDuration } from '@/composables/helpers/helpers.time'
 import { eventValue } from '@/composables/eventValue'
 
 const studentSchedules = computed(() => student.weekly_schedule.filter(e => e.weekDay && e.timeDay).map(e => `${shortWeekdays[e.weekDay]} ${horaBR(e.timeDay)}`).join('  •  '))

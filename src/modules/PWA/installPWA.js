@@ -3,12 +3,15 @@ import { Capacitor } from '@capacitor/core'
 import { toastShow } from '@/modules/toast/toastShow'
 
 const isWeb = Capacitor.getPlatform() === 'web'
-const deferredPrompt = ref(null)
-const installButtonVisible = ref(false)
-const isInstalled = ref(false)
 const isIOS = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())
 
+const isInstalled = ref(false)
+const deferredPrompt = ref(null)
+const installButtonVisible = ref(false)
+
+
 const hideInstallButton = () => installButtonVisible.value = false
+
 const installApp = async () => {
   if (isIOS) {
     toastShow('Instalação em iOS','Toque o ícone de "Compartilhamento" e depois "Adicionar à Tela de Início"')
@@ -34,10 +37,13 @@ const updatedVisibility = () => {
     installButtonVisible.value = false
     return
   }
+
   const modes = ['fullscreen', 'standalone', 'minimal-ui']
+
   const matchedDisplay = 
     modes.some(mode => window.matchMedia(`(display-mode: ${mode})`).matches) ||  // android and windows
     window.navigator.standalone // for IOs
+
   const wasInstalled = localStorage.getItem("GestãoPWAinstalled") === "true"
 
   isInstalled.value = matchedDisplay || wasInstalled
@@ -49,6 +55,7 @@ const setupPWA = () => {
   updatedVisibility()
   document.addEventListener("visibilitychange", updatedVisibility)
 }
+
 const cleanupPWA = () => document.removeEventListener("visibilitychange", updatedVisibility)
 
 // public composable
@@ -56,6 +63,5 @@ const usePWA = () => {
   onMounted(() => setupPWA())
   onUnmounted(() => cleanupPWA())
 }
-
 
 export { usePWA, deferredPrompt, isInstalled, installButtonVisible, isIOS, isWeb, installApp, hideInstallButton }

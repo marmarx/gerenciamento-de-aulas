@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
-import { lang, currency } from '@/composables/utility'
+import { lang } from '@/composables/helpers/helpers.main'
+import { currency } from '@/composables/helpers/helpers.text'
 import { eventsInRange, chargableInRange, paymentsInRange }  from '@/modules/panorama/dateFilter'
 import { studentStats, currentRevenue, revenueGrowth } from '@/modules/panorama/panoramaStats'
 

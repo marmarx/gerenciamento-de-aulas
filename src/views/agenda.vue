@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useDataStore } from "@/stores/dataStore"
-import { filterRange, addDays } from '@/composables/utility'
+import { filterRange, addDays } from '@/composables/helpers/helpers.date'
 import cardEvent from '@/components/cardEvent.vue'
 
 const dataStore = useDataStore()

@@ -1,6 +1,8 @@
 import { computed } from 'vue'
 import { eventValue } from '@/composables/eventValue'
-import { shortDateLabel, formatDuration, currency } from '@/composables/utility'
+import { shortDateLabel } from '@/composables/helpers/helpers.utility'
+import { formatDuration } from '@/composables/helpers/helpers.time'
+import { currency } from '@/composables/helpers/helpers.text'
 import { chargableInRange, doneInRange, paymentsInRange, previousChargable, previousDone, previousPayments } from '@/modules/panorama/dateFilter'
 
 import { useDataStore } from "@/stores/dataStore"

@@ -3,7 +3,7 @@ import inputToggle from '@/modules/inputs/inputToggle.vue'
 import { toastShow } from '@/modules/toast/toastShow'
 
 import { computed } from 'vue'
-import { shortDateLabel } from '@/composables/utility'
+import { shortDateLabel } from '@/composables/helpers/helpers.utility'
 import { filterStart, filterEnd } from '@/modules/panorama/dateFilter'
 import { report } from '@/modules/panorama/panoramaReport'
 

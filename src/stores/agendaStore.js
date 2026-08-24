@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { watch, computed, onMounted, onBeforeUnmount } from 'vue'
-import { parseDate, dateISO } from '@/composables/utility'
+
+import { temporal } from '@/composables/helpers/helpers.temporal'
+import { parseDate, dateISO, addDays } from '@/composables/helpers/helpers.date'
+import { weekDay } from '@/composables/helpers/helpers.week'
+
 import { useDataStore } from "@/stores/dataStore"
 
 export const useAgendaStore = defineStore('agenda', () => {
@@ -56,7 +60,7 @@ export const useAgendaStore = defineStore('agenda', () => {
 
     if (!autoFinishEvents.value) return
 
-    const now = new Date()
+    const now = temporal.now()  // new Date()
     let nextDelay = Infinity
 
     // Compute next timeout threshold
@@ -67,7 +71,7 @@ export const useAgendaStore = defineStore('agenda', () => {
       if (!student || student.paused) return
 
       const start = parseDate(ev.date, ev.time)
-      const threshold = new Date(start.getTime() + autoFinishOffset.value * 60 * 1000)
+      const threshold = start + autoFinishOffset.value * 60 * 1000
       const overdue = threshold <= now
       if (overdue) { ev.status = 'done'; return }
 
@@ -116,7 +120,7 @@ export const useAgendaStore = defineStore('agenda', () => {
       if (e.status !== 'scheduled') return true     // keep canceled and done events
 
       const eventDate = parseDate(e.date, e.time || '23:59')
-      const finishThreshold = eventDate.getTime() + (autoFinishOffset.value * 60 * 1000)
+      const finishThreshold = eventDate + (autoFinishOffset.value * 60 * 1000)
 
       const hoursOverdue = (now - finishThreshold) / (60 * 60 * 1000)
       const removalOverdue = hoursOverdue >= removalGraceHours.value
@@ -137,9 +141,9 @@ export const useAgendaStore = defineStore('agenda', () => {
     const datesToCheck = []
 
     for (let d = 0; d <= numberOfDays.value; d++) {
-      const date = new Date()
-      date.setDate(date.getDate() + d)
-      datesToCheck.push({ dateISO: dateISO(date), weekDay: date.getDay() })
+      const dateISO = addDays(d, temporal.now())
+      const ms = parseDate(dateISO)
+      datesToCheck.push({ dateISO, weekDay: weekDay(ms) })
     }
 
     const studentsWithSchedule = students.value.filter(s => Array.isArray(s.weekly_schedule) && s.weekly_schedule.length > 0)
@@ -171,9 +175,9 @@ export const useAgendaStore = defineStore('agenda', () => {
 
     // Remove auto-created events that are no longer valid (do NOT remove manual events)
     dataStore.data.events = [...dataStore.data.events].filter(e => {
-      if (e.added_manually) return true                           // keep events added manually
-      if (parseDate(e.date, e.time) < new Date()) return true     // keep past events
-      if (!e.genKey) return true                                  // keep legacy events
+      if (e.added_manually) return true                               // keep events added manually
+      if (parseDate(e.date, e.time) < temporal.now()) return true     // keep past events
+      if (!e.genKey) return true                                      // keep legacy events
       return validGenKeys.has(e.genKey)
     })
   }
@@ -202,10 +206,11 @@ export const useAgendaStore = defineStore('agenda', () => {
 
     // prepare date range
     const datesToCheck = []
+
     for (let d = 0; d <= numberOfDays.value; d++) {
-      const date = new Date()
-      date.setDate(date.getDate() + d)
-      datesToCheck.push({ dateISO: dateISO(date), weekDay: date.getDay() })
+      const dateISO = addDays(d, temporal.now())
+      const ms = parseDate(dateISO)
+      datesToCheck.push({ dateISO, weekDay: weekDay(ms) })
     }
 
     // collect valid keys for this student only
@@ -234,10 +239,10 @@ export const useAgendaStore = defineStore('agenda', () => {
 
     // Remove obsolete auto-created events for this student only (keep manual and past events)
     dataStore.data.events = [...dataStore.data.events].filter(e => {
-      if (e.id_student !== id_student) return true              // keep other student's events unchanged
-      if (parseDate(e.date, e.time) < new Date()) return true   // keep past events
-      if (e.added_manually) return true                         // keep events added manually
-      if (!e.genKey) return true                                // keep legacy events
+      if (e.id_student !== id_student) return true                  // keep other student's events unchanged
+      if (parseDate(e.date, e.time) < temporal.now()) return true   // keep past events
+      if (e.added_manually) return true                             // keep events added manually
+      if (!e.genKey) return true                                    // keep legacy events
       return validGenKeysForStudent.has(e.genKey)
     })
   }

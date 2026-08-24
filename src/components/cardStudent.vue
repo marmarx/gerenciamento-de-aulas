@@ -2,7 +2,9 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDataStore } from "@/stores/dataStore"
-import { horaBR, currency, shortWeekdays } from '@/composables/utility'
+import { horaBR } from '@/composables/helpers/helpers.time'
+import { shortWeekdays } from '@/composables/helpers/helpers.week'
+import { currency } from '@/composables/helpers/helpers.text'
 import { eventValue } from '@/composables/eventValue'
 
 const props = defineProps({ id: { type: String, required: true } }) // student id
