@@ -1,8 +1,9 @@
 import { fallbackNumber } from '@/composables/helpers/helpers.utility'
 import { mapsLink, whatsappLink } from '@/composables/helpers/helpers.text'
 import { parseDate, dateISO } from '@/composables/helpers/helpers.date'
-import { formatDuration } from '@/composables/helpers/helpers.time'
+import { addTime, formatDuration } from '@/composables/helpers/helpers.time'
 import { temporal } from '@/composables/helpers/helpers.temporal'
+import { pad } from '@/composables/helpers/helpers.text'
 
 
 // notifications will be set only for events/birthdays within the next n days
@@ -47,8 +48,8 @@ const isNewDay = (lastRefreshDate) => {
 const notifyEventAt = (event, minutesBefore) => {
   if (!event.date || !event.time) return
 
-  const eventDate = parseDate(event.date, event.time)
-  const notifyAt = eventDate - minutesBefore * 60 * 1000 // minutes to milliseconds
+  const eventMs = parseDate(event.date, event.time)
+  const notifyAt = eventMs - minutesBefore * 60 * 1000 // minutes to milliseconds
 
   const valid = checkTimespan(notifyAt)
   if (!valid) return
@@ -99,25 +100,27 @@ const getNextBirthday = (dob) => {
   if (!Number.isInteger(month) || !Number.isInteger(day)) return null
   
   const currentYear = temporal.year()
-  let birthday = parseDate(`${currentYear}-${month}-${day}`)
-  
-  const now = temporal.now()
-  if (birthday < now) birthday = parseDate(`${currentYear + 1}-${month}-${day}`)  // if birthday already passed this year → use next year
+  const nextBirthday = [currentYear, month, day].map(pad).join('-')
 
-  return birthday
+  const birthday = parseDate(nextBirthday)
+  const now = temporal.now()
+  if (birthday > now) return birthday
+
+  const nextYearBirthday = [currentYear + 1, month, day].map(pad).join('-') // if birthday already passed this year → use next year
+  return parseDate(nextYearBirthday)
 }
 
 // Set birthday notification date (one day before at 9 AM)
 const notifyBirthdayAt = (dob, dayBefore) => {
-  const notifyAt = getNextBirthday(dob)
-  if (!notifyAt) return
+  const nextBirthday = getNextBirthday(dob)
+  if (!nextBirthday) return
 
-  const day = notifyAt.getDate() - (dayBefore ? 1 : 0)
-  notifyAt.setDate(day)
-  notifyAt.setHours(9, 0, 0, 0)
+  const hoursBefore = dayBefore ? 15 : -9 // on previous day or same day at 9:00
+  const notifyAt = nextBirthday - hoursBefore * 60 * 60 * 1000
 
   const valid = checkTimespan(notifyAt)
   if (!valid) return
+
   return new Date(notifyAt)
 }
 

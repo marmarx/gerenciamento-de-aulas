@@ -4,6 +4,8 @@ import { Capacitor } from '@capacitor/core'
 import { App } from '@capacitor/app'
 import { toastShow } from '@/modules/toast/toastShow'
 
+import { temporal } from '@/composables/helpers/helpers.temporal'
+
 // shared state
 const transitionName = ref('slide-left')
 const windowWidth = ref(window.innerWidth)
@@ -28,7 +30,7 @@ const setBackGesture = () => {
     //({ canGoBack }) => {}  // `canGoBack` is provided by Capacitor, but we'll rely on Vue Router history
     if (router.options.history.state.back) router.back()
     else {
-      const now = Date.now()
+      const now = temporal.now()
       if (now - lastPress < 2000) App.exitApp()
       else {
         lastPress = now

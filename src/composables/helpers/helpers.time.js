@@ -14,8 +14,13 @@ export const horaBR = (hhmm) => {
   return `${h}h${m > 0 ? m : ''}`
 }
 
+export const addTime = (hours, minutes, date = temporal.dateISO()) => {
+  const plain = typeof date === 'string' && date.includes('-') 
+    ? Temporal.PlainDateTime.from(date)
+    : temporal.plainDateTime(typeof date === 'number' ? date : temporal.ms(date))
 
-
+  return plain.add({ hours, minutes }).toString()
+}
 
 export const formatDuration = (d) => {
   const hours = Math.floor(d)

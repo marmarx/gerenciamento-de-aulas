@@ -78,7 +78,7 @@ const exportStorage = async (data) => {
   const content = JSON.stringify(data, null, 2)
   if (!content) return
 
-  const filename = `${dateISO(Date.now())} - backup.json`
+  const filename = `${dateISO()} - backup.json`
   const blob = new Blob([content], { type: 'application/json' })
   
   // Web version

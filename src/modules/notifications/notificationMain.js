@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { hashUUID } from '@/modules/notifications/notificationHelper'
+import { temporal } from '@/composables/helpers/helpers.temporal'
 
 // ## PERMISSION REQUEST ##
 const permissionGranted = ref(false)
@@ -99,7 +100,7 @@ const testNotification = async () => {
       id: 999999,
       title: "Test notification",
       body: "Should fire in 10 seconds",
-      schedule: { at: new Date(Date.now() + 10000) }
+      schedule: { at: new Date(temporal.now() + 10000) }
     }]
   })
 }

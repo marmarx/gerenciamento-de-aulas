@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { temporal } from '@/composables/helpers/helpers.temporal'
 
 export const useToastStore = defineStore('toast', () => {
   const toasts = ref([])
@@ -21,10 +22,10 @@ export const useToastStore = defineStore('toast', () => {
 
   const startTicker = () => {
     if (ticker) return
-    let last = Date.now()
+    let last = temporal.now()
 
     ticker = setInterval(() => {
-      const now = Date.now()
+      const now = temporal.now()
       const delta = now - last
       last = now
 

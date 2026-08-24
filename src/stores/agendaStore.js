@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { watch, computed, onMounted, onBeforeUnmount } from 'vue'
 
 import { temporal } from '@/composables/helpers/helpers.temporal'
-import { parseDate, dateISO, addDays } from '@/composables/helpers/helpers.date'
+import { parseDate, addDays } from '@/composables/helpers/helpers.date'
 import { weekDay } from '@/composables/helpers/helpers.week'
 
 import { useDataStore } from "@/stores/dataStore"
@@ -60,7 +60,7 @@ export const useAgendaStore = defineStore('agenda', () => {
 
     if (!autoFinishEvents.value) return
 
-    const now = temporal.now()  // new Date()
+    const now = temporal.now()
     let nextDelay = Infinity
 
     // Compute next timeout threshold
@@ -114,7 +114,7 @@ export const useAgendaStore = defineStore('agenda', () => {
   const stripUndonePastEvents = () => {
     if (!autoFinishEvents.value && !autoRemovePastEvents.value) return
 
-    const now = Date.now()
+    const now = temporal.now()
     dataStore.data.events = [...dataStore.data.events].filter(e => {
       if (e.added_manually) return true             // keep manual events
       if (e.status !== 'scheduled') return true     // keep canceled and done events

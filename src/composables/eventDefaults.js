@@ -105,7 +105,7 @@ export function useEventDefaults(event) {
       event.canceledAt = null
     } else {
       event.status = 'canceled'
-      event.canceledAt = Date.now()
+      event.canceledAt = temporal.now()
     }
   }
 
