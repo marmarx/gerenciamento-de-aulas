@@ -1,7 +1,7 @@
 import { fallbackNumber } from '@/composables/helpers/helpers.utility'
 import { mapsLink, whatsappLink } from '@/composables/helpers/helpers.text'
 import { parseDate, dateISO } from '@/composables/helpers/helpers.date'
-import { addTime, formatDuration } from '@/composables/helpers/helpers.time'
+import { formatDuration } from '@/composables/helpers/helpers.time'
 import { temporal } from '@/composables/helpers/helpers.temporal'
 import { pad } from '@/composables/helpers/helpers.text'
 

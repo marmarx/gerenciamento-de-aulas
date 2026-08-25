@@ -3,6 +3,7 @@ import { currency, toSentenceCase } from '@/composables/helpers/helpers.text'
 import { parseDate, dateLabel } from '@/composables/helpers/helpers.date'
 import { weekLabel } from '@/composables/helpers/helpers.week'
 import { timeISO, horaBR, formatDuration } from '@/composables/helpers/helpers.time'
+import { temporal } from '@/composables/helpers/helpers.temporal'
 
 import { computed } from 'vue'
 import { eventValue } from '@/composables/eventValue'
@@ -65,8 +66,9 @@ const groupedByMonth = computed(() => {
   const items = [...history.value].reverse()
 
   for (const item of items) {
-    const d = parseDate(item.date, item.time)
-    const monthKey = d.toLocaleString('default', { month: 'long', year: 'numeric' })
+    const ms = parseDate(item.date, item.time)
+
+    const monthKey = temporal.localeDateTime(ms, { month: 'long', year: 'numeric' }) //d.toLocaleString('default', { month: 'long', year: 'numeric' })
     if (!groups[monthKey]) groups[monthKey] = {
       month: monthKey,
       items: [],

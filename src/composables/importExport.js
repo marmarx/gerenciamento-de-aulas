@@ -201,7 +201,7 @@ const exportXLSX = async (data) => {
           newObj[prop] = cell
             .map((item, key) => {
               if ("weekDay" in item && "timeDay" in item) {
-                if (typeof item.weekDay === 'number') return `${longWeekdays[item.weekDay]} ${item.timeDay}`
+                if (typeof item.weekDay === 'number') return `${longWeekdays[item.weekDay].label} ${item.timeDay}`
                 return null
               }
               return Object.values(item).join(" ")

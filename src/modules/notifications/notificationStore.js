@@ -47,8 +47,6 @@ export const useNotificationStore = defineStore('notificationStore', () => {
 
     const notifications = [...evNotifications, ...birthdays]
     if(!notifications.length) return
-
-    console.log(notifications)
     
     // console.log(`[notificationStore] Scheduling notifications for ${evNotifications.length} event(s) and ${birthdays.length} birthdays(s)`)
     await scheduleNotifications(notifications)

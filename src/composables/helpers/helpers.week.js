@@ -11,15 +11,19 @@ export const shortWeekday = (d, size = 'short') => {
 
 export const longWeekday = d => shortWeekday(d, 'long')
 
-export const weekdayFromIndex = (size) => Array.from({ length: 7 })
-  .map((_, i) => {
-    const date = `2025-11-${16 + i + weekstart}`  // 2025-11-16 is a Sunday — day 0
-    return size === 'long' ? longWeekday(date) : shortWeekday(date)
-  })
+const weekdayFromIndex = (size) => {
+  const weekdays = []
+  for (let i = 0; i < 7; i++)  {
+    const date = `2026-08-${24 + i + weekstart}`  // 2026-08-24 is a Monday
+    const label = shortWeekday(date, size)
+    const value = Temporal.PlainDate.from(date).dayOfWeek
+    weekdays.push({ value, label })
+  }
+  return weekdays
+}
 
 export const shortWeekdays = weekdayFromIndex('short')
 export const longWeekdays =  weekdayFromIndex('long')
-
 
 // Returns "Hoje", "Amanhã", "Ontem", or the abbreviated weekday ("Seg", "Ter", etc)
 export const weekLabel = (d) => {

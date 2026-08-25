@@ -15,7 +15,7 @@ import { shortWeekdays } from '@/composables/helpers/helpers.week'
 import { horaBR, formatDuration } from '@/composables/helpers/helpers.time'
 import { eventValue } from '@/composables/eventValue'
 
-const studentSchedules = computed(() => student.weekly_schedule.filter(e => e.weekDay && e.timeDay).map(e => `${shortWeekdays[e.weekDay]} ${horaBR(e.timeDay)}`).join('  •  '))
+const studentSchedules = computed(() => student.weekly_schedule.filter(e => e.weekDay && e.timeDay).map(e => `${shortWeekdays[e.weekDay].label} ${horaBR(e.timeDay)}`).join('  •  '))
 
 const scheduledEvs   = computed(() => dataStore.scheduledEvents.filter(e => e.id_student === student.id_student))
 const canceledEvents = computed(() => dataStore.canceledEvents.filter(e => e.id_student === student.id_student))

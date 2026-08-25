@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { eventValue } from '@/composables/eventValue'
-import { shortDateLabel } from '@/composables/helpers/helpers.utility'
+import { shortDateLabel } from '@/composables/helpers/helpers.date'
 import { formatDuration } from '@/composables/helpers/helpers.time'
 import { currency } from '@/composables/helpers/helpers.text'
 import { chargableInRange, doneInRange, paymentsInRange, previousChargable, previousDone, previousPayments } from '@/modules/panorama/dateFilter'

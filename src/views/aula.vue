@@ -7,7 +7,6 @@ import inputHelp from '@/modules/inputs/inputHelp.vue'
 import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { temporal } from '@/composables/helpers/helpers.temporal'
 import { currency } from '@/composables/helpers/helpers.text'
 import { shortDateLabel } from '@/composables/helpers/helpers.date'
 import { formatDuration, formatDur } from '@/composables/helpers/helpers.time'

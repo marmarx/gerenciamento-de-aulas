@@ -13,10 +13,11 @@ const router = useRouter()
 const dataStore = useDataStore()
 
 const student = dataStore.sortedStudents.find(s => s.id_student === props.id)
+
 const studentSchedules = computed(() => {
   const schedule = student.weekly_schedule.filter(e => e.weekDay || e.timeDay)
   if(!schedule.length) return 'Nenhum horário'
-  return schedule.map(e => `${shortWeekdays[e.weekDay]} ${horaBR(e.timeDay)}`).join('  •  ')
+  return schedule.map(e => `${shortWeekdays[e.weekDay].label} ${horaBR(e.timeDay)}`).join('  •  ')
 })
 
 const chargableEvents = computed(() => dataStore.chargableEvents.filter(e => e.id_student === student.id_student))

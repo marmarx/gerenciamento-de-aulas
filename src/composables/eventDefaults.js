@@ -79,7 +79,7 @@ export function useEventDefaults(event) {
     if (!event.date || !event.time || !event.dateEnd || !event.timeEnd) return false
 
     const startA = parseDate(event.date, event.time)
-    const endA   = parseDate(event.dateEnd, event.timeEnd)
+    let endA   = parseDate(event.dateEnd, event.timeEnd)
 
     if (startA === endA) endA = startA + 60 * 1000 //edge case: event has 0 duration -> treat as 1 minute event
 

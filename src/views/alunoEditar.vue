@@ -109,10 +109,9 @@ onBeforeUnmount(async () => {
         <inputText id="scholl" type="text"  placeholder="Escola"              v-model="student.scholl" />
         <inputText id="year"   type="text"  placeholder="Série"               v-model="student.year" />
         <hr/>
-
         <h4>Aulas e horários</h4>
         <div class="inputFlex schedule" v-for="(schedule, j) in student.weekly_schedule" :key="j">
-          <inputSelect :id="`wday-${j}`" :defaultDisabled="false" defaultText="Dia da semana" placeholder="Dia" :options="longWeekdays" label="" value="" v-model="schedule.weekDay" />
+          <inputSelect :id="`wday-${j}`" :defaultDisabled="false" defaultText="Dia da semana" placeholder="Dia" :options="longWeekdays" label="label" value="value" v-model="schedule.weekDay" />
           <inputText   :id="`time-${j}`" type="time"  placeholder="Horário"  v-model="schedule.timeDay" />
           <!-- <inputText   :id="`subj-${j}`" type="text"  placeholder="Matéria"  v-model="schedule.subject" /> -->
         </div>

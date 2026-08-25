@@ -2,8 +2,11 @@ import { temporal } from "./helpers.temporal";
 
 export const parseDate = (d, t = '00:00') => temporal.ms(d, t)
 
-export const isValidDate = (d) => {
-  try { Temporal.PlainDate.from(d); return true }   // true for valid date strings
+export const isValidDate = (date) => {
+  try {
+    if(typeof date === 'string' && date.includes('-')) { Temporal.PlainDate.from(date); return true }   // true for valid date strings
+    temporal.plainDate(typeof date === 'number' ? date : temporal.ms(date)); return true
+  }
   catch (error) { return false }
 }
 
